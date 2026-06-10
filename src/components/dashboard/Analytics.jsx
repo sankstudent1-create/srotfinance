@@ -26,7 +26,7 @@ const DonutChart = ({ segments, size = 140, thickness = 22, label, sub }) => {
             <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
                 {/* Track */}
                 <circle cx={C} cy={C} r={R} fill="none"
-                    stroke="rgba(255,255,255,0.05)" strokeWidth={thickness} />
+                    stroke="var(--color-border-main)" strokeWidth={thickness} />
                 {/* Segments */}
                 {segments.map((seg, i) => {
                     const pct = total > 0 ? seg.value / total : 0;
@@ -50,8 +50,8 @@ const DonutChart = ({ segments, size = 140, thickness = 22, label, sub }) => {
                 position: 'absolute', inset: 0, display: 'flex',
                 flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             }}>
-                <span className="text-white" style={{ fontSize: 13, fontWeight: 900, lineHeight: 1 }}>{label}</span>
-                {sub && <span className="text-slate-400" style={{ fontSize: 9, marginTop: 2, fontWeight: 600 }}>{sub}</span>}
+                <span className="text-[var(--color-main)]" style={{ fontSize: 13, fontWeight: 900, lineHeight: 1 }}>{label}</span>
+                {sub && <span className="text-[var(--color-muted)]" style={{ fontSize: 9, marginTop: 2, fontWeight: 600 }}>{sub}</span>}
             </div>
         </div>
     );
@@ -66,7 +66,7 @@ const MiniDonut = ({ segments, size = 56, thickness = 10 }) => {
     let off = 0;
     return (
         <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
-            <circle cx={C} cy={C} r={R} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={thickness} />
+            <circle cx={C} cy={C} r={R} fill="none" stroke="var(--color-border-main)" strokeWidth={thickness} />
             {segments.map((seg, i) => {
                 const dash = total > 0 ? (seg.value / total) * cir : 0;
                 const el = (
@@ -148,22 +148,22 @@ export const AnalyticsDashboard = ({ transactions }) => {
             {/* ── ROW 1: Savings Rate + Top Expense ───────────────── */}
             <motion.div variants={fade} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Savings rate card */}
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-7 relative overflow-hidden backdrop-blur-3xl">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-7 relative overflow-hidden backdrop-blur-3xl">
                     <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 opacity-60" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-2.5 mb-5">
                             <div className="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-xl"><Target size={20} /></div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Savings Rate</p>
+                            <p className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest">Savings Rate</p>
                         </div>
                         <div className="flex items-end gap-4 mb-4">
                             <p className={`text-5xl font-black tracking-tighter ${a.savingsRate >= 20 ? 'text-emerald-600' : a.savingsRate >= 0 ? 'text-amber-600' : 'text-rose-600'}`}>
                                 {a.savingsRate.toFixed(1)}%
                             </p>
                             <div className="mb-1.5">
-                                <p className="text-xs text-slate-400">{fmt(a.savings)} saved</p>
+                                <p className="text-xs text-[var(--color-muted)]">{fmt(a.savings)} saved</p>
                             </div>
                         </div>
-                        <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="w-full h-2.5 bg-[var(--color-border-main)] rounded-full overflow-hidden">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.min(Math.max(a.savingsRate, 0), 100)}%` }}
@@ -171,23 +171,23 @@ export const AnalyticsDashboard = ({ transactions }) => {
                                 className={`h-full rounded-full ${a.savingsRate >= 20 ? 'bg-emerald-500' : a.savingsRate >= 0 ? 'bg-amber-500' : 'bg-rose-500'}`}
                             />
                         </div>
-                        <p className="text-xs text-slate-400 mt-2.5">
+                        <p className="text-xs text-[var(--color-muted)] mt-2.5">
                             {a.savingsRate >= 20 ? '🎉 Great savings habit!' : a.savingsRate >= 0 ? '⚡ Room for improvement' : '⚠️ Spending exceeds income'}
                         </p>
                     </div>
                 </div>
 
                 {/* Top Expense */}
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-7 relative overflow-hidden backdrop-blur-3xl">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-7 relative overflow-hidden backdrop-blur-3xl">
                     <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-orange-500/10 opacity-60" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-2.5 mb-5">
                             <div className="p-2.5 bg-orange-500/20 text-orange-400 rounded-xl"><Flame size={20} /></div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top Expense</p>
+                            <p className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest">Top Expense</p>
                         </div>
-                        <p className="text-3xl font-black text-white tracking-tight mb-1">{a.topExpCat[0]}</p>
+                        <p className="text-3xl font-black text-[var(--color-main)] tracking-tight mb-1">{a.topExpCat[0]}</p>
                         <p className="text-xl font-bold text-orange-400 mb-3">{fmt(a.topExpCat[1])}</p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-[var(--color-muted)]">
                             {a.totalExpense > 0
                                 ? `${((a.topExpCat[1] / a.totalExpense) * 100).toFixed(0)}% of total spending`
                                 : 'No expenses yet'}
@@ -199,10 +199,10 @@ export const AnalyticsDashboard = ({ transactions }) => {
             {/* ── ROW 2: Donut Charts ──────────────────────────────── */}
             <motion.div variants={fade} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Expense donut */}
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-6 backdrop-blur-3xl">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-6 backdrop-blur-3xl">
                     <div className="flex items-center gap-2.5 mb-5">
                         <div className="p-2.5 bg-rose-500/20 text-rose-400 rounded-xl"><ArrowUpRight size={18} /></div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Expense Breakdown</p>
+                        <p className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest">Expense Breakdown</p>
                     </div>
                     <div className="flex items-center gap-5">
                         <DonutChart
@@ -218,10 +218,10 @@ export const AnalyticsDashboard = ({ transactions }) => {
                                         className="w-2.5 h-2.5 rounded-full flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-xs font-semibold text-slate-300 truncate">{cat}</span>
-                                            <span className="text-xs font-bold text-white ml-2 tabular-nums">{fmt(val)}</span>
+                                            <span className="text-xs font-semibold text-[var(--color-dim)] truncate">{cat}</span>
+                                            <span className="text-xs font-bold text-[var(--color-main)] ml-2 tabular-nums">{fmt(val)}</span>
                                         </div>
-                                        <div className="w-full h-1 bg-white/10 rounded-full mt-0.5">
+                                        <div className="w-full h-1 bg-[var(--color-border-main)] rounded-full mt-0.5">
                                             <div className="h-full rounded-full transition-all"
                                                 style={{
                                                     width: `${a.totalExpense > 0 ? (val / a.totalExpense) * 100 : 0}%`,
@@ -231,16 +231,16 @@ export const AnalyticsDashboard = ({ transactions }) => {
                                     </div>
                                 </div>
                             ))}
-                            {a.sortedExp.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No data yet</p>}
+                            {a.sortedExp.length === 0 && <p className="text-xs text-[var(--color-muted)] text-center py-4">No data yet</p>}
                         </div>
                     </div>
                 </div>
 
                 {/* Income donut */}
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-6 backdrop-blur-3xl">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-6 backdrop-blur-3xl">
                     <div className="flex items-center gap-2.5 mb-5">
                         <div className="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-xl"><ArrowDownLeft size={18} /></div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Income Sources</p>
+                        <p className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest">Income Sources</p>
                     </div>
                     <div className="flex items-center gap-5">
                         <DonutChart
@@ -256,17 +256,17 @@ export const AnalyticsDashboard = ({ transactions }) => {
                                         className="w-2.5 h-2.5 rounded-full flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-xs font-semibold text-slate-300 truncate">{cat}</span>
+                                            <span className="text-xs font-semibold text-[var(--color-dim)] truncate">{cat}</span>
                                             <span className="text-xs font-bold text-emerald-400 ml-2 tabular-nums">{fmt(val)}</span>
                                         </div>
-                                        <div className="w-full h-1 bg-white/10 rounded-full mt-0.5">
+                                        <div className="w-full h-1 bg-[var(--color-border-main)] rounded-full mt-0.5">
                                             <div className="h-full rounded-full bg-emerald-500 transition-all"
                                                 style={{ width: `${a.totalIncome > 0 ? (val / a.totalIncome) * 100 : 0}%` }} />
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            {a.sortedInc.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No data yet</p>}
+                            {a.sortedInc.length === 0 && <p className="text-xs text-[var(--color-muted)] text-center py-4">No data yet</p>}
                         </div>
                     </div>
                 </div>
@@ -274,12 +274,12 @@ export const AnalyticsDashboard = ({ transactions }) => {
 
             {/* ── ROW 3: Health Score ──────────────────────────────── */}
             <motion.div variants={fade}>
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-7 backdrop-blur-3xl">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-7 backdrop-blur-3xl">
                     <div className="flex items-center gap-2.5 mb-6">
                         <div className="p-2.5 rounded-xl" style={{ background: `${a.healthColor}18` }}>
                             <Shield size={20} style={{ color: a.healthColor }} />
                         </div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Financial Health Score</p>
+                        <p className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest">Financial Health Score</p>
                     </div>
                     <div className="flex items-center gap-8">
                         {/* Circular gauge */}
@@ -296,22 +296,22 @@ export const AnalyticsDashboard = ({ transactions }) => {
                                 />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-3xl font-black text-white">{a.healthScore}</span>
-                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">/100</span>
+                                <span className="text-3xl font-black text-[var(--color-main)]">{a.healthScore}</span>
+                                <span className="text-[9px] font-bold text-[var(--color-muted)] uppercase tracking-wider">/100</span>
                             </div>
                         </div>
                         <div className="flex-1">
                             <p className="text-2xl font-black mb-1" style={{ color: a.healthColor }}>{a.healthLabel}</p>
-                            <p className="text-xs text-slate-400 mb-4">Based on savings rate, income vs. expense ratio</p>
+                            <p className="text-xs text-[var(--color-muted)] mb-4">Based on savings rate, income vs. expense ratio</p>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {[
-                                    { label: 'Transactions', val: a.txCount, color: 'text-white', bg: 'bg-white/5' },
+                                    { label: 'Transactions', val: a.txCount, color: 'text-[var(--color-main)]', bg: 'bg-white/5' },
                                     { label: 'Avg Income', val: fmt(a.avgInc), color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
                                     { label: 'Avg Expense', val: fmt(a.avgExp), color: 'text-rose-400', bg: 'bg-rose-500/10' },
                                     { label: 'Net Saved', val: fmt(a.savings), color: 'text-orange-400', bg: 'bg-orange-500/10' },
                                 ].map(({ label, val, color, bg }) => (
                                     <div key={label} className={`${bg} p-3 rounded-2xl text-center`}>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+                                        <p className="text-[9px] font-bold text-[var(--color-muted)] uppercase tracking-wider mb-1">{label}</p>
                                         <p className={`text-base font-black ${color}`}>{val}</p>
                                     </div>
                                 ))}
@@ -323,14 +323,14 @@ export const AnalyticsDashboard = ({ transactions }) => {
 
             {/* ── ROW 4: Trend Charts ──────────────────────────────── */}
             <motion.div variants={fade} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-6 backdrop-blur-3xl">
-                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-6 backdrop-blur-3xl">
+                    <h3 className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest mb-5 flex items-center gap-2">
                         <BarChart3 size={14} className="text-rose-500" /> Expense Trend (monthly)
                     </h3>
                     <TrendBarChart transactions={transactions} type="expense" />
                 </div>
-                <div className="bg-[#181A20]/80 rounded-3xl border border-white/5 shadow-md p-6 backdrop-blur-3xl">
-                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl rounded-3xl border border-[var(--color-border-main)] shadow-md p-6 backdrop-blur-3xl">
+                    <h3 className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest mb-5 flex items-center gap-2">
                         <BarChart3 size={14} className="text-emerald-500" /> Income Trend (monthly)
                     </h3>
                     <TrendBarChart transactions={transactions} type="income" />
@@ -339,36 +339,36 @@ export const AnalyticsDashboard = ({ transactions }) => {
 
             {/* ── ROW 5: Mini Income vs Expense donut ─────────────── */}
             <motion.div variants={fade}>
-                <div className="bg-[#181A20]/80 border border-white/5 rounded-3xl p-6 relative overflow-hidden shadow-[0_10px_40px_rgba(249,115,22,0.1)] backdrop-blur-3xl">
+                <div className="bg-[var(--color-surface)] backdrop-blur-3xl border border-[var(--color-border-main)] rounded-3xl p-6 relative overflow-hidden shadow-[0_10px_40px_rgba(249,115,22,0.1)] backdrop-blur-3xl">
                     <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-400 via-pink-400 to-violet-400 rounded-t-3xl" />
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div>
-                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">Income vs Expense</p>
+                            <p className="text-[10px] font-bold text-[var(--color-main)]/40 uppercase tracking-widest mb-3">Income vs Expense</p>
                             <div className="flex items-center gap-6">
                                 <div>
-                                    <p className="text-[9px] text-white/40 font-semibold uppercase tracking-wider mb-1">Income</p>
+                                    <p className="text-[9px] text-[var(--color-main)]/40 font-semibold uppercase tracking-wider mb-1">Income</p>
                                     <p className="text-xl font-black text-emerald-400">{fmt(a.totalIncome)}</p>
                                 </div>
-                                <div className="w-px h-10 bg-white/10" />
+                                <div className="w-px h-10 bg-[var(--color-border-main)]" />
                                 <div>
-                                    <p className="text-[9px] text-white/40 font-semibold uppercase tracking-wider mb-1">Expense</p>
+                                    <p className="text-[9px] text-[var(--color-main)]/40 font-semibold uppercase tracking-wider mb-1">Expense</p>
                                     <p className="text-xl font-black text-rose-400">{fmt(a.totalExpense)}</p>
                                 </div>
-                                <div className="w-px h-10 bg-white/10" />
+                                <div className="w-px h-10 bg-[var(--color-border-main)]" />
                                 <div>
-                                    <p className="text-[9px] text-white/40 font-semibold uppercase tracking-wider mb-1">Net</p>
-                                    <p className={`text-xl font-black ${a.savings >= 0 ? 'text-white' : 'text-rose-400'}`}>{fmt(a.savings)}</p>
+                                    <p className="text-[9px] text-[var(--color-main)]/40 font-semibold uppercase tracking-wider mb-1">Net</p>
+                                    <p className={`text-xl font-black ${a.savings >= 0 ? 'text-[var(--color-main)]' : 'text-rose-400'}`}>{fmt(a.savings)}</p>
                                 </div>
                             </div>
                             {/* Balance bar */}
                             {a.totalIncome > 0 && (
                                 <div className="mt-4 w-48">
-                                    <div className="h-2 bg-white/10 rounded-full overflow-hidden flex">
+                                    <div className="h-2 bg-[var(--color-border-main)] rounded-full overflow-hidden flex">
                                         <div className="h-full bg-emerald-400 rounded-l-full"
                                             style={{ width: `${Math.min((a.totalIncome / (a.totalIncome + a.totalExpense)) * 100, 100)}%` }} />
                                         <div className="h-full bg-rose-400 flex-1 rounded-r-full" />
                                     </div>
-                                    <div className="flex justify-between text-[9px] text-white/30 mt-1">
+                                    <div className="flex justify-between text-[9px] text-[var(--color-main)]/30 mt-1">
                                         <span>Income</span><span>Expense</span>
                                     </div>
                                 </div>
