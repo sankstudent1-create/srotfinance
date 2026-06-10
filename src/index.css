@@ -357,3 +357,37 @@ body {
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
 }
+/* LIGHT THEME FORCED INPUT VISIBILITY FIX */
+:root.light-mode input[type='text'],
+:root.light-mode input[type='number'],
+:root.light-mode input[type='password'],
+:root.light-mode input[type='email'],
+:root.light-mode textarea,
+:root.light-mode select {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-main) !important;
+    border-color: rgba(0,0,0,0.15) !important;
+}
+
+:root.light-mode input::placeholder,
+:root.light-mode textarea::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Fix Calculator Modal generic text if overlapping */
+:root.light-mode .text-white,
+:root.light-mode .text-slate-200,
+:root.light-mode .text-slate-300 {
+    color: var(--text-main);
+}
+:root.light-mode .text-slate-400,
+:root.light-mode .text-gray-400 {
+    color: var(--text-dim);
+}
+/* EXCEPTIONS: Orange buttons must keep white text */
+:root.light-mode .bg-orange-500,
+:root.light-mode .bg-orange-600,
+:root.light-mode .text-white.bg-orange-500 {
+    color: #ffffff !important;
+}
+

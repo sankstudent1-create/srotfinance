@@ -31,6 +31,13 @@ export const PrintStyles = () => (
             background: #fff;
             position: relative;
         }
+        .strict-page {
+            height: 297mm;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
         .pg-break { page-break-after: always; break-after: page; }
         .no-break  { page-break-inside: avoid; break-inside: avoid; }
 
@@ -91,19 +98,22 @@ const PageHeader = ({ user, subtitle, page, totalPages }) => (
 /* ================================================================== */
 /*  SHARED: PAGE FOOTER                                                 */
 /* ================================================================== */
-// Inline footers instead of absolute so it doesn't overlap text when flowing naturally
-const PageFooter = () => (
+const PageFooter = ({ page, total }) => (
     <div style={{
-        marginTop: 40,
+        marginTop: 'auto',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         borderTop: '1px solid #e2e8f0', paddingTop: 10
     }}>
-        <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
-            Orange Finance · Generated automatically
-        </span>
-        <span style={{ fontSize: 8, color: '#cbd5e1', fontWeight: 600 }}>
-            orangefin.com
-        </span>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                ORANGE FINANCE
+            </span>
+            <span style={{ fontSize: 8, color: '#cbd5e1' }}>|</span>
+            <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>CONFIDENTIAL</span>
+        </div>
+        <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
+            {page && total ? `Page ${page} of ${total}` : 'orangefinance.com'}
+        </div>
     </div>
 );
 
@@ -125,16 +135,13 @@ export const CalculatorReport = ({ data, user }) => {
     const invPct = (invested + returns) > 0 ? (invested / (invested + returns) * 100) : 50;
     const retPct = 100 - invPct;
 
-    // Tool-specific tax label
-    const isPPF = toolName?.toLowerCase().includes('ppf');
-    const isEquity = toolName?.toLowerCase().includes('sip') || toolName?.toLowerCase().includes('lumpsum');
-
     /* ── Page 1 ──────────────────────────────────────────────── */
     return (
         <>
-            <div className="print-page" style={{ paddingBottom: '30mm' }}>
-                <PrintStyles />
-                <PageHeader user={user} subtitle="Investment Report" page={1} totalPages={2} />
+            <PrintStyles />
+            {/* ── PAGE 1 — Summary ──────────────────────── */}
+            <div className="print-page strict-page">
+                <PageHeader user={user} subtitle={`${toolName} Report`} page={1} totalPages={2} />
 
                 {/* Tool name eyebrow */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
@@ -258,11 +265,11 @@ export const CalculatorReport = ({ data, user }) => {
                     </p>
                 </div>
 
-                <PageFooter />
+                <PageFooter page={1} total={2} />
             </div>
 
             {/* ── PAGE 2 — Year-wise Analysis ──────────────────────── */}
-            <div className="print-page pg-break" style={{ paddingBottom: '20mm' }}>
+            <div className="print-page pg-break strict-page">
                 <PageHeader user={user} subtitle="Yearly Breakdown" page={2} totalPages={2} />
                 
                 <h2 className="mont" style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.04em', marginBottom: 16 }}>
@@ -679,7 +686,7 @@ export const AgeReport = ({ data, user }) => {
     const { toolName, inputs, result } = data;
     
     return (
-        <div className="print-page" style={{ paddingBottom: '30mm' }}>
+        <div className="print-page strict-page">
             <PrintStyles />
             <PageHeader user={user} subtitle="Age & Life Report" page={1} totalPages={1} />
 
@@ -775,7 +782,7 @@ export const AgeReport = ({ data, user }) => {
                 </div>
             </div>
 
-            <PageFooter />
+            <PageFooter page={1} total={1} />
         </div>
     );
 };
