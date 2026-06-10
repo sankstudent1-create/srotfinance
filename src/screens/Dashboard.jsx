@@ -718,7 +718,6 @@ export const Dashboard = ({ session }) => {
             min-height: 297mm;
             background: #ffffff;
             z-index: -9999;
-            opacity: 0.001;
             pointer-events: none;
             overflow: visible;
         `;

@@ -265,7 +265,7 @@ export const SettingsModal = ({ isOpen, onClose, user, avatarUrl, onAvatarUpload
 
             // Step 1: Render the premium AnalyticsReport off-screen (Truly Silent)
             const container = document.createElement('div');
-            container.style.cssText = 'position:fixed;left:-10000px;top:-10000px;width:210mm;background:#fff;z-index:-9999;opacity:0.001;pointer-events:none;';
+            container.style.cssText = 'position:fixed;left:-10000px;top:-10000px;width:210mm;background:#fff;z-index:-9999;pointer-events:none;';
             document.body.appendChild(container);
 
             // Create React root and render

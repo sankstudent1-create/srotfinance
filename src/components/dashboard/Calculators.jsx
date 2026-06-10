@@ -685,7 +685,7 @@ const getZodiac = (month, day) => {
     return ZODIAC[0];
 };
 
-const AgeCalculator = ({ onPrint, onShare, isSharing, translate }) => {
+const AgeCalculator = ({ onPrint, onDownload, onShare, isSharing, translate }) => {
     const [dob, setDob] = useState('');
     const [ageData, setAgeData] = useState(null);
     const [now, setNow] = useState(new Date());
