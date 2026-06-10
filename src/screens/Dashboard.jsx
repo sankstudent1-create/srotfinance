@@ -754,52 +754,80 @@ export const Dashboard = ({ session }) => {
             return null;
         }
 
-        // Step 3: Capture at ULTRA resolution
-        // windowWidth: 1200 helps prevent layout compression/iOS "half-side" issues
-        const canvas = await html2canvas(captureTarget, {
-            scale: 3, // Increased to 3x for ultra-sharp prints without hitting browser mem limits
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#ffffff',
-            logging: false,
-            width: 794, // Fixed A4 width (px)
-            height: captureTarget.scrollHeight,
-            windowWidth: 1200, // Forces a wider viewport during capture to avoid mobile truncation
-            windowHeight: Math.max(1200, captureTarget.scrollHeight + 100),
-            scrollX: 0,
-            scrollY: 0,
-            onclone: (doc) => {
-                const containerClone = doc.getElementById('pdf-hidden-container');
-                if (containerClone) {
-                    containerClone.style.left = '0px';
-                    containerClone.style.top = '0px';
-                }
-                const el = doc.getElementById('print-root-temp');
-                if (el) {
-                    el.style.opacity = '1';
-                    el.style.visibility = 'visible';
-                    el.style.display = 'block';
-                    el.style.position = 'relative';
-                    el.style.left = '0';
-                    el.style.top = '0';
-                    el.style.transform = 'none';
-                }
-            }
-        });
-
-        // Step 4: Multi-page assembly
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        // Step 3 & 4: Capture & Assembly
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = 210;
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
         const pageHeight = 297;
-        let yOffset = 0;
+        
+        const strictPages = Array.from(captureTarget.querySelectorAll('.strict-page'));
 
-        // Ensure all content is captured iteratively
-        while (yOffset < pdfHeight) {
-            if (yOffset > 0) pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, -yOffset, pdfWidth, pdfHeight, undefined, 'FAST');
-            yOffset += pageHeight;
+        if (strictPages.length > 0) {
+            // CALCULATORS: Capture each pre-paginated .strict-page individually. 
+            // Completely eliminates cross-page text bleeding and iOS maximum canvas memory crashes.
+            for (let i = 0; i < strictPages.length; i++) {
+                const pageEl = strictPages[i];
+                const canvas = await html2canvas(pageEl, {
+                    scale: 1.5,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    width: 794,
+                    height: pageEl.scrollHeight,
+                    windowWidth: 1200,
+                    windowHeight: Math.max(1200, captureTarget.scrollHeight + 100),
+                    onclone: (doc) => {
+                        const containerClone = doc.getElementById('pdf-hidden-container');
+                        if (containerClone) { containerClone.style.left = '0px'; containerClone.style.top = '0px'; }
+                        const el = doc.getElementById('print-root-temp');
+                        if (el) {
+                            el.style.opacity = '1'; el.style.visibility = 'visible'; el.style.display = 'block';
+                            el.style.position = 'relative'; el.style.left = '0'; el.style.top = '0'; el.style.transform = 'none';
+                        }
+                    }
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                if (i > 0) pdf.addPage();
+                
+                const currentPdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, currentPdfHeight, undefined, 'FAST');
+            }
+        } else {
+            // ANALYTICS: Single flowing page captured and sliced automatically
+            const canvas = await html2canvas(captureTarget, {
+                scale: 1.5,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                width: 794,
+                height: captureTarget.scrollHeight,
+                windowWidth: 1200,
+                windowHeight: Math.max(1200, captureTarget.scrollHeight + 100),
+                scrollX: 0,
+                scrollY: 0,
+                onclone: (doc) => {
+                    const containerClone = doc.getElementById('pdf-hidden-container');
+                    if (containerClone) { containerClone.style.left = '0px'; containerClone.style.top = '0px'; }
+                    const el = doc.getElementById('print-root-temp');
+                    if (el) {
+                        el.style.opacity = '1'; el.style.visibility = 'visible'; el.style.display = 'block';
+                        el.style.position = 'relative'; el.style.left = '0'; el.style.top = '0'; el.style.transform = 'none';
+                    }
+                }
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const totalPdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            let yOffset = 0;
+
+            // Use (totalPdfHeight - 0.5) tolerance to prevent a blank final page due to sub-pixel DPI rounding
+            while (yOffset < totalPdfHeight - 0.5) {
+                if (yOffset > 0) pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', 0, -yOffset, pdfWidth, totalPdfHeight, undefined, 'FAST');
+                yOffset += pageHeight;
+            }
         }
 
         // Step 5: Finalization & Cleanup
