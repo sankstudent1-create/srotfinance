@@ -709,9 +709,10 @@ export const Dashboard = ({ session }) => {
 
         // Step 1: Create a silent off-screen container
         const container = document.createElement('div');
+        container.id = 'pdf-hidden-container';
         // Rendered far off-screen so user sees NOTHING. No flickers.
         container.style.cssText = `
-            position: fixed;
+            position: absolute;
             left: -10000px;
             top: -10000px;
             width: 210mm;
@@ -766,6 +767,11 @@ export const Dashboard = ({ session }) => {
             scrollX: 0,
             scrollY: 0,
             onclone: (doc) => {
+                const containerClone = doc.getElementById('pdf-hidden-container');
+                if (containerClone) {
+                    containerClone.style.left = '0px';
+                    containerClone.style.top = '0px';
+                }
                 const el = doc.getElementById('print-root-temp');
                 if (el) {
                     el.style.opacity = '1';
