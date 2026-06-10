@@ -619,7 +619,7 @@ export const CalculatorModal = ({ toolId, onClose, onPrint, onDownload, onShare,
                                     <div className="flex gap-3 pt-1 px-5 pb-4 sm:px-6">
                                         {onDownload && (
                                             <button
-                                                onClick={() => onDownload(translate(`tool_${toolId}`), data, result)}
+                                                onClick={() => onDownload(translate(`tool_${toolId}`), data, { ...result, taxInfo: SCHEME_TAX_INFO[toolId] })}
                                                 disabled={isSharing}
                                                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white py-4 rounded-2xl text-xs font-black shadow-lg shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
                                             >
@@ -629,7 +629,7 @@ export const CalculatorModal = ({ toolId, onClose, onPrint, onDownload, onShare,
                                         )}
                                         {onPrint && (
                                             <button
-                                                onClick={() => onPrint(translate(`tool_${toolId}`), data, result)}
+                                                onClick={() => onPrint(translate(`tool_${toolId}`), data, { ...result, taxInfo: SCHEME_TAX_INFO[toolId] })}
                                                 className="w-14 items-center justify-center bg-white border border-slate-100 hidden sm:flex rounded-2xl text-slate-400 hover:text-slate-600 transition-all font-bold"
                                                 title="Print"
                                             >
@@ -638,7 +638,7 @@ export const CalculatorModal = ({ toolId, onClose, onPrint, onDownload, onShare,
                                         )}
                                         {onShare && (
                                             <button
-                                                onClick={() => onShare(translate(`tool_${toolId}`), data, result)}
+                                                onClick={() => onShare(translate(`tool_${toolId}`), data, { ...result, taxInfo: SCHEME_TAX_INFO[toolId] })}
                                                 disabled={isSharing}
                                                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3.5 rounded-2xl text-xs font-bold shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 active:scale-[0.98] transition-all disabled:opacity-50"
                                             >

@@ -135,13 +135,34 @@ export const CalculatorReport = ({ data, user }) => {
     const invPct = (invested + returns) > 0 ? (invested / (invested + returns) * 100) : 50;
     const retPct = 100 - invPct;
 
+    const taxInfo = result.taxInfo || null;
+    
+    // Chunking logic
+    const chunks = [];
+    if (projs.length > 0) {
+        // First chunk size is smaller if taxInfo exists
+        const firstChunkSize = taxInfo ? 12 : 18;
+        chunks.push(projs.slice(0, firstChunkSize));
+        
+        let remaining = projs.slice(firstChunkSize);
+        while (remaining.length > 0) {
+            chunks.push(remaining.slice(0, 25));
+            remaining = remaining.slice(25);
+        }
+    } else {
+        // Add an empty chunk so at least Page 2 renders
+        chunks.push([]);
+    }
+
+    const totalPages = 1 + chunks.length;
+
     /* ── Page 1 ──────────────────────────────────────────────── */
     return (
         <>
             <PrintStyles />
             {/* ── PAGE 1 — Summary ──────────────────────── */}
             <div className="print-page strict-page">
-                <PageHeader user={user} subtitle={`${toolName} Report`} page={1} totalPages={2} />
+                <PageHeader user={user} subtitle={`${toolName} Report`} page={1} totalPages={totalPages} />
 
                 {/* Tool name eyebrow */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
@@ -265,155 +286,135 @@ export const CalculatorReport = ({ data, user }) => {
                     </p>
                 </div>
 
-                <PageFooter page={1} total={2} />
+                <PageFooter page={1} total={totalPages} />
             </div>
 
-            {/* ── PAGE 2 — Year-wise Analysis ──────────────────────── */}
-            <div className="print-page pg-break strict-page">
-                <PageHeader user={user} subtitle="Yearly Breakdown" page={2} totalPages={2} />
-                
-                <h2 className="mont" style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.04em', marginBottom: 16 }}>
-                    Growth Trajectory
-                </h2>
+            {/* ── PAGE 2 onwards — Year-wise Analysis & Tax ──────────────────────── */}
+            {chunks.map((chunk, chunkIndex) => {
+                const pageNum = 2 + chunkIndex;
+                const isFirstChunk = chunkIndex === 0;
+                const isLastChunk = chunkIndex === chunks.length - 1;
 
-                {/* Section label */}
-                <p style={{
-                    fontSize: 8, color: '#f97316', fontWeight: 700, textTransform: 'uppercase',
-                    letterSpacing: '0.15em', marginBottom: 12
-                }}>
-                    Compounding at work — {gainPct}% total returns · {multiplier}× multiplier
-                </p>
+                return (
+                    <div key={pageNum} className="print-page pg-break strict-page">
+                        <PageHeader user={user} subtitle={isFirstChunk ? "Tax & Breakdown" : "Yearly Breakdown"} page={pageNum} totalPages={totalPages} />
+                        
+                        {isFirstChunk && (
+                            <>
+                                <h2 className="mont" style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.04em', marginBottom: 16 }}>
+                                    Growth Trajectory
+                                </h2>
+                                {/* Section label */}
+                                <p style={{
+                                    fontSize: 8, color: '#f97316', fontWeight: 700, textTransform: 'uppercase',
+                                    letterSpacing: '0.15em', marginBottom: 12
+                                }}>
+                                    Compounding at work — {gainPct}% total returns · {multiplier}× multiplier
+                                </p>
 
-                {/* Projections table */}
-                {projs.length > 0 ? (
-                    <div style={{ border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
-                            <thead>
-                                <tr style={{ background: '#0f172a' }}>
-                                    {['Year', 'Invested (₹)', 'Profit / Returns (₹)', 'Growth %', 'Total Value (₹)'].map((h, i) => (
-                                        <th key={h} style={{
-                                            padding: '10px 13px',
-                                            textAlign: i === 0 ? 'left' : 'right',
-                                            fontSize: 8, fontWeight: 800, color: '#94a3b8',
-                                            textTransform: 'uppercase', letterSpacing: '0.08em'
-                                        }}>{h}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {projs.map((p, i) => {
-                                    const profit = p.total - p.invested;
-                                    const growthPct = p.invested > 0 ? ((profit / p.invested) * 100).toFixed(1) : '0';
-                                    return (
-                                        <tr key={i} style={{
-                                            borderBottom: '1px solid #f1f5f9',
-                                            background: i % 2 === 0 ? 'white' : '#fafafa'
-                                        }}>
-                                            <td style={{
-                                                padding: '8px 13px', fontWeight: 700,
-                                                color: '#374151', fontSize: 11
-                                            }}>
-                                                Year {p.year}
-                                            </td>
-                                            <td style={{
-                                                padding: '8px 13px', textAlign: 'right',
-                                                color: '#64748b', fontFamily: 'monospace'
-                                            }}>
-                                                {fmt(p.invested)}
-                                            </td>
-                                            <td style={{
-                                                padding: '8px 13px', textAlign: 'right',
-                                                color: '#10b981', fontWeight: 700,
-                                                fontFamily: 'monospace'
-                                            }}>
-                                                +{fmt(profit)}
-                                            </td>
-                                            <td style={{ padding: '8px 13px', textAlign: 'right' }}>
-                                                <span style={{
-                                                    fontSize: 9, fontWeight: 700, padding: '2px 7px',
-                                                    borderRadius: 99,
-                                                    background: profit > 0 ? '#ecfdf5' : '#f1f5f9',
-                                                    color: profit > 0 ? '#065f46' : '#64748b'
-                                                }}>
-                                                    +{growthPct}%
-                                                </span>
-                                            </td>
-                                            <td style={{
-                                                padding: '8px 13px', textAlign: 'right',
-                                                fontWeight: 900, color: '#0f172a', fontSize: 12,
-                                                fontFamily: 'monospace'
-                                            }}>
-                                                {fmt(p.total)}
-                                            </td>
+                                {taxInfo && (
+                                    <div style={{ marginBottom: 16, padding: '14px', background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                                        <h3 style={{ fontSize: 11, fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <span style={{ fontSize: 12 }}>⚖️</span> {taxInfo.name} — Tax Treatment
+                                        </h3>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 16 }}>
+                                            <div>
+                                                <p style={{ fontSize: 8, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: 6 }}>Tax Rules</p>
+                                                {taxInfo.taxRules.map((rule, idx) => (
+                                                    <div key={idx} style={{ display: 'flex', justifyItems: 'start', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: 4, marginBottom: 4 }}>
+                                                        <span style={{ fontSize: 8, color: '#64748b', paddingRight: '8px' }}>{rule.label}</span>
+                                                        <span style={{ fontSize: 8, color: '#0f172a', fontWeight: 700, textAlign: 'right' }}>{rule.value}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: 8, fontWeight: 800, color: '#10b981', textTransform: 'uppercase', marginBottom: 6 }}>Key Benefits</p>
+                                                {taxInfo.exemptions.slice(0, 4).map((ex, idx) => (
+                                                    <p key={idx} style={{ fontSize: 8, color: '#475569', marginBottom: 4, display: 'flex', gap: 4 }}>
+                                                        <span style={{ color: '#10b981' }}>✓</span> {ex}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {chunk.length > 0 ? (
+                            <div style={{ border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                                    <thead>
+                                        <tr style={{ background: '#0f172a' }}>
+                                            {['Year', 'Invested (₹)', 'Profit / Returns (₹)', 'Growth %', 'Total Value (₹)'].map((h, i) => (
+                                                <th key={h} style={{
+                                                    padding: '10px 13px',
+                                                    textAlign: i === 0 ? 'left' : 'right',
+                                                    fontSize: 8, fontWeight: 800, color: '#94a3b8',
+                                                    textTransform: 'uppercase', letterSpacing: '0.08em'
+                                                }}>{h}</th>
+                                            ))}
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                            {/* Summary footer */}
-                            <tfoot>
-                                <tr style={{ background: '#f97316' }}>
-                                    <td colSpan={2} style={{
-                                        padding: '10px 13px', fontSize: 9,
-                                        fontWeight: 800, color: 'white'
-                                    }}>
-                                        Final Maturity
-                                    </td>
-                                    <td style={{
-                                        padding: '10px 13px', textAlign: 'right',
-                                        fontWeight: 800, color: 'white', fontSize: 10
-                                    }}>
-                                        +{fmt(returns)} profit
-                                    </td>
-                                    <td style={{
-                                        padding: '10px 13px', textAlign: 'right',
-                                        fontWeight: 700, color: 'rgba(255,255,255,0.8)', fontSize: 9
-                                    }}>
-                                        {gainPct}%
-                                    </td>
-                                    <td style={{
-                                        padding: '10px 13px', textAlign: 'right',
-                                        fontWeight: 900, color: 'white', fontSize: 14
-                                    }}>
-                                        {fmt(netTotal)}
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                ) : (
-                    <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
-                        <p style={{ fontSize: 12 }}>No year-wise projections available for this tool.</p>
-                    </div>
-                )}
+                                    </thead>
+                                    <tbody>
+                                        {chunk.map((p, i) => {
+                                            const profit = p.total - p.invested;
+                                            const growthPct = p.invested > 0 ? ((profit / p.invested) * 100).toFixed(1) : '0';
+                                            return (
+                                                <tr key={i} style={{
+                                                    borderBottom: '1px solid #f1f5f9',
+                                                    background: i % 2 === 0 ? 'white' : '#fafafa'
+                                                }}>
+                                                    <td style={{ padding: '8px 13px', fontWeight: 700, color: '#374151', fontSize: 11 }}>Year {p.year}</td>
+                                                    <td style={{ padding: '8px 13px', textAlign: 'right', color: '#64748b', fontFamily: 'monospace' }}>{fmt(p.invested)}</td>
+                                                    <td style={{ padding: '8px 13px', textAlign: 'right', color: '#10b981', fontWeight: 700, fontFamily: 'monospace' }}>+{fmt(profit)}</td>
+                                                    <td style={{ padding: '8px 13px', textAlign: 'right' }}>
+                                                        <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: profit > 0 ? '#ecfdf5' : '#f1f5f9', color: profit > 0 ? '#065f46' : '#64748b' }}>
+                                                            +{growthPct}%
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ padding: '8px 13px', textAlign: 'right', fontWeight: 900, color: '#0f172a', fontSize: 12, fontFamily: 'monospace' }}>{fmt(p.total)}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                    {isLastChunk && (
+                                        <tfoot>
+                                            <tr style={{ background: '#f97316' }}>
+                                                <td colSpan={2} style={{ padding: '10px 13px', fontSize: 9, fontWeight: 800, color: 'white' }}>Final Maturity</td>
+                                                <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 800, color: 'white', fontSize: 10 }}>+{fmt(returns)} profit</td>
+                                                <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 700, color: 'rgba(255,255,255,0.8)', fontSize: 9 }}>{gainPct}%</td>
+                                                <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 900, color: 'white', fontSize: 14 }}>{fmt(netTotal)}</td>
+                                            </tr>
+                                        </tfoot>
+                                    )}
+                                </table>
+                            </div>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8' }}>
+                                <p style={{ fontSize: 12 }}>No year-wise projections available for this tool.</p>
+                            </div>
+                        )}
 
-                {/* Key takeaways */}
-                <div className="no-break" style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
-                    gap: 12, marginTop: 20
-                }}>
-                    {[
-                        { label: 'Total Invested', value: fmt(invested), color: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
-                        { label: 'Wealth Created', value: `+${fmt(returns)}`, color: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
-                        { label: 'Net Maturity', value: fmt(netTotal), color: '#f97316', bg: '#fff7ed', border: '#fed7aa' },
-                    ].map(({ label, value, color, bg, border }) => (
-                        <div key={label} style={{
-                            background: bg, border: `1px solid ${border}`,
-                            borderRadius: 12, padding: '12px 14px', textAlign: 'center'
-                        }}>
-                            <p style={{
-                                fontSize: 8, fontWeight: 700, color, textTransform: 'uppercase',
-                                letterSpacing: '0.1em', marginBottom: 4
-                            }}>{label}</p>
-                            <p className="mont" style={{
-                                fontSize: 16, fontWeight: 900, color: '#0f172a',
-                                letterSpacing: '-0.02em'
-                            }}>{value}</p>
-                        </div>
-                    ))}
-                </div>
+                        {isLastChunk && (
+                            <div className="no-break" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 20 }}>
+                                {[
+                                    { label: 'Total Invested', value: fmt(invested), color: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
+                                    { label: 'Wealth Created', value: `+${fmt(returns)}`, color: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
+                                    { label: 'Net Maturity', value: fmt(netTotal), color: '#f97316', bg: '#fff7ed', border: '#fed7aa' },
+                                ].map(({ label, value, color, bg, border }) => (
+                                    <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '12px 14px', textAlign: 'center' }}>
+                                        <p style={{ fontSize: 8, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{label}</p>
+                                        <p className="mont" style={{ fontSize: 16, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em' }}>{value}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
-                <PageFooter page={2} total={2} />
-            </div>
+                        <PageFooter page={pageNum} total={totalPages} />
+                    </div>
+                );
+            })}
         </>
     );
 };
