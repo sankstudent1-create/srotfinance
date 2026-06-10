@@ -296,7 +296,9 @@ export const SettingsModal = ({ isOpen, onClose, user, avatarUrl, onAvatarUpload
                 backgroundColor: '#ffffff',
                 logging: false,
                 width: 794, 
+                height: element.scrollHeight,
                 windowWidth: 1200, // Prevention of mobile/iOS truncation
+                windowHeight: Math.max(1200, element.scrollHeight + 100),
                 scrollX: 0,
                 scrollY: 0,
                 onclone: (doc) => {

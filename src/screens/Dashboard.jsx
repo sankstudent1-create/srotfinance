@@ -763,7 +763,9 @@ export const Dashboard = ({ session }) => {
             backgroundColor: '#ffffff',
             logging: false,
             width: 794, // Fixed A4 width (px)
+            height: captureTarget.scrollHeight,
             windowWidth: 1200, // Forces a wider viewport during capture to avoid mobile truncation
+            windowHeight: Math.max(1200, captureTarget.scrollHeight + 100),
             scrollX: 0,
             scrollY: 0,
             onclone: (doc) => {
