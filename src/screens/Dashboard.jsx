@@ -166,7 +166,6 @@ export const Dashboard = ({ session }) => {
     const [previewZoom, setPreviewZoom] = useState(1);
     const [printVariant, setPrintVariant] = useState('classic');
     const [isSharing, setIsSharing] = useState(false);
-    const [isVaultUnlocked, setIsVaultUnlocked] = useState(false);
     const [calculatorPrintData, setCalculatorPrintData] = useState(null);
     const [showThemePicker, setShowThemePicker] = useState(false);
 
@@ -1275,20 +1274,8 @@ export const Dashboard = ({ session }) => {
                                     </div>
                                 </div>
 
-                                 {/* Analytics Dashboard Protected by Biometric Vault */}
-                                 {currentPrefs.biometric_enabled && !isVaultUnlocked ? (
-                                     <div className="h-[400px] flex items-center justify-center">
-                                         <BiometricLock
-                                             isOpen={true}
-                                             credentialId={currentPrefs.biometric_credential_id}
-                                             onUnlock={() => setIsVaultUnlocked(true)}
-                                             onCancel={() => setActiveTab('home')}
-                                             title="Data Vault Locked"
-                                         />
-                                     </div>
-                                 ) : (
-                                     <AnalyticsDashboard transactions={filteredTransactions} />
-                                 )}
+                                 {/* Analytics Dashboard */}
+                                 <AnalyticsDashboard transactions={filteredTransactions} />
                              </motion.div>
                         )}
                     </AnimatePresence>

@@ -356,6 +356,7 @@ export const CalculatorModal = ({ toolId, onClose, onPrint, onDownload, onShare,
                 {toolId === 'age' ? (
                     <AgeCalculator 
                         onPrint={onPrint} 
+                        onDownload={onDownload}
                         translate={translate} 
                         onShare={onShare} 
                         isSharing={isSharing}
@@ -792,17 +793,19 @@ const AgeCalculator = ({ onPrint, onShare, isSharing, translate }) => {
                     {/* Age Actions */}
                     <div className="flex gap-2.5 pt-2 mb-4">
                         <button
-                            onClick={() => onPrint?.('Age Report', { 'Date of Birth': dob }, ageData)}
-                            className="flex-1 bg-slate-900 text-white py-4 rounded-2xl text-xs font-black shadow-xl hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+                            onClick={() => onDownload?.('Age Report', { 'Date of Birth': dob }, ageData)}
+                            disabled={isSharing}
+                            className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white py-4 rounded-2xl text-xs font-black shadow-xl shadow-pink-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                         >
-                            <Download size={16} /> Print Report
+                            {isSharing ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} 
+                            {isSharing ? 'Generating...' : 'Download PDF'}
                         </button>
                         <button
                             onClick={() => onShare?.('Age Report', { 'Date of Birth': dob }, ageData)}
                             disabled={isSharing}
                             className="w-14 bg-white border-2 border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all"
                         >
-                            {isSharing ? <Loader2 size={18} className="animate-spin text-orange-500" /> : <Share2 size={18} />}
+                            {isSharing ? <Loader2 size={18} className="animate-spin text-pink-500" /> : <Share2 size={18} />}
                         </button>
                     </div>
                 </>

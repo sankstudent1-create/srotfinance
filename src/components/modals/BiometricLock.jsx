@@ -14,7 +14,7 @@ import { verifyBiometrics } from '../../utils/biometric';
  * @param {function} onCancel - Callback if the user cancels or fails
  * @param {string} title - Optional title for the lock screen
  */
-export const BiometricLock = ({ isOpen, credentialId, onUnlock, onCancel, title = "Sensitive Access Required" }) => {
+export const BiometricLock = ({ isOpen, credentialId, onUnlock, onCancel, title = "Sensitive Access Required", inline = false }) => {
     const [verifying, setVerifying] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -55,12 +55,15 @@ export const BiometricLock = ({ isOpen, credentialId, onUnlock, onCancel, title 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[9999] flex items-center justify-center bg-bg-base/90 backdrop-blur-2xl px-6"
+                className={inline 
+                    ? "w-full h-full flex flex-col items-center justify-center p-4 z-10 relative"
+                    : "fixed inset-0 z-[9999] flex items-center justify-center bg-bg-base/90 backdrop-blur-2xl px-6"
+                }
             >
                 <motion.div
                     initial={{ scale: 0.9, y: 20 }}
                     animate={{ scale: 1, y: 0 }}
-                    className="w-full max-w-sm glass-panel border-main p-8 rounded-[2.5rem] text-center space-y-6 shadow-2xl"
+                    className={`w-full max-w-sm glass-panel border-main p-8 rounded-[2.5rem] text-center space-y-6 shadow-2xl ${inline ? 'border border-white/5 bg-[#181A20]/50 backdrop-blur-md' : ''}`}
                 >
                     {/* Visual Status */}
                     <div className="relative mx-auto w-24 h-24">

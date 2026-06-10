@@ -9,6 +9,8 @@ import { SupportModal } from './components/modals/SupportModal';
 import { BannerModal } from './components/modals/BannerModal';
 
 import { AdminScreen } from './screens/admin/AdminScreen';
+import { BiometricLock } from './components/modals/BiometricLock';
+import { getUserPrefs } from './components/modals/SettingsModal';
 
 // --- SYSTEM MANAGER (PWA & SETUP) ---
 const SystemSetup = () => {
@@ -49,6 +51,9 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [isAdminRoute, setIsAdminRoute] = useState(false);
+  
+  // App-wide biometric lock state
+  const [appLocked, setAppLocked] = useState(getUserPrefs().biometric_enabled);
 
   useEffect(() => {
     // Check if we are on the admin path
@@ -127,6 +132,27 @@ export default function App() {
         <SystemSetup />
         <AdminScreen />
       </>
+    );
+  }
+
+  // App-wide Biometric Lock interception
+  if (appLocked && session && !recoveryMode && !isAdminRoute) {
+    const prefs = getUserPrefs();
+    return (
+      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
+        <SystemSetup />
+        <BiometricLock
+            isOpen={true}
+            credentialId={prefs.biometric_credential_id}
+            onUnlock={() => setAppLocked(false)}
+            onCancel={async () => {
+                await supabase.auth.signOut();
+                setAppLocked(true); // stay locked until signed out propagates
+            }}
+            title="App Vault Locked"
+            inline={false}
+        />
+      </div>
     );
   }
 

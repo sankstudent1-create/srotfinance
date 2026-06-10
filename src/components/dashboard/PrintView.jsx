@@ -672,12 +672,121 @@ export const AnalyticsReport = ({ user, stats, transactions, filterLabel }) => (
 );
 
 /* ================================================================== */
+/*  AGE REPORT  (1 page)                                                */
+/* ================================================================== */
+export const AgeReport = ({ data, user }) => {
+    if (!data) return null;
+    const { toolName, inputs, result } = data;
+    
+    return (
+        <div className="print-page" style={{ paddingBottom: '30mm' }}>
+            <PrintStyles />
+            <PageHeader user={user} subtitle="Age & Life Report" page={1} totalPages={1} />
+
+            {/* Tool name eyebrow */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <div style={{ width: 4, height: 16, background: '#ec4899', borderRadius: 4 }} />
+                <p style={{
+                    fontSize: 10, color: '#ec4899', fontWeight: 800, textTransform: 'uppercase',
+                    letterSpacing: '0.15em'
+                }}>
+                    Life Milestones Analysis
+                </p>
+            </div>
+            
+            <h1 className="mont" style={{
+                fontSize: 32, fontWeight: 900, color: '#0f172a',
+                letterSpacing: '-0.05em', lineHeight: 1, marginBottom: 24
+            }}>
+                Personal Timeline
+            </h1>
+
+            {/* Hero Dark Card */}
+            <div className="no-break" style={{
+                background: '#0f172a', borderRadius: 24, padding: '32px',
+                marginBottom: 24, position: 'relative', overflow: 'hidden',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            }}>
+                <div style={{ 
+                    position: 'absolute', top: -30, right: -20, fontSize: 120, 
+                    fontWeight: 900, color: 'rgba(255,255,255,0.02)', pointerEvents: 'none' 
+                }}>
+                    AGE
+                </div>
+
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <p style={{ fontSize: 9, color: '#fdb777', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Your Exact Age</p>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                            <div>
+                                <span className="mont" style={{ fontSize: 48, fontWeight: 950, color: 'white', letterSpacing: '-0.02em' }}>{result.years}</span>
+                                <span style={{ fontSize: 14, color: '#94a3b8', marginLeft: 4, fontWeight: 700 }}>Yrs</span>
+                            </div>
+                            <div>
+                                <span className="mont" style={{ fontSize: 32, fontWeight: 900, color: '#f472b6', letterSpacing: '-0.02em' }}>{result.months}</span>
+                                <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4, fontWeight: 700 }}>Mos</span>
+                            </div>
+                            <div>
+                                <span className="mont" style={{ fontSize: 32, fontWeight: 900, color: '#f9a8d4', letterSpacing: '-0.02em' }}>{result.days}</span>
+                                <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 4, fontWeight: 700 }}>Days</span>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: 12, color: '#cbd5e1', marginTop: 8 }}>
+                            Born on {new Date(result.birth).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                        </p>
+                    </div>
+                    
+                    <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.05)', padding: '16px 24px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <p style={{ fontSize: 32 }}>{result.zodiac?.emoji}</p>
+                        <p style={{ fontSize: 14, fontWeight: 800, color: 'white', marginTop: 4 }}>{result.zodiac?.sign}</p>
+                        <p style={{ fontSize: 8, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Zodiac</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+                {[
+                    { label: 'Total Months', value: result.totalMonths, color: '#3b82f6', bg: '#eff6ff', border: '#bfdbfe' },
+                    { label: 'Total Weeks', value: result.totalWeeks, color: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
+                    { label: 'Total Days', value: result.totalDays, color: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
+                    { label: 'Total Hours', value: result.totalHours, color: '#f59e0b', bg: '#fffbeb', border: '#fde68a' },
+                ].map(({ label, value, color, bg, border }) => (
+                    <div key={label} style={{
+                        background: bg, border: `1px solid ${border}`,
+                        borderRadius: 16, padding: '16px', textAlign: 'center'
+                    }}>
+                        <p className="mont" style={{ fontSize: 20, fontWeight: 900, color: '#0f172a' }}>{Number(value).toLocaleString('en-IN')}</p>
+                        <p style={{ fontSize: 9, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 4 }}>{label}</p>
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+                <div style={{ background: '#fdf2f8', border: '1px solid #fbcfe8', borderRadius: 16, padding: '24px', textAlign: 'center' }}>
+                    <p style={{ fontSize: 10, color: '#db2777', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Next Birthday</p>
+                    <p className="mont" style={{ fontSize: 36, fontWeight: 900, color: '#be185d' }}>{result.isBirthday ? 'Today!' : `${result.daysLeft} Days`}</p>
+                </div>
+                
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 10, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Seconds Alive</span>
+                        <span className="mont" style={{ fontSize: 24, fontWeight: 900, color: '#0f172a' }}>{Number(result.totalSeconds).toLocaleString('en-IN')}</span>
+                    </div>
+                </div>
+            </div>
+
+            <PageFooter />
+        </div>
+    );
+};
+
+/* ================================================================== */
 /*  ROOT EXPORT                                                         */
 /* ================================================================== */
 export const PrintView = ({ user, stats, transactions, filterLabel, calculatorData, isPrinting }) => (
     <div id="print-root" className={isPrinting ? 'print-active' : 'print-only'} style={{ fontFamily: "'Outfit', sans-serif" }}>
         {calculatorData
-            ? <CalculatorReport data={calculatorData} user={user} />
+            ? (calculatorData.toolName?.toLowerCase().includes('age') ? <AgeReport data={calculatorData} user={user} /> : <CalculatorReport data={calculatorData} user={user} />)
             : <AnalyticsReport user={user} stats={stats} transactions={transactions} filterLabel={filterLabel} />
         }
     </div>
