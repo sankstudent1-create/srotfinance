@@ -391,3 +391,28 @@ body {
     color: #ffffff !important;
 }
 
+
+/* DASHBOARD INSIGHTS LIGHT MODE ADAPTATION */
+:root.light-mode .bg-\[#181A20\]\/80,
+:root.light-mode .bg-\[#181A20\]\/70,
+:root.light-mode .bg-\[#181A20\] {
+    background-color: var(--bg-card) !important;
+    border-color: rgba(0,0,0,0.06) !important;
+}
+:root.light-mode .bg-white\/10 {
+    background-color: rgba(0,0,0,0.06) !important;
+}
+:root.light-mode .bg-white\/5 {
+    background-color: rgba(0,0,0,0.03) !important;
+}
+:root.light-mode .border-white\/5,
+:root.light-mode .border-white\/10 {
+    border-color: rgba(0,0,0,0.06) !important;
+}
+:root.light-mode .text-white\/40,
+:root.light-mode .text-white\/30,
+:root.light-mode .text-white\/20,
+:root.light-mode .text-white\/50 {
+    color: var(--text-muted) !important;
+}
+

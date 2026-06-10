@@ -50,8 +50,8 @@ const DonutChart = ({ segments, size = 140, thickness = 22, label, sub }) => {
                 position: 'absolute', inset: 0, display: 'flex',
                 flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             }}>
-                <span style={{ fontSize: 13, fontWeight: 900, color: '#ffffff', lineHeight: 1 }}>{label}</span>
-                {sub && <span style={{ fontSize: 9, color: '#94a3b8', marginTop: 2, fontWeight: 600 }}>{sub}</span>}
+                <span className="text-white" style={{ fontSize: 13, fontWeight: 900, lineHeight: 1 }}>{label}</span>
+                {sub && <span className="text-slate-400" style={{ fontSize: 9, marginTop: 2, fontWeight: 600 }}>{sub}</span>}
             </div>
         </div>
     );
