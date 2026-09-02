@@ -1,10 +1,10 @@
 /**
- * Biometric Utility for Orange Finance PWA
+ * Biometric Utility for Srot Finance PWA
  * Uses WebAuthn API to interface with TouchID/FaceID/Windows Hello
  */
 
 const AUTH_CONFIG = {
-    rpName: "Orange Finance",
+    rpName: "Srot Finance",
     challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]), // Static challenge for local lock
 };
 
@@ -37,8 +37,8 @@ export const enrollBiometrics = async (userName) => {
                 rp: { name: AUTH_CONFIG.rpName, id: window.location.hostname },
                 user: {
                     id: userId,
-                    name: userName || "user@orangefin.com",
-                    displayName: userName || "Orange Finance User",
+                    name: userName || "user@srotfin.com",
+                    displayName: userName || "Srot Finance User",
                 },
                 pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
                 authenticatorSelection: {

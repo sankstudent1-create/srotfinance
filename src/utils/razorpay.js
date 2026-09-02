@@ -57,7 +57,7 @@ export const handlePayment = async ({ amount, user, onSuccess, onError }) => {
             contact: '',
         },
         notes: {
-            app_name: 'Orange Finance',
+            app_name: 'Srot Finance',
             supporter: username,
             domain,
         },

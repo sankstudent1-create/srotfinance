@@ -114,7 +114,7 @@ export const AdminDashboard = ({ session, onLogout }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     to: selectedUser.email,
-                    subject: 'Message from Orange Finance Admin',
+                    subject: 'Message from Srot Finance Admin',
                     reportName: 'Admin_Notification.pdf',
                     filterLabel: 'System Notification',
                     stats: { income: 0, expense: 0, balance: 0 },
@@ -601,7 +601,7 @@ export const AdminDashboard = ({ session, onLogout }) => {
                                                         'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
                                                     },
                                                     body: JSON.stringify({
-                                                        title: 'Message from Orange Finance HQ',
+                                                        title: 'Message from Srot Finance HQ',
                                                         body: pushMessage.trim(),
                                                         targetUserIds: selectedUser ? [selectedUser.id] : users.map(u => u.id)
                                                     })

@@ -3,7 +3,7 @@ import { supabase } from '../../config/supabase';
 import { Loader2, MonitorSmartphone, Send, Image as ImageIcon, Link2, Sparkles, X, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export const AdminPush = ({ users, showToast }) => {
-    const [title, setTitle] = useState('Message from Orange Finance HQ');
+    const [title, setTitle] = useState('Message from Srot Finance HQ');
     const [message, setMessage] = useState('');
     const [linkUrl, setLinkUrl] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -56,7 +56,7 @@ export const AdminPush = ({ users, showToast }) => {
         if (!aiPrompt.trim()) return;
         setIsGeneratingAI(true);
         try {
-            const promptContext = `Write a short, engaging push notification body (max 2 sentences, ~120 chars) for an app called Orange Finance based on this idea: "${aiPrompt}". No hashtags.`;
+            const promptContext = `Write a short, engaging push notification body (max 2 sentences, ~120 chars) for an app called Srot Finance based on this idea: "${aiPrompt}". No hashtags.`;
 
             const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
@@ -122,7 +122,7 @@ export const AdminPush = ({ users, showToast }) => {
 
             // Clear form
             setMessage('');
-            setTitle('Message from Orange Finance HQ');
+            setTitle('Message from Srot Finance HQ');
             setImageUrl('');
             setLinkUrl('');
         } catch (err) {
@@ -298,10 +298,10 @@ export const AdminPush = ({ users, showToast }) => {
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Orange Finance</span>
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Srot Finance</span>
                                     <span className="text-[9px] text-slate-500">now</span>
                                 </div>
-                                <h4 className="text-sm font-bold leading-tight mb-1 text-white pr-2">{title || 'Message from Orange Finance HQ'}</h4>
+                                <h4 className="text-sm font-bold leading-tight mb-1 text-white pr-2">{title || 'Message from Srot Finance HQ'}</h4>
                                 <p className="text-xs text-slate-300 leading-snug line-clamp-2">{message || 'Type your message on the left to see the live preview here.'}</p>
                             </div>
                         </div>

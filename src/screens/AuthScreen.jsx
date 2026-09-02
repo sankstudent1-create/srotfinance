@@ -172,7 +172,7 @@ export const AuthScreen = () => {
                 </div>
 
                 <div className="relative z-10 text-white/30 text-sm font-medium">
-                    &copy; {new Date().getFullYear()} Orange Finance. All rights reserved.
+                    &copy; {new Date().getFullYear()} Srot Finance. All rights reserved.
                 </div>
             </div>
 
@@ -411,7 +411,7 @@ export const AuthScreen = () => {
 
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="mt-8 text-center pt-6 border-t border-white/10">
                         <p className="text-white/50 text-sm font-medium tracking-wide">
-                            {isLogin ? "New to Orange Finance?" : "Already have an account?"}{" "}
+                            {isLogin ? "New to Srot Finance?" : "Already have an account?"}{" "}
                             <button
                                 onClick={() => setIsLogin(!isLogin)}
                                 className="text-orange-400 font-bold hover:text-orange-300 hover:underline hover:underline-offset-4 transition-all ml-1"

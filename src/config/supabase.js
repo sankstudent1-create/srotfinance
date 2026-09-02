@@ -18,7 +18,7 @@ if (IS_DEV) {
         errors: [],
     };
 
-    console.group('%c🟠 Orange Finance — Dev Diagnostics', 'font-size:13px;font-weight:bold;color:#ea580c');
+    console.group('%c🟠 Srot Finance — Dev Diagnostics', 'font-size:13px;font-weight:bold;color:#ea580c');
     console.log('%cSupabase URL :', 'font-weight:bold;color:#64748b', supabaseUrl);
     console.log('%cVITE_URL env :', 'font-weight:bold;color:#64748b', window.__FIN_DIAG__.envUrl);
     console.log('%cVITE_KEY env :', 'font-weight:bold;color:#64748b', window.__FIN_DIAG__.envKey);

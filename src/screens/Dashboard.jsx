@@ -837,7 +837,7 @@ export const Dashboard = ({ session }) => {
         const pdfBlob = pdf.output('blob');
         const defaultName = calcData
             ? `${calcData.toolName.replace(/\s+/g, '_')}_Analysis`
-            : `OrangeFin_Report_${(filterLabel || 'All_Time').replace(/\s+/g, '_')}`;
+            : `SrotFin_Report_${(filterLabel || 'All_Time').replace(/\s+/g, '_')}`;
         
         console.log('✅ PDF Generation Complete.');
         return new File([pdfBlob], `${defaultName}.pdf`, { type: 'application/pdf' });
@@ -919,7 +919,7 @@ export const Dashboard = ({ session }) => {
                 await navigator.share({
                     files: [file],
                     title: 'Financial Report',
-                    text: 'My financial report from Orange Finance'
+                    text: 'My financial report from Srot Finance'
                 });
             } else {
                 // fallback to download
@@ -952,7 +952,7 @@ export const Dashboard = ({ session }) => {
                 await navigator.share({ 
                     files: [file], 
                     title: `${toolName} Report`, 
-                    text: `My ${toolName} projection from Orange Finance` 
+                    text: `My ${toolName} projection from Srot Finance` 
                 });
             } else {
                 const url = URL.createObjectURL(file);
@@ -1077,7 +1077,7 @@ export const Dashboard = ({ session }) => {
                                     const newTheme = currentPrefs.theme === 'light' ? 'dark' : 'light';
                                     const newPrefs = { ...currentPrefs, theme: newTheme };
                                     setCurrentPrefs(newPrefs);
-                                    localStorage.setItem('orange_fin_prefs', JSON.stringify(newPrefs));
+                                    localStorage.setItem('srot_fin_prefs', JSON.stringify(newPrefs));
                                 }}
                                 className="w-10 h-10 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-400 hover:bg-orange-500/20 hover:text-orange-400 transition-all hover:scale-105"
                                 title={`Switch to ${currentPrefs.theme === 'light' ? 'Dark' : 'Light'} Mode`}
@@ -1798,7 +1798,7 @@ export const Dashboard = ({ session }) => {
                             </div>
                             <div className="flex-1">
                                 <h3 className="text-sm font-black text-slate-900">Enable Push Alerts?</h3>
-                                <p className="text-xs font-medium text-slate-500 mt-0.5 leading-relaxed flex-wrap">Get real-time updates directly from Orange Finance system support and reminders!</p>
+                                <p className="text-xs font-medium text-slate-500 mt-0.5 leading-relaxed flex-wrap">Get real-time updates directly from Srot Finance system support and reminders!</p>
                             </div>
                             <button onClick={handleDismissPush} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors shrink-0">
                                 <X size={16} />

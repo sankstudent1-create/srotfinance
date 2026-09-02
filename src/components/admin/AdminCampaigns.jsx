@@ -32,13 +32,13 @@ export const AdminCampaigns = ({ users, showToast }) => {
         {
             label: 'Keep Investing (Tips)',
             subject: 'Unlock Your Future: Smart Investing Strategies',
-            message: 'Consistency is the key to wealth generation. Even small investments, when compounded over time, can yield magnificent results. As part of Orange Finance, we strongly advise automating a portion of your monthly savings directly into diverse investment vehicles. Stay strong and keep investing for your financial future.',
+            message: 'Consistency is the key to wealth generation. Even small investments, when compounded over time, can yield magnificent results. As part of Srot Finance, we strongly advise automating a portion of your monthly savings directly into diverse investment vehicles. Stay strong and keep investing for your financial future.',
             includeStats: true
         },
         {
             label: 'Keep Saving (Encouragement)',
             subject: 'Great Job: Keep Building Your Savings',
-            message: 'We noticed your disciplined approach to managing your finances! Saving effectively is the most crucial step toward financial independence. Ensure you always maintain a 6-month emergency fund, and continue making intelligent spending decisions. We are proud of your progress on Orange Finance.',
+            message: 'We noticed your disciplined approach to managing your finances! Saving effectively is the most crucial step toward financial independence. Ensure you always maintain a 6-month emergency fund, and continue making intelligent spending decisions. We are proud of your progress on Srot Finance.',
             includeStats: true
         },
         {
@@ -55,13 +55,13 @@ export const AdminCampaigns = ({ users, showToast }) => {
         },
         {
             label: 'Festival / Occasion Greetings',
-            subject: 'Happy Festivities from Orange Finance!',
-            message: 'The entire executive team at Orange Finance wishes you and your family abundant joy and prosperity this festive season! As you celebrate, remember that true wealth belongs to those who spread happiness. We value your continued trust and membership with us. Have a wonderful celebration!',
+            subject: 'Happy Festivities from Srot Finance!',
+            message: 'The entire executive team at Srot Finance wishes you and your family abundant joy and prosperity this festive season! As you celebrate, remember that true wealth belongs to those who spread happiness. We value your continued trust and membership with us. Have a wonderful celebration!',
             includeStats: false
         },
         {
             label: 'Custom Official Notice',
-            subject: 'Official Notice from Orange Finance',
+            subject: 'Official Notice from Srot Finance',
             message: '',
             includeStats: false
         }
@@ -71,7 +71,7 @@ export const AdminCampaigns = ({ users, showToast }) => {
         if (!aiPrompt.trim()) return;
         setIsGeneratingAI(true);
         try {
-            const promptContext = `You are the executive writer for Orange Finance (a smart personal finance tracker app). Write a highly professional, engaging, and personalized notice letter body based on the following instructions: "${aiPrompt}". Do not include salutations (like Dear User) or closing signatures (like Sincerely, CEO), just the direct body paragraphs (max 3 short paragraphs). Adapt the tone for the event or tip requested.`;
+            const promptContext = `You are the executive writer for Srot Finance (a smart personal finance tracker app). Write a highly professional, engaging, and personalized notice letter body based on the following instructions: "${aiPrompt}". Do not include salutations (like Dear User) or closing signatures (like Sincerely, CEO), just the direct body paragraphs (max 3 short paragraphs). Adapt the tone for the event or tip requested.`;
 
             const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',

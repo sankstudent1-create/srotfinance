@@ -32,7 +32,7 @@ const SystemSetup = () => {
     }
 
     // 3. PWA Meta Tags
-    document.title = "Orange Finance | Swinfosystems";
+    document.title = "Srot Finance | Swinfosystems";
     let metaViewport = document.querySelector('meta[name="viewport"]');
     if (!metaViewport) {
       metaViewport = document.createElement('meta');

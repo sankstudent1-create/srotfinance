@@ -64,7 +64,7 @@ export const ResetPasswordScreen = ({ onComplete }) => {
                     <p className="text-slate-500 font-medium">
                         {success
                             ? 'Your password has been changed successfully. Redirecting...'
-                            : 'Create a strong new password for your Orange Finance account.'
+                            : 'Create a strong new password for your Srot Finance account.'
                         }
                     </p>
                 </div>
@@ -184,7 +184,7 @@ export const ResetPasswordScreen = ({ onComplete }) => {
 
                 <div className="mt-6 text-center">
                     <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-300">
-                        Orange Finance · Secured by Supabase
+                        Srot Finance · Secured by Supabase
                     </p>
                 </div>
             </motion.div>

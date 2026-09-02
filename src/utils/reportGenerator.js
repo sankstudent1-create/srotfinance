@@ -29,7 +29,7 @@ export const generateCalculatorPDF = (toolName, inputs, result) => {
     doc.setFontSize(26);
     doc.setTextColor(...SLATE_900);
     doc.setFont('helvetica', 'bold');
-    doc.text('Orange Finance', 18, 25);
+    doc.text('Srot Finance', 18, 25);
 
     doc.setFontSize(10);
     doc.setTextColor(...ORANGE);
@@ -251,7 +251,7 @@ export const generateCalculatorPDF = (toolName, inputs, result) => {
         doc.setFontSize(7);
         doc.setTextColor(...SLATE_500);
         doc.setFont('helvetica', 'normal');
-        doc.text('Orange Finance • Secure Financial Intelligence • fin.swinfosystems.online', 18, height - 12);
+        doc.text('Srot Finance • Secure Financial Intelligence • fin.swinfosystems.online', 18, height - 12);
         doc.text(`Page ${i} of ${pageCount}`, width - 14, height - 12, { align: 'right' });
     }
 

@@ -12,7 +12,7 @@ const EN_Translations = {
     time_period: "Time Period (Years)", exp_ratio: "Expense Ratio (%)", return_rate: "Exp. Return Rate (% p.a)",
     ppf_info: "PPF uses fixed Govt rate ~7.1%", projection: "Projection", reset: "Reset",
     pdf_report: "PDF Report", est_tax: "Est. Tax",
-    calc_subject: "Projection", calc_share_text: "I calculated my investment return on Orange Finance.",
+    calc_subject: "Projection", calc_share_text: "I calculated my investment return on Srot Finance.",
     analysis_projections: "Investment Analysis & Projections", report_generated: "Report Generated",
     invested: "Invested", wealth_created: "Wealth Created", net_value: "Net Maturity Value",
     calculate: "Calculate", detailed_report: "Detailed Report", share: "Share", generating: "Generating..."

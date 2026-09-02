@@ -65,7 +65,7 @@ const PageHeader = ({ user, subtitle, page, totalPages }) => (
                     <span style={{ color: 'white', fontSize: 13, fontWeight: 900 }}>₹</span>
                 </div>
                 <span className="mont" style={{ fontSize: 17, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.035em' }}>
-                    Orange Finance
+                    Srot Finance
                 </span>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -106,13 +106,13 @@ const PageFooter = ({ page, total }) => (
     }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <span style={{ fontSize: 9, fontWeight: 800, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                ORANGE FINANCE
+                Srot Finance
             </span>
             <span style={{ fontSize: 8, color: '#cbd5e1' }}>|</span>
             <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>CONFIDENTIAL</span>
         </div>
         <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
-            {page && total ? `Page ${page} of ${total}` : 'orangefinance.com'}
+            {page && total ? `Page ${page} of ${total}` : 'srotfinance.com'}
         </div>
     </div>
 );

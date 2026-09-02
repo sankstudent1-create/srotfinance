@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom/client';
 import { isBiometricSupported, enrollBiometrics } from '../../utils/biometric';
 
 // ─── Preferences ────────────────────────────────────────────────────────────
-const PREFS_KEY = 'orange_fin_prefs';
+const PREFS_KEY = 'srot_fin_prefs';
 const DEFAULT_PREFS = {
     sound_enabled: true, sound_volume: 70, sound_duration: 300,
     budget_amount: 50000,
@@ -152,7 +152,7 @@ export const SettingsModal = ({ isOpen, onClose, user, avatarUrl, onAvatarUpload
                 return;
             }
 
-            const credId = await enrollBiometrics(user?.email || "Orange Finance User");
+            const credId = await enrollBiometrics(user?.email || "Srot Finance User");
             if (credId) {
                 updatePref('biometric_credential_id', credId);
                 updatePref('biometric_enabled', true);
@@ -216,7 +216,7 @@ export const SettingsModal = ({ isOpen, onClose, user, avatarUrl, onAvatarUpload
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; 
-        a.download = `orange_fin_data_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `srot_fin_data_${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
     };
@@ -343,7 +343,7 @@ export const SettingsModal = ({ isOpen, onClose, user, avatarUrl, onAvatarUpload
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     to: user?.email,
-                    reportName: `OrangeFin_Report_${reportLabel.replace(/\s+/g, '_')}.pdf`,
+                    reportName: `SrotFin_Report_${reportLabel.replace(/\s+/g, '_')}.pdf`,
                     filterLabel: reportLabel,
                     stats: reportStats,
                     pdfBase64: base64,

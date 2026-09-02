@@ -99,7 +99,7 @@ export const AIChatbot = ({ isOpen, onClose, transactions, userName }) => {
             .map(([cat, amt]) => `${cat}: ₹${amt.toFixed(0)}`)
             .join(', ');
 
-        return `You are a helpful, expert AI Financial Advisor for an app called Orange Finance. 
+        return `You are a helpful, expert AI Financial Advisor for an app called Srot Finance. 
 The user's name is ${userName || 'User'}. 
 Here is their financial data:
 Total Income: ₹${totalIncome.toFixed(2)}

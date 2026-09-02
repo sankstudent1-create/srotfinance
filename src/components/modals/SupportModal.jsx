@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 const UPI_ID = 'agriwadi464881.rzp@icici';
 const MERCHANT_NAME = 'Agriwadi - Swinfosystems';
-const APP_NAME = 'Orange Finance';
+const APP_NAME = 'Srot Finance';
 
 const TIERS = [
     { amt: 49, label: 'Coffee', emoji: '☕', desc: 'Buy us a coffee', gradient: 'from-amber-400 to-orange-400' },
@@ -111,7 +111,7 @@ export const SupportModal = ({ isOpen, onClose, user }) => {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-slate-900 leading-tight">Support Us</h2>
-                            <p className="text-xs text-slate-400 font-medium">Orange Finance by Swinfosystems</p>
+                            <p className="text-xs text-slate-400 font-medium">Srot Finance by Swinfosystems</p>
                         </div>
                     </div>
 
