@@ -421,7 +421,7 @@ export const SettingsModal = ({ isOpen, onClose, user, avatarUrl, onAvatarUpload
         if (!user?.email || resetLoading) return;
         setResetLoading(true);
         const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-            redirectTo: 'https://fin.swinfosystems.online',
+            redirectTo: 'https://srotfinance.vercel.app',
         });
         setResetLoading(false);
         if (!error) {

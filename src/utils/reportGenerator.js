@@ -58,7 +58,7 @@ export const generateCalculatorPDF = (toolName, inputs, result) => {
     doc.setFontSize(9);
     doc.setTextColor(...SLATE_500);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}  •  Source: fin.swinfosystems.online`, 18, 62);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}  •  Source: srotfinance.vercel.app`, 18, 62);
 
     // ===== RESULTS HERO SECTION =====
     // Background card
@@ -251,7 +251,7 @@ export const generateCalculatorPDF = (toolName, inputs, result) => {
         doc.setFontSize(7);
         doc.setTextColor(...SLATE_500);
         doc.setFont('helvetica', 'normal');
-        doc.text('Srot Finance • Secure Financial Intelligence • fin.swinfosystems.online', 18, height - 12);
+        doc.text('Srot Finance • Secure Financial Intelligence • srotfinance.vercel.app', 18, height - 12);
         doc.text(`Page ${i} of ${pageCount}`, width - 14, height - 12, { align: 'right' });
     }
 

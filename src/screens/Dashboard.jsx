@@ -1018,11 +1018,11 @@ export const Dashboard = ({ session }) => {
                 <header className="sticky top-0 z-40 bg-secondary/70 backdrop-blur-3xl border-b border-main px-4 sm:px-6 py-4">
                     <div className="max-w-7xl mx-auto flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-11 h-11 bg-gradient-to-br from-orange-400 to-rose-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.3)] border border-orange-400/20">
-                                <Wallet className="text-white drop-shadow-md" size={22} />
+                            <div className="w-11 h-11 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(249,115,22,0.3)] border border-orange-400/20 bg-white flex items-center justify-center">
+                                <img src="/logo.png" alt="Srot Finance" className="w-10 h-10 object-contain" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-main tracking-tight leading-tight">Orange <span className="font-light text-dim">Finance</span></h1>
+                                <h1 className="text-xl font-bold text-main tracking-tight leading-tight">Srot <span className="font-light text-dim">Finance</span></h1>
                                 {/* ── Online / Offline / Syncing chip ── */}
                                 <div className="flex items-center gap-1.5 mt-1">
                                     {syncStatus === 'syncing' ? (

@@ -98,7 +98,7 @@ export const AdminPush = ({ users, showToast }) => {
             const payload = {
                 title,
                 body: message,
-                icon: 'https://fin.swinfosystems.online/favicon.ico'
+                icon: 'https://srotfinance.vercel.app/favicon.ico'
             };
 
             if (linkUrl.trim()) payload.url = linkUrl.trim();
