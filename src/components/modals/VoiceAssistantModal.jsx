@@ -288,7 +288,7 @@ export const VoiceAssistantModal = ({ isOpen, onClose, userName, transactions })
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    model: 'llama-3.3-70b-versatile',
+                    model: 'openai/gpt-oss-120b',
                     messages: [
                         { role: 'system', content: `You are Srot Finance Voice Assistant. You speak exclusively in English, but act completely natural and conversational like a human on the phone. Do NOT use markdown. Reply in ONE short, snappy sentence max. User name: ${userName || 'user'}. Recent transactions summary: ${summary}` },
                         ...conversation,
