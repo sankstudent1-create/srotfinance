@@ -252,7 +252,7 @@ Answer the user's questions about their finances accurately, warmly, and concise
         <AnimatePresence>
             <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[500] bg-black/40 backdrop-blur-sm sm:p-6 sm:flex sm:items-center sm:justify-center p-0"
+                className="fixed inset-0 z-[500] bg-black/60 backdrop-blur-md sm:p-6 sm:flex sm:items-center sm:justify-center p-0"
                 onClick={onClose}
             >
                 <motion.div
@@ -260,29 +260,32 @@ Answer the user's questions about their finances accurately, warmly, and concise
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: "100%", opacity: 0 }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="bg-white w-full sm:w-[450px] sm:h-[600px] h-[90vh] mt-[10vh] sm:mt-0 sm:rounded-[2rem] rounded-t-[2rem] shadow-2xl flex flex-col overflow-hidden"
+                    className="glass-panel w-full sm:w-[480px] sm:h-[640px] h-[90vh] mt-[10vh] sm:mt-0 sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl flex flex-col overflow-hidden border border-main"
                     onClick={e => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-orange-500 to-rose-500 p-4 sm:p-5 flex items-center justify-between text-white shrink-0">
+                    <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 p-4 sm:p-5 flex items-center justify-between text-white shrink-0 shadow-lg">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-inner">
+                            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
                                 <Sparkles size={20} className="text-white" />
                             </div>
                             <div>
-                                <h3 className="font-black text-lg leading-tight">AI Advisor</h3>
+                                <h3 className="font-black text-lg leading-tight flex items-center gap-2">
+                                    AI Advisor
+                                    <span className="text-[10px] uppercase font-bold tracking-widest bg-white/20 px-2 py-0.5 rounded-full">Pro</span>
+                                </h3>
                                 <p className="text-xs text-orange-100 font-medium">
-                                    {activeProvider === 'groq' ? 'Powered by Llama 3.3' : activeProvider === 'gemini' ? 'Powered by Gemini' : 'AI Financial Advisor'}
+                                    {activeProvider === 'groq' ? 'Powered by Llama 3.3' : activeProvider === 'gemini' ? 'Powered by Gemini' : 'Intelligent Financial Copilot'}
                                 </p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="p-2 bg-black/10 hover:bg-black/20 rounded-full transition-colors active:scale-95">
+                        <button onClick={onClose} className="p-2 bg-black/10 hover:bg-black/20 rounded-full transition-all active:scale-95 text-white">
                             <X size={20} />
                         </button>
                     </div>
 
                     {/* Chat Area */}
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50 space-y-4">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-secondary/30 space-y-4">
                         {messages.map((msg, idx) => (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
@@ -290,11 +293,15 @@ Answer the user's questions about their finances accurately, warmly, and concise
                                 key={idx}
                                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
-                                <div className={`flex items-end gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-slate-900' : 'bg-gradient-to-br from-orange-400 to-rose-400'}`}>
-                                        {msg.role === 'user' ? <User size={14} className="text-white" /> : <Bot size={14} className="text-white" />}
+                                <div className={`flex items-end gap-2.5 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-gradient-to-br from-orange-500 to-rose-500' : 'bg-secondary border border-main text-orange-400'}`}>
+                                        {msg.role === 'user' ? <User size={15} className="text-white" /> : <Bot size={15} className="text-orange-400" />}
                                     </div>
-                                    <div className={`p-3.5 rounded-[1.25rem] text-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-slate-900 text-white rounded-br-sm' : 'bg-white text-slate-700 shadow-sm border border-slate-100 rounded-bl-sm'}`}>
+                                    <div className={`p-4 rounded-2xl text-xs sm:text-sm whitespace-pre-wrap leading-relaxed ${
+                                        msg.role === 'user' 
+                                            ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-br-none shadow-md shadow-orange-500/20 font-medium' 
+                                            : 'bg-card text-main shadow-md border border-main rounded-bl-none font-normal'
+                                    }`}>
                                         {msg.content}
                                     </div>
                                 </div>
@@ -302,14 +309,14 @@ Answer the user's questions about their finances accurately, warmly, and concise
                         ))}
                         {isLoading && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                                <div className="flex items-end gap-2">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-rose-400 flex items-center justify-center shrink-0 shadow-sm">
-                                        <Bot size={14} className="text-white" />
+                                <div className="flex items-end gap-2.5">
+                                    <div className="w-8 h-8 rounded-xl bg-secondary border border-main flex items-center justify-center shrink-0 shadow-sm">
+                                        <Bot size={15} className="text-orange-400" />
                                     </div>
-                                    <div className="bg-white border border-slate-100 p-4 rounded-[1.25rem] rounded-bl-sm shadow-sm flex gap-1.5 items-center">
-                                        <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                        <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                        <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <div className="bg-card border border-main p-4 rounded-2xl rounded-bl-none shadow-md flex gap-2 items-center">
+                                        <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <div className="w-2 h-2 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                     </div>
                                 </div>
                             </motion.div>
@@ -317,14 +324,37 @@ Answer the user's questions about their finances accurately, warmly, and concise
                         <div ref={messagesEndRef} />
                     </div>
 
+                    {/* Quick suggestion pills */}
+                    <div className="px-4 py-2 bg-secondary/50 border-t border-main/50 flex gap-2 overflow-x-auto no-scrollbar">
+                        {[
+                            "Top spending?",
+                            "How much did I save?",
+                            "Budget tips"
+                        ].map((prompt, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handleSend(prompt)}
+                                disabled={isLoading}
+                                className="whitespace-nowrap px-3 py-1 rounded-full text-[11px] font-bold bg-card border border-main text-dim hover:text-orange-400 hover:border-orange-500/30 transition-all shrink-0 active:scale-95"
+                            >
+                                ✨ {prompt}
+                            </button>
+                        ))}
+                    </div>
+
                     {/* Input Area */}
-                    <div className="p-4 bg-white border-t border-slate-100 shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                    <div className="p-4 bg-card border-t border-main shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={toggleVoiceInput}
-                                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all flex-shrink-0 ${isListening ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-500/30' : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
+                                className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all flex-shrink-0 ${
+                                    isListening 
+                                        ? 'bg-rose-500 text-white animate-pulse shadow-lg shadow-rose-500/30 ring-2 ring-rose-400' 
+                                        : 'bg-secondary border border-main text-dim hover:text-orange-400 hover:border-orange-500/30'
+                                }`}
+                                title="Hold or tap to speak"
                             >
-                                <Mic size={20} />
+                                <Mic size={18} />
                             </button>
                             <div className="relative flex-1">
                                 <input
@@ -333,14 +363,14 @@ Answer the user's questions about their finances accurately, warmly, and concise
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                                     placeholder="Ask anything about your finances..."
-                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-4 pr-12 py-3.5 text-sm font-medium text-slate-700 outline-none focus:border-orange-300 focus:bg-white transition-all shadow-inner"
+                                    className="w-full bg-secondary/80 border border-main rounded-2xl pl-4 pr-12 py-3 text-xs sm:text-sm font-medium text-main placeholder:text-dim outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all"
                                 />
                                 <button
                                     onClick={() => handleSend()}
                                     disabled={!input.trim() || isLoading}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-orange-500 text-white rounded-xl flex items-center justify-center disabled:opacity-50 disabled:bg-slate-300 transition-all hover:bg-orange-600 active:scale-95"
+                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-xl flex items-center justify-center disabled:opacity-30 disabled:grayscale transition-all hover:brightness-105 active:scale-95 shadow-sm"
                                 >
-                                    <Send size={16} className="ml-0.5" />
+                                    <Send size={14} className="ml-0.5" />
                                 </button>
                             </div>
                         </div>

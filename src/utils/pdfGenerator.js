@@ -1,439 +1,525 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// --- THEME CONSTANTS ---
-const ORANGE_MAIN = [249, 115, 22]; // Orange 500
-const ORANGE_LIGHT = [255, 237, 213]; // Orange 100
-const SLATE_900 = [15, 23, 42];
-const SLATE_500 = [100, 116, 139];
-const SLATE_200 = [226, 232, 240];
-const EMERALD = [16, 185, 129];
-const ROSE = [244, 63, 94];
+// --- BRAND COLOR SYSTEM ---
+const BRAND_ORANGE = [249, 115, 22];   // #f97316 (Primary Accent)
+const BRAND_AMBER  = [245, 158, 11];   // #f59e0b (Warm Amber)
+const BRAND_ROSE   = [244, 63, 94];    // #f43f5e (Rose Accent)
+const BRAND_EMERALD= [16, 185, 129];   // #10b981 (Growth / Income)
+const SLATE_900    = [15, 23, 42];     // #0f172a (Deep Text)
+const SLATE_800    = [30, 41, 59];     // #1e293b (Card Backgrounds)
+const SLATE_700    = [51, 65, 85];     // #334155 (Dark Muted)
+const SLATE_500    = [100, 116, 139];  // #64748b (Secondary Text)
+const SLATE_400    = [148, 163, 184];  // #94a3b8 (Tertiary Text)
+const SLATE_200    = [226, 232, 240];  // #e2e8f0 (Borders)
+const SLATE_100    = [241, 245, 249];  // #f1f5f9 (Soft Fills)
+const SLATE_50     = [248, 250, 252];  // #f8fafc (Light Background)
+const WHITE        = [255, 255, 255];
 
-const addHeader = (doc, width, title, subTitle) => {
-    // Top Bar
-    doc.setFillColor(...ORANGE_MAIN);
-    doc.rect(0, 0, width, 6, 'F');
+const fmtINR = (val) => `INR ${Math.round(val || 0).toLocaleString('en-IN')}`;
 
-    // Branding
-    doc.setFontSize(24);
+// Draws a sleek modern executive header
+const addExecutiveHeader = (doc, width, title, subTitle, userProfile) => {
+    // Dual-tone Accent Banner Top Strip
+    doc.setFillColor(...BRAND_ORANGE);
+    doc.rect(0, 0, width * 0.7, 4, 'F');
+    doc.setFillColor(...BRAND_ROSE);
+    doc.rect(width * 0.7, 0, width * 0.3, 4, 'F');
+
+    // Logo Monogram Box
+    doc.setFillColor(...SLATE_900);
+    doc.roundedRect(20, 14, 14, 14, 3, 3, 'F');
+    doc.setFontSize(10);
+    doc.setTextColor(...BRAND_ORANGE);
+    doc.setFont('helvetica', 'bold');
+    doc.text('SF', 27, 23, { align: 'center' });
+
+    // Brand Name
+    doc.setFontSize(18);
     doc.setTextColor(...SLATE_900);
     doc.setFont('helvetica', 'bold');
-    doc.text("Srot Finance", 20, 25);
+    doc.text('Srot Finance', 38, 22);
 
-    // Title
-    doc.setFontSize(16);
-    doc.setTextColor(...SLATE_500);
-    doc.setFont('helvetica', 'normal');
-    doc.text(title, width - 20, 25, { align: 'right' });
+    doc.setFontSize(8);
+    doc.setTextColor(...BRAND_ORANGE);
+    doc.setFont('helvetica', 'bold');
+    doc.text('FINANCIAL INTELLIGENCE • WEALTH ADVISORY', 38, 27);
+
+    // Title & Badge Right Side
+    doc.setFontSize(13);
+    doc.setTextColor(...SLATE_900);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title, width - 20, 21, { align: 'right' });
 
     if (subTitle) {
-        doc.setFontSize(10);
-        doc.text(subTitle, width - 20, 31, { align: 'right' });
+        doc.setFontSize(8);
+        doc.setTextColor(...SLATE_500);
+        doc.setFont('helvetica', 'normal');
+        doc.text(subTitle, width - 20, 26, { align: 'right' });
     }
 
-    // Divider
+    // Horizontal Separator
     doc.setDrawColor(...SLATE_200);
-    doc.setLineWidth(0.5);
-    doc.line(20, 36, width - 20, 36);
+    doc.setLineWidth(0.4);
+    doc.line(20, 32, width - 20, 32);
+
+    // Metadata Bar
+    doc.setFillColor(...SLATE_50);
+    doc.roundedRect(20, 35, width - 40, 14, 2, 2, 'F');
+    doc.setDrawColor(...SLATE_200);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(20, 35, width - 40, 14, 2, 2, 'S');
+
+    const userName = userProfile?.user_metadata?.full_name || 'Valued Client';
+    const reportDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    const docId = `SF-${Date.now().toString().slice(-6)}`;
+
+    doc.setFontSize(8);
+    doc.setTextColor(...SLATE_500);
+    doc.setFont('helvetica', 'normal');
+    doc.text('ACCOUNT HOLDER:', 26, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...SLATE_900);
+    doc.text(userName, 58, 42);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...SLATE_500);
+    doc.text('DATE GENERATED:', width / 2 - 10, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...SLATE_900);
+    doc.text(reportDate, width / 2 + 18, 42);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...SLATE_500);
+    doc.text('DOC REF:', width - 60, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...BRAND_ORANGE);
+    doc.text(docId, width - 44, 42);
 };
 
-const addFooter = (doc, width, height) => {
+// Clean professional multi-page footer
+const addExecutiveFooter = (doc, width, height) => {
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(...SLATE_500);
-        doc.text('Generated by Srot Finance • Secure Financial Tracking • srotfinance.vercel.app', width / 2, height - 10, { align: 'center' });
-        doc.text(`Page ${i} of ${pageCount}`, width - 20, height - 10, { align: 'right' });
+
+        doc.setDrawColor(...SLATE_200);
+        doc.setLineWidth(0.3);
+        doc.line(20, height - 14, width - 20, height - 14);
+
+        doc.setFontSize(7.5);
+        doc.setTextColor(...SLATE_400);
+        doc.setFont('helvetica', 'normal');
+        doc.text('CONFIDENTIAL • Generated by Srot Finance Ecosystem • srotfinance.vercel.app', 20, height - 9);
+        doc.text(`Page ${i} of ${pageCount}`, width - 20, height - 9, { align: 'right' });
     }
 };
 
-export const createPDF = (transactions, stats, userProfile, filterLabel) => {
+// ── 1. MAIN FINANCIAL INTELLIGENCE REPORT ─────────────────────────────────────
+export const createPDF = (transactions = [], stats = {}, userProfile = {}, filterLabel = 'All Time') => {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.width;
     const height = doc.internal.pageSize.height;
 
-    addHeader(doc, width, "Financial Intelligence Report", `Period: ${filterLabel}`);
+    addExecutiveHeader(doc, width, "Financial Activity Statement", `Filter Period: ${filterLabel}`, userProfile);
 
-    // User Info
-    doc.setFontSize(10);
-    doc.setTextColor(...SLATE_900);
-    doc.text(`User: ${userProfile?.user_metadata?.full_name || 'Valued User'}`, 20, 48);
-    doc.setTextColor(...SLATE_500);
-    doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 20, 53);
-
-    // Summary Cards Section
-    let yPos = 65;
-    const cardGap = 10;
+    // KPI Cards Section
+    const yPos = 56;
+    const cardGap = 8;
     const cardWidth = (width - 40 - (cardGap * 2)) / 3;
     const cardHeight = 28;
 
-    const drawSummaryCard = (x, label, value, color) => {
-        doc.setDrawColor(230, 230, 230);
-        doc.setFillColor(252, 252, 252);
+    const drawKpiCard = (x, label, value, subText, accentColor) => {
+        // Card Background
+        doc.setFillColor(...SLATE_50);
+        doc.setDrawColor(...SLATE_200);
+        doc.setLineWidth(0.4);
         doc.roundedRect(x, yPos, cardWidth, cardHeight, 3, 3, 'FD');
 
-        // Color Strip
-        doc.setFillColor(...color);
-        doc.rect(x, yPos + 4, 1.5, cardHeight - 8, 'F');
+        // Vertical Accent Indicator Bar
+        doc.setFillColor(...accentColor);
+        doc.roundedRect(x, yPos, 2.5, cardHeight, 1, 1, 'F');
 
-        doc.setFontSize(9);
+        // Card Label
+        doc.setFontSize(7.5);
         doc.setTextColor(...SLATE_500);
         doc.setFont('helvetica', 'bold');
-        doc.text(label.toUpperCase(), x + 8, yPos + 10);
+        doc.text(label.toUpperCase(), x + 7, yPos + 8);
 
-        doc.setFontSize(14);
+        // Main Metric
+        doc.setFontSize(13);
         doc.setTextColor(...SLATE_900);
-        doc.text(`Rs. ${value.toLocaleString()}`, x + 8, yPos + 21);
+        doc.setFont('helvetica', 'bold');
+        doc.text(fmtINR(value), x + 7, yPos + 18);
+
+        // Subtext / Indicator
+        doc.setFontSize(7);
+        doc.setTextColor(...accentColor);
+        doc.setFont('helvetica', 'bold');
+        doc.text(subText, x + 7, yPos + 24);
     };
 
-    drawSummaryCard(20, 'Total Income', stats.income, EMERALD);
-    drawSummaryCard(20 + cardWidth + cardGap, 'Total Expense', stats.expense, ROSE);
-    drawSummaryCard(20 + (cardWidth + cardGap) * 2, 'Net Savings', stats.balance, ORANGE_MAIN);
+    const savingsRate = stats.income > 0 ? ((stats.balance / stats.income) * 100).toFixed(1) : '0';
+    const expenseRatio = stats.income > 0 ? ((stats.expense / stats.income) * 100).toFixed(1) : '0';
 
-    // Transactions Table
-    yPos += 45;
+    drawKpiCard(20, 'Total Inflow', stats.income || 0, `+${100}% Inflow Velocity`, BRAND_EMERALD);
+    drawKpiCard(20 + cardWidth + cardGap, 'Total Outflow', stats.expense || 0, `${expenseRatio}% Expense Ratio`, BRAND_ROSE);
+    drawKpiCard(20 + (cardWidth + cardGap) * 2, 'Net Savings', stats.balance || 0, `${savingsRate}% Savings Rate`, BRAND_ORANGE);
 
-    doc.setFontSize(12);
+    // Section Header: Transaction Ledger
+    let tableStartY = yPos + cardHeight + 12;
+    doc.setFontSize(11);
     doc.setTextColor(...SLATE_900);
     doc.setFont('helvetica', 'bold');
-    doc.text("Transaction History", 20, yPos);
-    yPos += 5;
+    doc.text("Verified Transaction Ledger", 20, tableStartY);
 
+    doc.setFontSize(8);
+    doc.setTextColor(...SLATE_500);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${transactions.length} record(s) included in this statement`, width - 20, tableStartY, { align: 'right' });
+
+    // Table Data formatting
     const tableData = transactions.map(t => [
-        new Date(t.date).toLocaleDateString(),
-        t.title,
-        t.category,
-        t.type.toUpperCase(),
-        `Rs. ${t.amount.toLocaleString()}`
+        new Date(t.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+        t.title || 'Untitled',
+        (t.category || 'General').toUpperCase(),
+        (t.type || 'expense').toUpperCase(),
+        fmtINR(t.amount)
     ]);
 
     autoTable(doc, {
-        startY: yPos,
-        head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
+        startY: tableStartY + 5,
+        margin: { left: 20, right: 20 },
+        head: [['Date', 'Transaction Description', 'Category', 'Type', 'Amount (INR)']],
         body: tableData,
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 3, textColor: SLATE_500 },
-        headStyles: { fillColor: [248, 250, 252], textColor: SLATE_900, fontStyle: 'bold', minCellHeight: 12, valign: 'middle' },
-        columnStyles: {
-            0: { cellWidth: 25 },
-            1: { cellWidth: 'auto' },
-            3: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
-            4: { halign: 'right', fontStyle: 'bold', cellWidth: 35 }
+        styles: {
+            fontSize: 8.5,
+            cellPadding: { top: 4, bottom: 4, left: 6, right: 6 },
+            textColor: SLATE_700,
+            valign: 'middle'
         },
-        alternateRowStyles: { fillColor: [255, 255, 255] },
-        didParseCell: function (data) {
+        headStyles: {
+            fillColor: SLATE_900,
+            textColor: WHITE,
+            fontStyle: 'bold',
+            fontSize: 8,
+            cellPadding: { top: 5, bottom: 5, left: 6, right: 6 }
+        },
+        columnStyles: {
+            0: { cellWidth: 26, fontStyle: 'bold', textColor: SLATE_500 },
+            1: { cellWidth: 'auto', fontStyle: 'bold', textColor: SLATE_900 },
+            2: { cellWidth: 32, fontSize: 7.5, textColor: SLATE_500 },
+            3: { cellWidth: 24, halign: 'center', fontStyle: 'bold', fontSize: 7.5 },
+            4: { halign: 'right', fontStyle: 'bold', cellWidth: 36, textColor: SLATE_900 }
+        },
+        alternateRowStyles: { fillColor: SLATE_50 },
+        didParseCell: (data) => {
             if (data.section === 'body') {
                 if (data.column.index === 3) {
-                    data.cell.styles.textColor = data.cell.raw === 'INCOME' ? EMERALD : ROSE;
+                    data.cell.styles.textColor = data.cell.raw === 'INCOME' ? BRAND_EMERALD : BRAND_ROSE;
+                }
+                if (data.column.index === 4) {
+                    const rowType = data.row.cells[3]?.raw;
+                    data.cell.styles.textColor = rowType === 'INCOME' ? BRAND_EMERALD : SLATE_900;
                 }
             }
         },
         didDrawCell: (data) => {
             if (data.section === 'body' && data.column.index === data.table.columns.length - 1) {
-                doc.setDrawColor(240, 240, 240);
+                doc.setDrawColor(...SLATE_200);
+                doc.setLineWidth(0.2);
                 doc.line(data.table.settings.margin.left, data.cell.y + data.cell.height, width - data.table.settings.margin.right, data.cell.y + data.cell.height);
             }
         }
     });
 
-    addFooter(doc, width, height);
+    addExecutiveFooter(doc, width, height);
     return doc;
 };
 
 export const getPDFFile = (transactions, stats, userProfile, filterLabel) => {
     const doc = createPDF(transactions, stats, userProfile, filterLabel);
     const blob = doc.output('blob');
-    return new File([blob], `Fin_Report_${Date.now()}.pdf`, { type: 'application/pdf' });
+    return new File([blob], `SrotFin_Report_${Date.now()}.pdf`, { type: 'application/pdf' });
 };
 
-// --- SCHEME TAX INFO FOR PDF ---
+// ── 2. SCHEME & TAX COMPLIANCE DIRECTORY ──────────────────────────────────────
 const SCHEME_TAX_DATA = {
     SIP: {
         fullName: 'Systematic Investment Plan (SIP)',
-        section: 'Equity Mutual Fund — Capital Gains',
+        section: 'Equity Mutual Funds — Capital Gains Regime',
         taxRules: [
-            ['Holding Period for LTCG', '> 12 months per SIP unit'],
-            ['LTCG Tax Rate', '12.5% on gains exceeding Rs.1,25,000/year'],
-            ['STCG Tax Rate', '20% if redeemed within 12 months'],
-            ['Indexation', 'Not available for equity MFs'],
-            ['TDS', 'Not applicable on equity MFs'],
+            ['Holding Period for LTCG', '> 12 months per installment unit'],
+            ['LTCG Tax Rate', '12.5% on capital gains exceeding INR 1,25,000/FY'],
+            ['STCG Tax Rate', '20.0% if redeemed before 12 months'],
+            ['Indexation Benefit', 'Not applicable to equity mutual funds'],
+            ['TDS at Source', 'Zero TDS on redemption for Resident Individuals'],
         ],
         exemptions: [
-            'LTCG up to Rs.1,25,000 per FY is fully exempt from tax',
-            'Each SIP installment treated as a separate purchase',
-            'No TDS deducted on equity mutual fund redemptions',
-            'Dividend income taxable at investor slab rate',
+            'LTCG up to INR 1,25,000 per financial year is 100% tax-exempt',
+            'Each individual SIP installment qualifies for independent 12-month tenure',
+            'No TDS deduction on capital appreciation for domestic retail investors',
+            'Dividend income is added to gross income and taxed as per investor slab rate',
         ],
     },
     Lumpsum: {
-        fullName: 'Lumpsum Investment',
-        section: 'Equity MF — One-time Capital Gains',
+        fullName: 'Lumpsum Investment Scheme',
+        section: 'Capital Gains — Equity & Growth Assets',
         taxRules: [
-            ['LTCG Qualification', 'Holding > 12 months'],
-            ['LTCG Tax', '12.5% on gains > Rs.1.25L'],
-            ['STCG Tax', '20%'],
-            ['Indexation', 'Not available'],
-            ['Surcharge', 'Based on total annual income'],
+            ['LTCG Qualification Period', 'Holding duration > 12 months'],
+            ['LTCG Tax Rate', '12.5% on net capital gains above INR 1,25,000'],
+            ['STCG Tax Rate', '20.0% for assets redeemed under 12 months'],
+            ['Indexation Benefit', 'Removed as per Budget 2024 rationalization'],
+            ['Surcharge & Cess', 'Applicable health & education cess of 4%'],
         ],
         exemptions: [
-            'First Rs.1,25,000 LTCG per FY is tax-free',
-            'No Sec 80C deduction for equity MF',
-            'Debt MFs (post Apr 2023): gains taxed at slab rate',
+            'Initial INR 1,25,000 LTCG exemption available every financial year',
+            'Tax is triggered exclusively on realization (redemption), not on accrual',
+            'Set-off and carry-forward of short-term capital loss allowed for 8 years',
         ],
     },
     'Fixed Deposit': {
-        fullName: 'Fixed Deposit (FD)',
-        section: 'Income from Other Sources',
+        fullName: 'Fixed Deposit (FD) Term Scheme',
+        section: 'Section 56(2) — Income from Other Sources',
         taxRules: [
-            ['Interest Tax', 'Fully taxable at slab rate'],
-            ['TDS Threshold (<60 yrs)', 'Rs.50,000/year'],
-            ['TDS Threshold (60+ yrs)', 'Rs.1,00,000/year'],
-            ['TDS Rate (PAN)', '10%'],
-            ['TDS Rate (No PAN)', '20%'],
+            ['Interest Taxation', 'Fully taxable at individual progressive slab rates'],
+            ['TDS Threshold (Regular)', 'INR 50,000 per financial year per bank'],
+            ['TDS Threshold (Senior 60+)', 'INR 1,00,000 per FY under Section 80TTB'],
+            ['TDS Rate with PAN', '10.0% standard deduction by bank'],
+            ['TDS Rate without PAN', '20.0% penal rate deduction under Section 206AA'],
         ],
         exemptions: [
-            '5-Year Tax Saver FD: Sec 80C deduction up to Rs.1.5L (Old Regime)',
-            'Senior citizens: Rs.50,000 exempt under Sec 80TTB',
-            'Form 15G/15H to avoid TDS if income below taxable limit',
+            '5-Year Tax Saver FDs qualify for Section 80C deduction up to INR 1.5 Lakhs (Old Regime)',
+            'Senior citizens enjoy deduction up to INR 50,000 on interest under Section 80TTB',
+            'Form 15G / 15H can be submitted to prevent TDS deduction if total income is below threshold',
         ],
     },
     PPF: {
         fullName: 'Public Provident Fund (PPF)',
-        section: 'EEE — Exempt-Exempt-Exempt',
+        section: 'Exempt-Exempt-Exempt (EEE) Sovereign Status',
         taxRules: [
-            ['Contribution Deduction', 'Sec 80C up to Rs.1.5L/year'],
-            ['Interest Earned', '100% Tax Free'],
-            ['Maturity Amount', '100% Tax Free'],
-            ['Current Rate', '7.1% p.a. compounded yearly'],
-            ['Lock-in', '15 years (partial from Yr 7)'],
+            ['Investment Deduction', 'Deduction under Section 80C up to INR 1,50,000/yr'],
+            ['Interest Income', '100% Tax Free under Section 10(11) of IT Act'],
+            ['Maturity Proceeds', '100% Tax Free with zero tax liability at withdrawal'],
+            ['Current Sovereign Rate', '7.1% per annum compounded annually'],
+            ['Statutory Tenure', '15 Years (Partial withdrawals available from Year 7)'],
         ],
         exemptions: [
-            'PPF enjoys EEE status — zero tax at all stages',
-            'Interest exempt under Section 10(11)',
-            'Max annual investment: Rs.1,50,000',
-            'Available in Old & New tax regimes',
+            'Full EEE status — tax exemption at entry, accumulation, and maturity phases',
+            'Immune from court attachments under the Public Provident Fund Act',
+            'Available across both Old and New Tax Regimes (maturity tax exemption holds in both)',
         ],
     },
     Interest: {
-        fullName: 'Simple Interest Calculator',
-        section: 'Income from Other Sources',
+        fullName: 'Simple Interest & Savings Vehicle',
+        section: 'Section 56 — Accrued Interest Earnings',
         taxRules: [
-            ['Interest Tax', 'Taxed at income slab rate'],
-            ['Sec 80TTA (Savings)', 'Rs.10,000 exempt (<60 yrs)'],
-            ['Sec 80TTB (Senior)', 'Rs.50,000 exempt (60+ yrs)'],
-            ['TDS', 'Based on source of interest'],
+            ['Tax Liability', 'Taxable at applicable marginal income tax slab'],
+            ['Sec 80TTA Exemption', 'Savings account interest up to INR 10,000 exempt (<60 yrs)'],
+            ['Sec 80TTB Exemption', 'Senior citizens interest up to INR 50,000 exempt (60+ yrs)'],
+            ['Reporting Obligation', 'Must be declared under Annual Information Statement (AIS)'],
         ],
         exemptions: [
-            'Savings interest up to Rs.10K exempt (80TTA)',
-            'Senior citizens: Rs.50K interest exempt (80TTB)',
-            'PPF, Sukanya Samriddhi interest fully exempt',
+            'Savings bank account interest up to INR 10,000 exempt under Section 80TTA',
+            'Senior citizens benefit from broad INR 50,000 exemption covering SB & FD interest',
+            'Sovereign schemes (PPF, Sukanya Samriddhi) maintain complete tax exemption',
         ],
     },
 };
 
-export const getCalcPDFFile = (title, data, result, userProfile) => {
+// ── 3. EXECUTIVE CALCULATOR INVESTMENT REPORT ────────────────────────────────
+export const getCalcPDFFile = (title = 'Investment Calculator', data = {}, result = {}, userProfile = {}) => {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.width;
     const height = doc.internal.pageSize.height;
 
-    // Stylish Sidebar
-    doc.setFillColor(...ORANGE_MAIN);
-    doc.rect(0, 0, 15, height, 'F');
-
     // Header
-    doc.setFontSize(28);
-    doc.setTextColor(...SLATE_900);
-    doc.setFont('helvetica', 'bold');
-    doc.text(title, 35, 30);
+    addExecutiveHeader(doc, width, `${title} Analysis`, "Wealth Growth & Tax Projection", userProfile);
 
-    doc.setFontSize(12);
-    doc.setTextColor(...ORANGE_MAIN);
-    doc.text("ANALYSIS & PROJECTION REPORT", 35, 38);
+    let yPos = 56;
 
-    // Fiscal Year badge
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
+    // Hero Investment & Maturity Block
     doc.setFillColor(...SLATE_900);
-    doc.roundedRect(width - 55, 20, 38, 14, 3, 3, 'F');
-    doc.text('FY 2025-26', width - 52, 29);
+    doc.roundedRect(20, yPos, width - 40, 48, 4, 4, 'F');
 
-    // Meta Info
-    doc.setFontSize(10);
-    doc.setTextColor(...SLATE_500);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Prepared for: ${userProfile?.user_metadata?.full_name || 'Valued Client'}`, 35, 50);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 35, 56);
+    // Inner Glow Banner Top
+    doc.setFillColor(...BRAND_ORANGE);
+    doc.roundedRect(20, yPos, width - 40, 2.5, 1, 1, 'F');
 
-    doc.setDrawColor(...SLATE_200);
-    doc.line(35, 62, width - 20, 62);
+    const heroY = yPos + 12;
+    const heroColW = (width - 40) / 3;
 
-    // Inputs Section
-    let yPos = 75;
+    // Total Capital Invested
+    doc.setFontSize(7.5);
+    doc.setTextColor(...SLATE_400);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAL CAPITAL INVESTED', 30, heroY);
     doc.setFontSize(14);
+    doc.setTextColor(...WHITE);
+    doc.text(fmtINR(result.invested || 0), 30, heroY + 8);
+    doc.setFontSize(7);
+    doc.setTextColor(...SLATE_400);
+    doc.text('Principal Contribution', 30, heroY + 14);
+
+    // Total Projected Wealth Gain
+    const col2X = 20 + heroColW;
+    doc.setFontSize(7.5);
+    doc.setTextColor(...SLATE_400);
+    doc.text('ESTIMATED WEALTH GAIN', col2X, heroY);
+    doc.setFontSize(14);
+    doc.setTextColor(...BRAND_EMERALD);
+    doc.text(`+ ${fmtINR(result.returns || 0)}`, col2X, heroY + 8);
+    const roiPct = result.invested > 0 ? ((result.returns / result.invested) * 100).toFixed(1) : '0';
+    doc.setFontSize(7);
+    doc.setTextColor(...BRAND_EMERALD);
+    doc.text(`${roiPct}% Total Capital Growth`, col2X, heroY + 14);
+
+    // Final Maturity Value
+    const col3X = 20 + heroColW * 2;
+    doc.setFontSize(7.5);
+    doc.setTextColor(...BRAND_ORANGE);
+    doc.text('PROJECTED MATURITY VALUE', col3X, heroY);
+    doc.setFontSize(16);
+    doc.setTextColor(...WHITE);
+    doc.text(fmtINR(result.netTotal || result.total || 0), col3X, heroY + 8);
+    doc.setFontSize(7);
+    doc.setTextColor(result.tax > 0 ? BRAND_ROSE : BRAND_EMERALD);
+    doc.text(result.tax > 0 ? `Est. Tax: ${fmtINR(result.tax)}` : 'Zero Tax Liability (Exempt)', col3X, heroY + 14);
+
+    // Ratio Progress Bar
+    const totalWealth = (result.invested || 0) + (result.returns || 0);
+    const principalPct = totalWealth > 0 ? Math.min(100, Math.max(0, (result.invested / totalWealth) * 100)) : 50;
+    const barWidth = width - 60;
+    const barY = yPos + 36;
+
+    doc.setFillColor(40, 50, 70);
+    doc.roundedRect(30, barY, barWidth, 3.5, 1.5, 1.5, 'F');
+    doc.setFillColor(...BRAND_ORANGE);
+    doc.roundedRect(30, barY, (barWidth * principalPct) / 100, 3.5, 1.5, 1.5, 'F');
+
+    doc.setFontSize(6.5);
+    doc.setTextColor(...SLATE_400);
+    doc.text(`Principal: ${principalPct.toFixed(0)}%`, 30, barY + 8);
+    doc.text(`Returns: ${(100 - principalPct).toFixed(0)}%`, width - 30, barY + 8, { align: 'right' });
+
+    // Input Parameters Section
+    yPos += 58;
+    doc.setFontSize(10.5);
     doc.setTextColor(...SLATE_900);
     doc.setFont('helvetica', 'bold');
-    doc.text("Input Parameters", 35, yPos);
+    doc.text("Calculation Parameters", 20, yPos);
 
-    yPos += 10;
-    const inputs = [
-        ['Investment Amount', `Rs. ${parseFloat(data.amount).toLocaleString()}`],
-        ['Duration', `${data.duration} Years`],
-        ['Interest / Return Rate', `${data.rate || '7.1'}%`],
-        ['Expense Ratio', `${data.expense_ratio || '0'}%`]
+    const inputData = [
+        ['Investment Amount', fmtINR(data.amount)],
+        ['Investment Duration', `${data.duration || 1} Year(s)`],
+        ['Expected Annual Return', `${data.rate || '7.1'}% p.a.`],
+        ['Expense Ratio / Deductions', `${data.expense_ratio || '0'}%`]
     ];
 
-    doc.setFontSize(11);
-    inputs.forEach(([label, val], i) => {
-        if (i % 2 === 0 && i !== 0) yPos += 12;
-        const xOffset = i % 2 === 0 ? 35 : 120;
-
-        doc.setTextColor(...SLATE_500);
-        doc.setFont('helvetica', 'normal');
-        doc.text(label, xOffset, yPos);
-
-        doc.setTextColor(...SLATE_900);
-        doc.setFont('helvetica', 'bold');
-        doc.text(val, xOffset, yPos + 6);
+    autoTable(doc, {
+        startY: yPos + 4,
+        margin: { left: 20, right: 20 },
+        head: [['Simulation Parameter', 'Input Value']],
+        body: inputData,
+        theme: 'plain',
+        styles: { fontSize: 8.5, cellPadding: 3.5, textColor: SLATE_700 },
+        headStyles: { fillColor: SLATE_900, textColor: WHITE, fontSize: 8, fontStyle: 'bold' },
+        columnStyles: {
+            0: { cellWidth: 80, fontStyle: 'bold', textColor: SLATE_900 },
+            1: { halign: 'right', fontStyle: 'bold', textColor: BRAND_ORANGE }
+        },
+        alternateRowStyles: { fillColor: SLATE_50 }
     });
 
-    // Results Box
-    yPos += 25;
-    doc.setFillColor(...ORANGE_LIGHT);
-    doc.setDrawColor(...ORANGE_MAIN);
-    doc.roundedRect(30, yPos, width - 50, 55, 4, 4, 'FD');
+    // Scheme Tax Breakdown Section
+    const scheme = SCHEME_TAX_DATA[title] || null;
+    let nextY = (doc.lastAutoTable?.finalY || yPos + 35) + 10;
 
-    const resYStart = yPos + 14;
-
-    // Invested
-    doc.setFontSize(10);
-    doc.setTextColor(...SLATE_500);
-    doc.text("Total Invested", 45, resYStart);
-    doc.setFontSize(14);
-    doc.setTextColor(...SLATE_900);
-    doc.text(`Rs. ${Math.round(result.invested).toLocaleString()}`, 45, resYStart + 8);
-
-    // Returns
-    doc.setFontSize(10);
-    doc.setTextColor(...SLATE_500);
-    doc.text("Total Gains", 100, resYStart);
-    doc.setFontSize(14);
-    doc.setTextColor(...EMERALD);
-    doc.text(`+ Rs. ${Math.round(result.returns).toLocaleString()}`, 100, resYStart + 8);
-
-    // Final
-    doc.setFontSize(12);
-    doc.setTextColor(...ORANGE_MAIN);
-    doc.setFont('helvetica', 'bold');
-    doc.text("MATURITY VALUE", width - 80, resYStart);
-    doc.setFontSize(22);
-    doc.text(`Rs. ${Math.round(result.netTotal).toLocaleString()}`, width - 80, resYStart + 12);
-
-    // Tax estimation
-    doc.setFontSize(9);
-    doc.setTextColor(...ROSE);
-    doc.text(`Estimated Tax: Rs. ${Math.round(result.tax).toLocaleString()}`, 45, resYStart + 28);
-
-    // --- TAX & SCHEME INFO SECTION ---
-    yPos += 70;
-    const schemeInfo = SCHEME_TAX_DATA[title] || null;
-
-    if (schemeInfo) {
-        doc.setFontSize(13);
+    if (scheme) {
+        doc.setFontSize(10.5);
         doc.setTextColor(...SLATE_900);
         doc.setFont('helvetica', 'bold');
-        doc.text(`Tax Treatment — ${schemeInfo.fullName}`, 35, yPos);
-        doc.setFontSize(9);
-        doc.setTextColor(...ORANGE_MAIN);
-        doc.text(`Section: ${schemeInfo.section} | As per Indian IT Act, FY 2025-26`, 35, yPos + 7);
+        doc.text(`Tax Treatment & Compliance — ${scheme.fullName}`, 20, nextY);
 
-        // Tax Rules Table
-        yPos += 12;
-        autoTable(doc, {
-            startY: yPos,
-            margin: { left: 35, right: 20 },
-            head: [['Rule', 'Details']],
-            body: schemeInfo.taxRules,
-            theme: 'striped',
-            headStyles: { fillColor: SLATE_900, textColor: 255, fontSize: 9 },
-            styles: { fontSize: 9, cellPadding: 3 },
-            alternateRowStyles: { fillColor: [248, 250, 252] },
-            columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55 } }
-        });
-
-        // Exemptions
-        yPos = (doc.lastAutoTable?.finalY || yPos + 60) + 10;
-
-        // Check if we need a new page
-        if (yPos > height - 80) {
-            doc.addPage();
-            yPos = 30;
-        }
-
-        doc.setFontSize(11);
-        doc.setTextColor(...EMERALD);
+        doc.setFontSize(7.5);
+        doc.setTextColor(...BRAND_ORANGE);
         doc.setFont('helvetica', 'bold');
-        doc.text("Tax Benefits & Exemptions", 35, yPos);
-        yPos += 6;
+        doc.text(`Governed by ${scheme.section} • As per FY 2025-26 Indian Income Tax Rules`, 20, nextY + 5);
 
-        doc.setFontSize(9);
-        doc.setTextColor(...SLATE_500);
-        doc.setFont('helvetica', 'normal');
-        schemeInfo.exemptions.forEach((ex, i) => {
-            if (yPos > height - 40) {
-                doc.addPage();
-                yPos = 30;
+        autoTable(doc, {
+            startY: nextY + 8,
+            margin: { left: 20, right: 20 },
+            head: [['Statutory Rule', 'Compliance Parameter']],
+            body: scheme.taxRules,
+            theme: 'striped',
+            styles: { fontSize: 8, cellPadding: 3, textColor: SLATE_700 },
+            headStyles: { fillColor: SLATE_800, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: SLATE_50 },
+            columnStyles: {
+                0: { cellWidth: 60, fontStyle: 'bold', textColor: SLATE_900 }
             }
-            doc.text(`✓ ${ex}`, 38, yPos);
-            yPos += 6;
         });
+
+        nextY = (doc.lastAutoTable?.finalY || nextY + 45) + 8;
+
+        // Exemptions list
+        if (nextY < height - 60) {
+            doc.setFontSize(8.5);
+            doc.setTextColor(...BRAND_EMERALD);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Key Exemptions & Allowances:", 20, nextY);
+            nextY += 5;
+
+            scheme.exemptions.forEach((exemption) => {
+                doc.setFontSize(7.5);
+                doc.setTextColor(...SLATE_700);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`•  ${exemption}`, 24, nextY);
+                nextY += 4.5;
+            });
+        }
     }
 
-    // Projections Table if available
+    // Yearly Growth Projections Table (if available)
     if (result.projections && result.projections.length > 0) {
-        yPos += 10;
-        if (yPos > height - 60) {
+        if (nextY > height - 80) {
             doc.addPage();
-            yPos = 30;
+            nextY = 24;
         }
 
-        doc.setFontSize(14);
+        doc.setFontSize(10.5);
         doc.setTextColor(...SLATE_900);
         doc.setFont('helvetica', 'bold');
-        doc.text("Growth Projection (Yearly)", 35, yPos);
+        doc.text("Compounded Growth Projection (Year-by-Year)", 20, nextY);
 
-        const projData = result.projections.map(p => [
+        const projRows = result.projections.slice(0, 15).map(p => [
             `Year ${p.year}`,
-            `Rs. ${Math.round(p.invested).toLocaleString()}`,
-            `Rs. ${Math.round(p.total).toLocaleString()}`,
-            `+${p.invested > 0 ? (((p.total - p.invested) / p.invested) * 100).toFixed(1) : '0'}%`
+            fmtINR(p.invested),
+            fmtINR(p.total - p.invested),
+            fmtINR(p.total),
+            p.invested > 0 ? `+${(((p.total - p.invested) / p.invested) * 100).toFixed(1)}%` : '0%'
         ]);
 
         autoTable(doc, {
-            startY: yPos + 5,
-            margin: { left: 35 },
-            head: [['Period', 'Invested', 'Projected Value', 'Growth']],
-            body: projData,
-            theme: 'striped',
-            headStyles: { fillColor: SLATE_900, textColor: 255 },
-            styles: { fontSize: 10, cellPadding: 3 },
-            alternateRowStyles: { fillColor: [248, 250, 252] },
+            startY: nextY + 4,
+            margin: { left: 20, right: 20 },
+            head: [['Timeline', 'Invested Capital', 'Accumulated Gains', 'Total Value', 'Growth %']],
+            body: projRows,
+            theme: 'plain',
+            styles: { fontSize: 8, cellPadding: 3, textColor: SLATE_700 },
+            headStyles: { fillColor: SLATE_900, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: SLATE_50 },
             columnStyles: {
-                3: { textColor: EMERALD, fontStyle: 'bold' }
+                0: { fontStyle: 'bold', textColor: SLATE_900 },
+                2: { textColor: BRAND_EMERALD, fontStyle: 'bold' },
+                3: { fontStyle: 'bold', textColor: SLATE_900 },
+                4: { halign: 'right', textColor: BRAND_EMERALD, fontStyle: 'bold' }
             }
         });
     }
 
-    // Disclaimer
-    const disclaimerY = doc.internal.pageSize.height - 35;
-    doc.setFontSize(8);
-    doc.setTextColor(...SLATE_500);
-    doc.setFont('helvetica', 'italic');
-    doc.text("* Tax calculations based on FY 2025-26 Indian Income Tax rules. Actual tax may vary based on total income,", 35, disclaimerY);
-    doc.text("  applicable surcharge, and cess. This is informational only, not financial/tax advice.", 35, disclaimerY + 5);
-
-    addFooter(doc, width, height);
+    addExecutiveFooter(doc, width, height);
 
     const blob = doc.output('blob');
     return new File([blob], `${title.replace(/\s+/g, '_')}_SrotFin.pdf`, { type: 'application/pdf' });

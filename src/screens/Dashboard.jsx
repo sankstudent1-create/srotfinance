@@ -741,9 +741,8 @@ export const Dashboard = ({ session }) => {
                 </div>
             );
             
-            // INCREASED TIMERS: 10s for calculators, 30s for full heavy analytics
-            // This ensures all charts, gradients, and font weights are finalized.
-            const waitMs = calcData ? 10000 : 30000;
+            // Fast DOM settlement timer to ensure fonts, gradients, and layout are finalized
+            const waitMs = calcData ? 800 : 1200;
             setTimeout(resolve, waitMs);
         });
 
@@ -1209,13 +1208,13 @@ export const Dashboard = ({ session }) => {
 
                                     {/* Search */}
                                     <div className="relative mb-6">
-                                        <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-orange-500/50" />
+                                        <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-orange-500/60" />
                                         <input
                                             type="text"
                                             value={searchQuery}
                                             onChange={e => setSearchQuery(e.target.value)}
                                             placeholder="Search transactions..."
-                                            className="w-full bg-[#181A20]/70 backdrop-blur-md border border-white/5 rounded-2xl pl-14 pr-4 py-4 text-sm font-medium text-slate-100 placeholder:text-slate-500 outline-none focus:border-orange-500/50 focus:shadow-[0_0_20px_rgba(249,115,22,0.15)] focus:bg-[#181A20] transition-all"
+                                            className="w-full bg-secondary/80 backdrop-blur-md border border-main rounded-2xl pl-14 pr-4 py-4 text-sm font-medium text-main placeholder:text-dim outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 focus:bg-card transition-all"
                                         />
                                     </div>
 
@@ -1226,9 +1225,9 @@ export const Dashboard = ({ session }) => {
                                         </div>
                                     ) : filteredTransactions.length === 0 ? (
                                         <div className="text-center py-16">
-                                            <Receipt className="mx-auto text-slate-200 mb-4" size={48} />
-                                            <p className="text-sm font-semibold text-slate-400">No transactions yet</p>
-                                            <p className="text-xs text-slate-300 mt-1">Tap the + button to add your first one</p>
+                                            <Receipt className="mx-auto text-dim/40 mb-4" size={48} />
+                                            <p className="text-sm font-semibold text-dim">No transactions yet</p>
+                                            <p className="text-xs text-dim/70 mt-1">Tap the + button to add your first one</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
@@ -1260,15 +1259,15 @@ export const Dashboard = ({ session }) => {
                                 {/* Report Header */}
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Deep Dive Analytics</h2>
-                                        <p className="text-sm text-slate-400 font-medium mt-1">Insights & reports for your finances</p>
+                                        <h2 className="text-2xl font-black text-main tracking-tight">Deep Dive Analytics</h2>
+                                        <p className="text-sm text-dim font-medium mt-1">Insights & reports for your finances</p>
                                     </div>
                                     <div className="flex gap-2">
                                         {/* Share */}
                                         <button
                                             onClick={handleShare}
                                             disabled={isSharing}
-                                            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-3 rounded-2xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 disabled:opacity-50"
+                                            className="flex items-center gap-2 bg-secondary text-main border border-main px-4 py-3 rounded-2xl text-xs font-bold hover:bg-surface transition-all shadow-sm disabled:opacity-50"
                                         >
                                             {isSharing ? <Loader2 size={14} className="animate-spin" /> : <Share2 size={14} />}
                                             Share
@@ -1277,14 +1276,14 @@ export const Dashboard = ({ session }) => {
                                 </div>
 
                                 {/* Report Actions */}
-                                <div className="bg-[#181A20]/80 rounded-[2.5rem] p-8 border border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 backdrop-blur-2xl">
+                                <div className="glass-panel rounded-[2.5rem] p-8 border border-main shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 backdrop-blur-2xl">
                                     <div className="flex items-center gap-3">
                                         <div className="p-3 bg-violet-500/20 text-violet-400 rounded-2xl border border-violet-500/20 shadow-inner">
                                             <FileText size={20} />
                                         </div>
                                         <div>
-                                            <h3 className="text-sm font-black text-slate-100">Financial Report</h3>
-                                            <p className="text-[10px] text-slate-400 font-medium tracking-wide">Export or preview your data</p>
+                                            <h3 className="text-sm font-black text-main">Financial Report</h3>
+                                            <p className="text-[10px] text-dim font-medium tracking-wide">Export or preview your data</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2 w-full sm:w-auto">
@@ -1302,7 +1301,7 @@ export const Dashboard = ({ session }) => {
                                                 setPreviewZoom(1);
                                                 setIsPrinting(true);
                                             }}
-                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-bold border border-white/10 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-secondary text-main px-5 py-2.5 rounded-xl text-xs font-bold border border-main hover:bg-surface transition-all active:scale-95"
                                         >
                                             <Eye size={14} /> Preview
                                         </button>
@@ -1324,7 +1323,7 @@ export const Dashboard = ({ session }) => {
                         whileHover={{ scale: 1.1, y: -4 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={() => setShowChatbot(true)}
-                        className="pointer-events-auto w-12 h-12 bg-[#0A0B10]/90 backdrop-blur-3xl border border-white/10 rounded-[2rem] flex items-center justify-center text-orange-500 shadow-[0_15px_30px_rgba(0,0,0,0.4)] group transition-all"
+                        className="pointer-events-auto w-12 h-12 bg-secondary/90 backdrop-blur-3xl border border-main rounded-[2rem] flex items-center justify-center text-orange-500 shadow-xl group transition-all"
                     >
                         <div className="absolute inset-0 bg-orange-500/10 blur-xl rounded-full group-hover:bg-orange-500/20 transition-all" />
                         <MessageSquareText size={22} className="relative group-hover:animate-bounce" />
@@ -1435,23 +1434,23 @@ export const Dashboard = ({ session }) => {
                             <motion.div
                                 initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
                                 transition={{ type: 'spring', damping: 26, stiffness: 300 }}
-                                className="bg-[#181A20] w-full sm:max-w-md sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border border-white/5 max-h-[90vh] overflow-hidden flex flex-col"
+                                className="glass-panel w-full sm:max-w-md sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl border border-main max-h-[90vh] overflow-hidden flex flex-col"
                                 onClick={e => e.stopPropagation()}
                             >
                                 {/* Drag Handle */}
                                 <div className="flex justify-center pt-3 sm:hidden">
-                                    <div className="w-10 h-1 bg-slate-200 rounded-full" />
+                                    <div className="w-10 h-1 bg-border-main rounded-full" />
                                 </div>
 
                                 {/* Header */}
-                                <div className="flex justify-between items-center px-6 pt-5 pb-3 sm:px-8 sm:pt-8 bg-gradient-to-b from-white/5 to-transparent">
+                                <div className="flex justify-between items-center px-6 pt-5 pb-3 sm:px-8 sm:pt-8 bg-gradient-to-b from-orange-500/5 to-transparent">
                                     <div>
-                                        <h3 className="text-xl font-black text-slate-100">{editTransaction ? 'Edit Transaction' : 'New Transaction'}</h3>
-                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                                        <h3 className="text-xl font-black text-main">{editTransaction ? 'Edit Transaction' : 'New Transaction'}</h3>
+                                        <p className="text-[11px] text-dim font-medium mt-0.5">
                                             {editTransaction ? 'Update the details below' : 'Track your money flow'}
                                         </p>
                                     </div>
-                                    <button onClick={() => setShowTransaction(false)} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-orange-500/20 hover:text-orange-400 transition-colors hover:scale-105">
+                                    <button onClick={() => setShowTransaction(false)} className="w-10 h-10 rounded-full bg-secondary/80 border border-main flex items-center justify-center text-dim hover:bg-orange-500/10 hover:text-orange-400 transition-colors hover:scale-105">
                                         <X size={20} />
                                     </button>
                                 </div>
@@ -1459,18 +1458,18 @@ export const Dashboard = ({ session }) => {
                                 {/* Body (scrollable) */}
                                 <div className="flex-1 overflow-y-auto px-6 pb-6 sm:px-8 sm:pb-8 space-y-5">
                                     {/* Type Toggle — Expense / Income */}
-                                    <div className="flex gap-2 bg-white/5 border border-white/5 p-1.5 rounded-2xl">
+                                    <div className="flex gap-2 bg-secondary/80 border border-main p-1.5 rounded-2xl">
                                         {['expense', 'income'].map(type => {
                                             const isActive = txForm.type === type;
                                             return (
                                                 <button
                                                     key={type}
                                                     onClick={() => setTxForm({ ...txForm, type })}
-                                                    className={`relative flex-1 py-3 rounded-xl text-sm font-black uppercase tracking-wider transition-all ${isActive
+                                                    className={`relative flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${isActive
                                                         ? (type === 'expense'
-                                                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 shadow-[0_0_15px_rgba(243,24,107,0.3)]'
-                                                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.3)]')
-                                                        : 'text-slate-500 hover:text-slate-300'
+                                                            ? 'bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.25)]'
+                                                            : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.25)]')
+                                                        : 'text-dim hover:text-main'
                                                         }`}
                                                 >
                                                     {type === 'expense' ? '↓ ' : '↑ '}{type}
@@ -1480,23 +1479,23 @@ export const Dashboard = ({ session }) => {
                                     </div>
 
                                     {/* Amount — Big Input */}
-                                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-center shadow-inner">
-                                        <label className="text-[10px] font-black text-orange-400/80 uppercase tracking-widest block mb-2">Amount</label>
+                                    <div className="bg-secondary/60 border border-main rounded-2xl p-5 text-center shadow-inner">
+                                        <label className="text-[10px] font-black text-orange-400 uppercase tracking-widest block mb-2">Amount</label>
                                         <div className="flex items-center justify-center gap-1">
-                                            <span className="text-3xl font-black text-slate-500">₹</span>
+                                            <span className="text-3xl font-black text-dim">₹</span>
                                             <input
                                                 type="number"
                                                 value={txForm.amount}
                                                 onChange={e => setTxForm({ ...txForm, amount: e.target.value })}
                                                 placeholder="0"
-                                                className="bg-transparent text-center text-4xl font-black text-white outline-none w-40 placeholder:text-slate-600 focus:shadow-[0_0_15px_rgba(249,115,22,0.2)] rounded-lg transition-all py-1"
+                                                className="bg-transparent text-center text-4xl font-black text-main outline-none w-44 placeholder:text-dim/40 focus:ring-2 focus:ring-orange-500/30 rounded-lg transition-all py-1 font-mono"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Title */}
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Description</label>
+                                        <label className="text-[10px] font-black text-dim uppercase tracking-widest mb-2 block ml-1">Description</label>
                                         <input
                                             type="text"
                                             value={txForm.title}
@@ -1509,14 +1508,14 @@ export const Dashboard = ({ session }) => {
                                                 }));
                                             }}
                                             placeholder="e.g. Grocery shopping"
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 font-bold text-white outline-none focus:border-orange-500/50 focus:bg-[#181A20] focus:shadow-[0_0_20px_rgba(249,115,22,0.15)] transition-all placeholder:text-slate-600"
+                                            className="w-full bg-secondary/60 border border-main rounded-2xl px-5 py-3.5 font-bold text-main outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all placeholder:text-dim/50"
                                         />
                                     </div>
 
                                     {/* Category Picker — Visual Grid */}
                                     <div>
                                         <div className="flex items-center justify-between mb-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
+                                            <label className="text-[10px] font-black text-dim uppercase tracking-widest ml-1">Category</label>
                                             <button
                                                 onClick={() => { setShowTransaction(false); setTimeout(() => setShowCategoryManager(true), 200); }}
                                                 className="text-[10px] font-bold text-orange-500 hover:text-orange-600 transition-colors flex items-center gap-1"
@@ -1538,15 +1537,15 @@ export const Dashboard = ({ session }) => {
                                                             key={cat.name}
                                                             onClick={() => setTxForm({ ...txForm, category: cat.name })}
                                                             className={`flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl text-center transition-all ${isActive
-                                                                ? `${catColor.bg} ring-2 ring-orange-400 shadow-sm scale-[1.02]`
-                                                                : 'bg-slate-50 hover:bg-slate-100'
+                                                                ? `${catColor.bg} ring-2 ring-orange-500 shadow-sm scale-[1.02]`
+                                                                : 'bg-secondary/60 hover:bg-secondary border border-main text-dim hover:text-main'
                                                                 }`}
                                                         >
-                                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isActive ? `${catColor.text}` : 'text-slate-400'
+                                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isActive ? `${catColor.text}` : 'text-dim'
                                                                 }`}>
                                                                 {cat.isEmoji ? <span className="text-lg">{cat.icon_key}</span> : (CatIcon && <CatIcon size={16} />)}
                                                             </div>
-                                                            <span className={`text-[9px] font-bold truncate w-full ${isActive ? 'text-slate-800' : 'text-slate-400'
+                                                            <span className={`text-[9px] font-bold truncate w-full ${isActive ? 'text-main font-black' : 'text-dim'
                                                                 }`}>
                                                                 {cat.name}
                                                             </span>
@@ -1558,12 +1557,12 @@ export const Dashboard = ({ session }) => {
 
                                     {/* Date */}
                                     <div>
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-1">Date</label>
+                                        <label className="text-[10px] font-black text-dim uppercase tracking-widest mb-2 block ml-1">Date</label>
                                         <input
                                             type="date"
                                             value={txForm.date}
                                             onChange={e => setTxForm({ ...txForm, date: e.target.value })}
-                                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 font-bold text-slate-900 outline-none focus:border-orange-400 transition-all"
+                                            className="w-full bg-secondary/60 border border-main rounded-2xl px-5 py-3.5 font-bold text-main outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all"
                                         />
                                     </div>
 
@@ -1572,7 +1571,7 @@ export const Dashboard = ({ session }) => {
                                         <div className="flex flex-col gap-2">
                                             <button
                                                 onClick={handleVoiceTransaction}
-                                                className={`w-full flex items-center justify-center gap-3 px-5 py-3 rounded-2xl text-xs font-bold transition-all shadow-sm ${isListeningTx ? 'bg-rose-500 text-white animate-pulse' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}`}
+                                                className={`w-full flex items-center justify-center gap-3 px-5 py-3 rounded-2xl text-xs font-bold transition-all shadow-sm ${isListeningTx ? 'bg-rose-500 text-white animate-pulse' : 'bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20'}`}
                                             >
                                                 <Mic size={16} />
                                                 {isListeningTx ? "Listening... Speak now" : "Voice to Transaction (Try 'I spent 15 on a taxi')"}
@@ -1580,7 +1579,7 @@ export const Dashboard = ({ session }) => {
 
                                             <button
                                                 onClick={() => { setShowTransaction(false); setTimeout(() => setShowScanner(true), 200); }}
-                                                className="w-full flex items-center justify-center gap-3 bg-orange-50 text-orange-600 px-5 py-3 rounded-2xl text-xs font-bold hover:bg-orange-100 transition-colors shadow-sm"
+                                                className="w-full flex items-center justify-center gap-3 bg-orange-500/10 text-orange-500 dark:text-orange-400 border border-orange-500/20 px-5 py-3 rounded-2xl text-xs font-bold hover:bg-orange-500/20 transition-colors shadow-sm"
                                             >
                                                 <ScanLine size={16} />
                                                 Scan receipt instead
@@ -1594,9 +1593,9 @@ export const Dashboard = ({ session }) => {
                                     <button
                                         onClick={handleAddTransaction}
                                         disabled={savingTx || !txForm.title || !txForm.amount}
-                                        className={`w-full py-4 rounded-2xl font-black text-lg active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${txForm.type === 'income'
-                                            ? 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-600'
-                                            : 'bg-slate-900 text-white shadow-slate-900/20 hover:bg-slate-800'
+                                        className={`w-full py-4 rounded-2xl font-black text-base active:scale-95 transition-all shadow-xl flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${txForm.type === 'income'
+                                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/25 hover:brightness-105'
+                                            : 'bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white shadow-orange-500/30 hover:brightness-105'
                                             }`}
                                     >
                                         {savingTx ? (
@@ -1790,23 +1789,23 @@ export const Dashboard = ({ session }) => {
                         initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
-                        className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[9999] bg-white border border-slate-200 shadow-2xl rounded-2xl p-4 flex flex-col gap-3"
+                        className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[9999] glass-panel border border-main shadow-2xl rounded-2xl p-4 flex flex-col gap-3"
                     >
                         <div className="flex gap-4 items-start">
-                            <div className="w-10 h-10 bg-orange-100 text-orange-500 rounded-xl flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 bg-orange-500/10 text-orange-500 rounded-xl flex items-center justify-center shrink-0 border border-orange-500/20">
                                 <MonitorSmartphone size={20} />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-sm font-black text-slate-900">Enable Push Alerts?</h3>
-                                <p className="text-xs font-medium text-slate-500 mt-0.5 leading-relaxed flex-wrap">Get real-time updates directly from Srot Finance system support and reminders!</p>
+                                <h3 className="text-sm font-black text-main">Enable Push Alerts?</h3>
+                                <p className="text-xs font-medium text-dim mt-0.5 leading-relaxed flex-wrap">Get real-time updates directly from Srot Finance system support and reminders!</p>
                             </div>
-                            <button onClick={handleDismissPush} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition-colors shrink-0">
+                            <button onClick={handleDismissPush} className="text-dim hover:bg-secondary p-1.5 rounded-lg transition-colors shrink-0">
                                 <X size={16} />
                             </button>
                         </div>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={handleDismissPush} className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">Not Now</button>
-                            <button onClick={handleEnablePush} className="px-4 py-2 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-lg shadow-md shadow-orange-500/20 transition-all flex items-center gap-2">
+                            <button onClick={handleDismissPush} className="px-4 py-2 text-xs font-bold text-dim hover:text-main hover:bg-secondary rounded-lg transition-colors">Not Now</button>
+                            <button onClick={handleEnablePush} className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-rose-500 hover:brightness-105 rounded-lg shadow-md shadow-orange-500/20 transition-all flex items-center gap-2">
                                 <Check size={14} /> Enable
                             </button>
                         </div>

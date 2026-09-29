@@ -149,9 +149,9 @@ export const AdminScreen = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl animate-pulse">
-                    <Loader2 className="animate-spin text-white" size={30} />
+            <div className="min-h-screen flex items-center justify-center bg-primary">
+                <div className="w-16 h-16 glass-panel rounded-2xl flex items-center justify-center shadow-xl border border-main animate-pulse">
+                    <Loader2 className="animate-spin text-orange-400" size={30} />
                 </div>
             </div>
         );
@@ -169,21 +169,22 @@ export const AdminScreen = () => {
     // Secondary 2FA Screen for users accessing /admin while already logged in
     if (session && isAdmin && needs2FA) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-                <div className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl relative overflow-hidden transition-all transform scale-100">
-                    <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 via-rose-500 to-indigo-500" />
-                    <div className="mb-8 text-center">
-                        <div className="w-16 h-16 bg-orange-50 text-orange-500 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-inner shadow-orange-500/20">
+            <div className="min-h-screen bg-primary flex items-center justify-center p-4 relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `radial-gradient(ellipse 70% 60% at 50% -10%, rgba(249,115,22,0.18), transparent), radial-gradient(ellipse 60% 50% at 50% 110%, rgba(244,63,94,0.12), transparent)` }} />
+                <div className="w-full max-w-md glass-panel rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden transition-all border border-main z-10">
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500" />
+                    <div className="mb-8 text-center pt-2">
+                        <div className="w-16 h-16 bg-orange-500/10 text-orange-400 border border-orange-500/20 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-orange-500/10">
                             <ShieldCheck size={32} strokeWidth={2.5} />
                         </div>
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Admin Verification</h2>
-                        <p className="text-sm font-medium text-slate-500 mt-2">Enter the code sent to your email to continue</p>
+                        <h2 className="text-2xl font-black text-main tracking-tight">Admin Verification</h2>
+                        <p className="text-xs font-semibold text-dim mt-1.5">Enter the security code sent to your email</p>
                     </div>
 
                     <form onSubmit={handleOtpSubmit} className="space-y-4">
-                        <div className="bg-orange-50/80 border border-orange-200/50 rounded-2xl p-4 text-center mb-4">
-                            <p className="text-xs font-bold text-orange-600 uppercase tracking-widest">2FA Code sent to</p>
-                            <p className="text-sm font-black text-slate-800 mt-1">{session.user.email}</p>
+                        <div className="bg-orange-500/10 border border-orange-500/25 rounded-2xl p-4 text-center mb-4">
+                            <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest">2FA Code sent to</p>
+                            <p className="text-xs font-black text-main mt-1">{session.user.email}</p>
                         </div>
 
                         <div>
@@ -195,7 +196,7 @@ export const AdminScreen = () => {
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                                     placeholder="000000"
-                                    className="w-full py-4 bg-slate-50 border-2 border-slate-200 rounded-xl text-2xl font-black tracking-[0.5em] text-center focus:outline-none focus:border-orange-500 focus:bg-white transition-all transform shadow-sm"
+                                    className="w-full py-4 bg-secondary/80 border-2 border-main rounded-2xl text-2xl font-black tracking-[0.5em] text-center text-main focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30 transition-all shadow-inner font-mono"
                                 />
                             </div>
                         </div>
@@ -203,7 +204,7 @@ export const AdminScreen = () => {
                         <button
                             type="submit"
                             disabled={verifyingOtp || otp.length !== 6}
-                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white p-3.5 rounded-xl text-sm font-bold hover:from-orange-600 hover:to-rose-600 disabled:opacity-50 transition-all shadow-lg shadow-orange-500/30 mt-6"
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white p-4 rounded-2xl text-sm font-black hover:brightness-105 active:scale-95 disabled:opacity-50 transition-all shadow-xl shadow-orange-500/25 mt-6"
                         >
                             {verifyingOtp ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
                             Verify & Enter Dashboard
@@ -214,14 +215,14 @@ export const AdminScreen = () => {
                                 type="button"
                                 disabled={verifyingOtp || otpTimer > 0}
                                 onClick={() => trigger2FAEmail(session.user.id, session.user.email, session.access_token)}
-                                className="text-xs font-bold text-orange-500 hover:text-orange-600 transition-colors py-2"
+                                className="text-xs font-bold text-orange-400 hover:text-orange-500 transition-colors py-2"
                             >
                                 Resend Code{otpTimer > 0 ? ` (${otpTimer}s)` : ''}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => supabase.auth.signOut()}
-                                className="text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors py-2"
+                                className="text-xs font-bold text-dim hover:text-main transition-colors py-2"
                             >
                                 Logout
                             </button>

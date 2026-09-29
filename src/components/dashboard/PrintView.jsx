@@ -12,7 +12,7 @@ const fmtDay = (d) => new Date(d).toLocaleDateString('en-IN', { weekday: 'long',
 /* ================================================================== */
 export const PrintStyles = () => (
     <style>{`
-        /* Fonts are preloaded in index.html (already cached) */
+        /* Fonts are preloaded in index.html */
         @page { size: A4 portrait; margin: 0; }
 
         #print-root *, #print-root-export *, #print-root-temp * {
@@ -20,6 +20,8 @@ export const PrintStyles = () => (
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         #print-root h1, #print-root h2, #print-root h3,
         #print-root-export h1, #print-root-export h2, #print-root-export h3,
@@ -28,7 +30,8 @@ export const PrintStyles = () => (
         .print-page {
             width: 210mm;
             padding: 12mm 14mm;
-            background: #fff;
+            background: #ffffff;
+            color: #0f172a;
             position: relative;
         }
         .strict-page {
@@ -41,9 +44,10 @@ export const PrintStyles = () => (
         .pg-break { page-break-after: always; break-after: page; }
         .no-break  { page-break-inside: avoid; break-inside: avoid; }
 
-        /* Shared gradient */
-        .grad-orange { background: linear-gradient(135deg,#f97316 0%,#ec4899 100%); }
-        .grad-dark   { background: linear-gradient(135deg,#0f172a 0%,#1e293b 100%); }
+        /* Shared gradient & luxury styling */
+        .grad-orange { background: linear-gradient(135deg, #f97316 0%, #ec4899 100%); }
+        .grad-dark   { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .hero-border { border: 1px solid rgba(249, 115, 22, 0.3); }
     `}</style>
 );
 
@@ -200,7 +204,7 @@ export const CalculatorReport = ({ data, user }) => {
                         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 24, marginBottom: 28 }}>
                             {/* Maturity Card */}
                             <div style={{ 
-                                background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)',
+                                background: 'rgba(249, 115, 22, 0.15)', border: '1px solid rgba(249, 115, 22, 0.3)',
                                 borderRadius: 16, padding: '20px'
                             }}>
                                 <p style={{ fontSize: 9, color: '#fdb777', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Net Maturity Value</p>

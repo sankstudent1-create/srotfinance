@@ -1,112 +1,134 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Coins, Trash2, Pencil } from 'lucide-react';
+import { Coins, Trash2, Pencil, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { ICON_MAP, AVAILABLE_ICONS } from '../../config/constants';
 
-// Resolve any icon_key (lucide name or category name) → component
+// Resolve any icon_key to a Lucide icon component
 const resolveIcon = (iconKey) => {
     if (!iconKey) return Coins;
-    // Direct map lookup (e.g. "Shopping", "Food")
     if (ICON_MAP[iconKey]) return ICON_MAP[iconKey];
-    // Lucide component name lookup (e.g. "ShoppingBag", "Car")
     const found = AVAILABLE_ICONS.find(i => i.name === iconKey);
     return found?.component || Coins;
 };
 
-// Category color palette — hash category name to a consistent color
-const PALETTE = [
-    { bg: 'bg-rose-100', text: 'text-rose-600' },
-    { bg: 'bg-orange-100', text: 'text-orange-600' },
-    { bg: 'bg-amber-100', text: 'text-amber-600' },
-    { bg: 'bg-emerald-100', text: 'text-emerald-600' },
-    { bg: 'bg-teal-100', text: 'text-teal-600' },
-    { bg: 'bg-blue-100', text: 'text-blue-600' },
-    { bg: 'bg-indigo-100', text: 'text-indigo-600' },
-    { bg: 'bg-purple-100', text: 'text-purple-600' },
-    { bg: 'bg-pink-100', text: 'text-pink-600' },
-    { bg: 'bg-orange-100', text: 'text-orange-600' },
-];
+// Theme-safe vibrant category palette with distinct badges
+const CATEGORY_COLORS = {
+    Shopping: { bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/20', dot: 'bg-rose-500' },
+    Food: { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/20', dot: 'bg-orange-500' },
+    Transport: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20', dot: 'bg-blue-500' },
+    Bills: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20', dot: 'bg-amber-500' },
+    Health: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', dot: 'bg-emerald-500' },
+    Travel: { bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/20', dot: 'bg-indigo-500' },
+    Entertainment: { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20', dot: 'bg-purple-500' },
+    Salary: { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30', dot: 'bg-emerald-400' },
+    Investment: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/20', dot: 'bg-cyan-500' },
+    Other: { bg: 'bg-slate-500/10', text: 'text-slate-400', border: 'border-slate-500/20', dot: 'bg-slate-500' },
+};
 
-const hashColor = (str = '') => {
-    let h = 0;
-    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-    return PALETTE[h % PALETTE.length];
+const getCategoryStyle = (catName = 'Other') => {
+    return CATEGORY_COLORS[catName] || CATEGORY_COLORS.Other;
 };
 
 export const TransactionItem = ({ transaction, categories = [], onEdit, onDelete }) => {
-    // Find full category object from the live userCategories array
     const catObj = categories.find(c => c.name === transaction.category);
-
     const isEmoji = catObj?.is_emoji || false;
     const iconKey = catObj?.icon_key || transaction.category;
     const Icon = isEmoji ? null : resolveIcon(iconKey);
-    const color = hashColor(transaction.category);
-
+    const style = getCategoryStyle(transaction.category);
     const isExpense = transaction.type === 'expense';
 
-    // Relative date
-    const getRelativeDate = (d) => {
-        const date = new Date(d);
-        const now = new Date();
-        const diff = Math.floor((now - date) / 86400000);
-        if (diff === 0) return 'Today';
-        if (diff === 1) return 'Yesterday';
-        if (diff < 7) return date.toLocaleDateString('en-IN', { weekday: 'short' });
-        return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    // Format relative date nicely
+    const formatTxDate = (d) => {
+        if (!d) return '';
+        const txDate = new Date(d);
+        const today = new Date();
+        const diffDays = Math.floor((today - txDate) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return txDate.toLocaleDateString('en-IN', { weekday: 'short' });
+        return txDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
     };
+
+    const numAmount = parseFloat(transaction.amount) || 0;
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            whileHover={{ scale: 1.02, x: 2 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            whileHover={{ y: -2 }}
             onClick={() => onEdit && onEdit(transaction)}
-            className="group relative flex items-center gap-4 p-4 glass-panel border-main hover:border-orange-500/40 hover:bg-surface transition-all cursor-pointer overflow-hidden"
+            className="group relative flex items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl glass-panel border border-[var(--border-main)] hover:border-[var(--border-highlight)] hover:bg-[var(--bg-surface-active)] transition-all cursor-pointer overflow-hidden shadow-sm"
         >
-            {/* Category Icon / Emoji */}
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-lg bg-white/5 border border-white/10 ${color.text} shadow-inner`}>
-                {isEmoji
-                    ? <span className="text-2xl leading-none drop-shadow-md">{iconKey}</span>
-                    : Icon && <Icon size={20} className="drop-shadow-[0_0_8px_currentColor]" />
-                }
-            </div>
+            {/* Left: Category Icon + Title + Meta */}
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 border ${style.border} ${style.bg} ${style.text} shadow-inner transition-transform group-hover:scale-105 duration-200`}>
+                    {isEmoji ? (
+                        <span className="text-xl sm:text-2xl leading-none">{iconKey}</span>
+                    ) : (
+                        Icon && <Icon size={20} strokeWidth={2.2} />
+                    )}
+                </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-                <p className="font-bold text-main text-[15px] truncate tracking-wide">{transaction.title}</p>
-                <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md bg-surface border border-main ${color.text} uppercase tracking-wider`}>
-                        {transaction.category}
-                    </span>
-                    <span className="text-[10px] text-slate-500">•</span>
-                    <span className="text-[10px] font-medium text-slate-400">{getRelativeDate(transaction.date)}</span>
+                <div className="min-w-0">
+                    <p className="font-bold text-[var(--text-main)] text-sm sm:text-base truncate tracking-tight group-hover:text-orange-400 transition-colors">
+                        {transaction.title || 'Untitled Transaction'}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${style.bg} ${style.text} ${style.border} uppercase tracking-wider`}>
+                            <span className={`w-1 h-1 rounded-full ${style.dot}`} />
+                            {transaction.category}
+                        </span>
+                        <span className="text-[10px] text-[var(--text-muted)] font-medium">•</span>
+                        <span className="text-[11px] font-medium text-[var(--text-muted)] flex items-center gap-1">
+                            <Calendar size={11} className="opacity-70" />
+                            {formatTxDate(transaction.date)}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            {/* Amount */}
-            <div className="flex items-center gap-2 shrink-0">
-                <span className={`font-mono font-bold text-lg tracking-tight ${isExpense ? 'text-main/90' : 'text-emerald-500 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]'}`}>
-                    {isExpense ? '-' : '+'}₹{parseFloat(transaction.amount).toLocaleString('en-IN')}
-                </span>
-            </div>
+            {/* Right: Amount + Action Slide-over */}
+            <div className="flex items-center gap-3 shrink-0">
+                <div className="text-right">
+                    <p className={`font-mono font-bold text-base sm:text-lg tracking-tight flex items-center justify-end gap-1 ${
+                        isExpense ? 'text-[var(--text-main)]' : 'text-emerald-500 font-extrabold'
+                    }`}>
+                        <span className="text-xs sm:text-sm opacity-80">{isExpense ? '-' : '+'}</span>
+                        <span>₹{numAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                    </p>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                        {isExpense ? 'Expense' : 'Income'}
+                    </p>
+                </div>
 
-            {/* Hover Actions */}
-            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-bg-secondary via-bg-secondary to-transparent translate-x-full group-hover:translate-x-0 transition-transform duration-300 flex items-center justify-end pr-4 gap-2 z-20">
-                <button
-                    onClick={(e) => { e.stopPropagation(); onEdit && onEdit(transaction); }}
-                    className="p-2 bg-surface text-orange-400 rounded-xl hover:bg-orange-500/20 hover:scale-110 transition-all border border-orange-500/20"
-                >
-                    <Pencil size={14} />
-                </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(transaction.id); }}
-                    className="p-2 bg-surface text-rose-400 rounded-xl hover:bg-rose-500/20 hover:scale-110 transition-all border border-rose-500/20"
-                >
-                    <Trash2 size={14} />
-                </button>
+                {/* Desktop hover actions drawer */}
+                <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-2">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit && onEdit(transaction);
+                        }}
+                        className="w-8 h-8 rounded-xl bg-[var(--bg-surface)] hover:bg-orange-500/20 text-orange-400 border border-[var(--border-main)] hover:border-orange-500/30 flex items-center justify-center transition-all hover:scale-105"
+                        title="Edit transaction"
+                    >
+                        <Pencil size={13} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete && onDelete(transaction.id);
+                        }}
+                        className="w-8 h-8 rounded-xl bg-[var(--bg-surface)] hover:bg-rose-500/20 text-rose-400 border border-[var(--border-main)] hover:border-rose-500/30 flex items-center justify-center transition-all hover:scale-105"
+                        title="Delete transaction"
+                    >
+                        <Trash2 size={13} />
+                    </button>
+                </div>
             </div>
         </motion.div>
     );

@@ -1,192 +1,242 @@
-
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Lock, Loader2, Check, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Loader2, Check, Eye, EyeOff, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { supabase } from '../config/supabase';
 
 export const ResetPasswordScreen = ({ onComplete }) => {
     const [password, setPassword] = useState('');
     const [confirmPwd, setConfirmPwd] = useState('');
     const [showPwd, setShowPwd] = useState(false);
+    const [showConfirmPwd, setShowConfirmPwd] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+
+    // Password strength evaluator
+    const getStrength = (pwd) => {
+        let score = 0;
+        if (pwd.length >= 6) score++;
+        if (pwd.length >= 10) score++;
+        if (/[A-Z]/.test(pwd)) score++;
+        if (/[0-9]/.test(pwd)) score++;
+        if (/[^A-Za-z0-9]/.test(pwd)) score++;
+        return score; // 0 to 5
+    };
+
+    const strength = getStrength(password);
+    const strengthLabels = ['Too weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    const strengthColors = ['bg-rose-500', 'bg-rose-500', 'bg-amber-500', 'bg-amber-400', 'bg-emerald-500', 'bg-emerald-400'];
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         if (password.length < 6) {
-            setError('Password must be at least 6 characters.');
+            setError('Password must be at least 6 characters long.');
             return;
         }
         if (password !== confirmPwd) {
-            setError('Passwords do not match.');
+            setError('Passwords do not match. Please re-enter.');
             return;
         }
 
         setLoading(true);
-        const { error: updateErr } = await supabase.auth.updateUser({ password });
-        setLoading(false);
+        try {
+            const { error: updateErr } = await supabase.auth.updateUser({ password });
+            if (updateErr) throw updateErr;
 
-        if (updateErr) {
-            setError(updateErr.message);
-        } else {
             setSuccess(true);
             setTimeout(() => {
                 onComplete?.();
-            }, 2500);
+            }, 2000);
+        } catch (err) {
+            setError(err.message || 'Failed to update password. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
-            {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-200 rounded-full blur-3xl opacity-30 animate-pulse" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-rose-200 rounded-full blur-3xl opacity-30 animate-pulse delay-1000" />
+        <div className="min-h-screen bg-[#07080D] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden text-white antialiased">
+            {/* Background Atmosphere */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        backgroundImage: `radial-gradient(ellipse 70% 60% at 50% -10%, rgba(249,115,22,0.18), transparent), radial-gradient(ellipse 60% 50% at 50% 110%, rgba(244,63,94,0.12), transparent)`,
+                    }}
+                />
+                <div
+                    className="absolute inset-0 opacity-[0.03]"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
+                        backgroundSize: '40px 40px'
+                    }}
+                />
             </div>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-white/80 backdrop-blur-xl w-full max-w-md rounded-[2.5rem] shadow-2xl border border-white/50 p-8 sm:p-12 relative z-10"
+                initial={{ opacity: 0, y: 25, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.5, type: 'spring' }}
+                className="glass-panel border border-white/10 w-full max-w-md rounded-[2.5rem] p-8 sm:p-10 relative z-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden"
             >
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-gradient-to-tr from-slate-800 to-slate-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-slate-900/20 text-white">
-                        {success ? <ShieldCheck size={32} /> : <Lock size={32} />}
-                    </div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
+                {/* Radiant top accent */}
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-orange-500/80 to-transparent" />
+
+                {/* Header Icon */}
+                <div className="text-center mb-7">
+                    <motion.div
+                        animate={success ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
+                        className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-all duration-300 ${
+                            success
+                                ? 'bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.5)]'
+                                : 'bg-gradient-to-br from-orange-500 to-rose-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.4)]'
+                        }`}
+                    >
+                        {success ? <ShieldCheck size={32} /> : <Lock size={28} />}
+                    </motion.div>
+
+                    <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
                         {success ? 'Password Updated!' : 'Set New Password'}
-                    </h1>
-                    <p className="text-slate-500 font-medium">
+                    </h2>
+                    <p className="text-xs sm:text-sm text-white/50 font-medium mt-1.5">
                         {success
-                            ? 'Your password has been changed successfully. Redirecting...'
-                            : 'Create a strong new password for your Srot Finance account.'
-                        }
+                            ? 'Your security key has been updated. Redirecting to your vault...'
+                            : 'Create a strong, unique password to safeguard your account'}
                     </p>
                 </div>
 
-                {success ? (
-                    <motion.div
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="flex flex-col items-center gap-4 py-6"
-                    >
-                        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
-                            <Check size={40} className="text-emerald-600" />
-                        </div>
-                        <p className="text-emerald-600 font-bold text-sm">Redirecting to your dashboard...</p>
-                        <Loader2 size={20} className="animate-spin text-emerald-400" />
-                    </motion.div>
-                ) : (
+                {/* Error Banner */}
+                <AnimatePresence>
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="bg-rose-500/15 border border-rose-500/25 text-rose-200 px-4 py-3 rounded-2xl text-xs font-semibold mb-5 flex items-start gap-2.5"
+                        >
+                            <span>⚠️</span>
+                            <span>{error}</span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {!success ? (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* New Password */}
                         <div>
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block ml-1">
+                            <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-1.5 pl-1">
                                 New Password
                             </label>
-                            <div className="relative">
-                                <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <div className="relative group">
+                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-orange-400 transition-colors" />
                                 <input
                                     type={showPwd ? 'text' : 'password'}
-                                    placeholder="Min. 6 characters"
+                                    placeholder="••••••••••••"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-4 pl-12 pr-12 font-bold text-slate-900 focus:border-orange-500/50 focus:bg-white outline-none transition-all placeholder:text-slate-400"
+                                    onChange={e => setPassword(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-11 py-3.5 text-sm font-semibold text-white placeholder:text-white/20 outline-none focus:border-orange-500/60 focus:bg-white/10 transition-all font-mono"
                                     required
                                     autoFocus
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPwd(!showPwd)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors"
                                 >
-                                    {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
                             </div>
+
+                            {/* Strength indicator */}
+                            {password && (
+                                <div className="mt-2 space-y-1 px-1">
+                                    <div className="flex justify-between items-center text-[10px] font-bold">
+                                        <span className="text-white/40">Strength:</span>
+                                        <span className="text-white/70">{strengthLabels[strength]}</span>
+                                    </div>
+                                    <div className="flex gap-1 h-1">
+                                        {[1, 2, 3, 4, 5].map(step => (
+                                            <div
+                                                key={step}
+                                                className={`flex-1 rounded-full transition-all duration-300 ${
+                                                    strength >= step ? strengthColors[strength] : 'bg-white/10'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Confirm Password */}
                         <div>
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block ml-1">
+                            <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-1.5 pl-1">
                                 Confirm Password
                             </label>
-                            <div className="relative">
-                                <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <div className="relative group">
+                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-orange-400 transition-colors" />
                                 <input
-                                    type={showPwd ? 'text' : 'password'}
-                                    placeholder="Re-enter password"
+                                    type={showConfirmPwd ? 'text' : 'password'}
+                                    placeholder="••••••••••••"
                                     value={confirmPwd}
-                                    onChange={(e) => setConfirmPwd(e.target.value)}
-                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-4 pl-12 pr-4 font-bold text-slate-900 focus:border-orange-500/50 focus:bg-white outline-none transition-all placeholder:text-slate-400"
+                                    onChange={e => setConfirmPwd(e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-11 py-3.5 text-sm font-semibold text-white placeholder:text-white/20 outline-none focus:border-orange-500/60 focus:bg-white/10 transition-all font-mono"
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPwd(!showConfirmPwd)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors"
+                                >
+                                    {showConfirmPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                             </div>
+                            {confirmPwd && password && (
+                                <p className={`text-[10px] font-bold mt-1.5 pl-1 ${confirmPwd === password ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {confirmPwd === password ? '✓ Passwords match' : '✗ Passwords do not match'}
+                                </p>
+                            )}
                         </div>
 
-                        {/* Password Strength Indicator */}
-                        {password.length > 0 && (
-                            <div className="space-y-2">
-                                <div className="flex gap-1.5">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div
-                                            key={i}
-                                            className={`h-1.5 flex-1 rounded-full transition-colors ${password.length >= i * 3
-                                                    ? password.length >= 10
-                                                        ? 'bg-emerald-500'
-                                                        : password.length >= 6
-                                                            ? 'bg-orange-500'
-                                                            : 'bg-rose-500'
-                                                    : 'bg-slate-100'
-                                                }`}
-                                        />
-                                    ))}
-                                </div>
-                                <p className={`text-[10px] font-bold ${password.length >= 10 ? 'text-emerald-500' : password.length >= 6 ? 'text-orange-500' : 'text-rose-500'
-                                    }`}>
-                                    {password.length < 6 ? 'Too weak' : password.length < 10 ? 'Good' : 'Strong'} · {password.length} characters
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Match indicator */}
-                        {confirmPwd.length > 0 && (
-                            <p className={`text-xs font-semibold ${password === confirmPwd ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                {password === confirmPwd ? '✅ Passwords match' : '❌ Passwords don\'t match'}
-                            </p>
-                        )}
-
-                        {/* Error */}
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl text-sm font-medium"
+                        {/* Submit Button */}
+                        <div className="pt-3">
+                            <motion.button
+                                whileHover={{ scale: 1.01 }}
+                                whileTap={{ scale: 0.98 }}
+                                type="submit"
+                                disabled={loading}
+                                className="w-full relative overflow-hidden rounded-2xl py-4 font-black text-sm tracking-wide disabled:opacity-60 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white shadow-[0_8px_30px_rgba(249,115,22,0.4)] hover:brightness-105 transition-all"
                             >
-                                ❌ {error}
-                            </motion.div>
-                        )}
-
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            disabled={loading || password.length < 6 || password !== confirmPwd}
-                            className="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-xl shadow-slate-900/20 hover:bg-slate-800 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-                        >
-                            {loading ? <Loader2 className="animate-spin" size={20} /> : <ShieldCheck size={20} />}
-                            {loading ? 'Updating...' : 'Set New Password'}
-                        </button>
+                                <span className="relative z-10 flex items-center justify-center gap-2 drop-shadow">
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={18} />
+                                            <span>Securing Account...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Update Password</span>
+                                            <ArrowRight size={18} />
+                                        </>
+                                    )}
+                                </span>
+                            </motion.button>
+                        </div>
                     </form>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="py-4 text-center space-y-4"
+                    >
+                        <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-full text-xs font-bold">
+                            <Check size={14} /> Password updated successfully
+                        </div>
+                        <p className="text-xs text-white/40 font-medium">Entering your dashboard now...</p>
+                    </motion.div>
                 )}
-
-                <div className="mt-6 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-300">
-                        Srot Finance · Secured by Supabase
-                    </p>
-                </div>
             </motion.div>
         </div>
     );

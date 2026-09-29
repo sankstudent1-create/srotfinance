@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Pencil, Trash2, Check, ChevronLeft, Loader2 } from 'lucide-react';
+import { X, Plus, Pencil, Trash2, Check, ChevronLeft, Loader2, Tag, Smile } from 'lucide-react';
 import { DEFAULT_CATEGORIES, ICON_MAP, AVAILABLE_ICONS, CATEGORY_COLORS } from '../../config/constants';
 import { supabase } from '../../config/supabase';
 
 /**
- * Default category objects (used when Supabase has no custom data yet)
+ * Default category objects
  */
 const DEFAULT_CAT_OBJECTS = DEFAULT_CATEGORIES.map(name => ({
     name,
@@ -16,7 +16,7 @@ const DEFAULT_CAT_OBJECTS = DEFAULT_CATEGORIES.map(name => ({
 }));
 
 /**
- * Get the icon component for a category name from the global categories list
+ * Get the icon component for a category name
  */
 export const getCategoryIcon = (name, categories = []) => {
     const match = categories.find(c => c.name === name);
@@ -29,20 +29,20 @@ export const getCategoryIcon = (name, categories = []) => {
 };
 
 /**
- * Get the color info for a category
+ * Get color config for a category
  */
 export const getCategoryColor = (name) => {
     const colorMap = {
-        'Shopping': 'rose', 'Food': 'orange', 'Transport': 'blue', 'Bills': 'amber',
-        'Health': 'rose', 'Travel': 'indigo', 'Entertainment': 'purple', 'Salary': 'emerald',
-        'Investment': 'teal', 'Other': 'slate',
+        Shopping: 'rose', Food: 'orange', Transport: 'blue', Bills: 'amber',
+        Health: 'emerald', Travel: 'indigo', Entertainment: 'purple', Salary: 'emerald',
+        Investment: 'teal', Other: 'slate',
     };
-    const colorId = colorMap[name] || 'slate';
-    return CATEGORY_COLORS.find(c => c.id === colorId) || CATEGORY_COLORS[9];
+    const colorId = colorMap[name] || 'orange';
+    return CATEGORY_COLORS.find(c => c.id === colorId) || CATEGORY_COLORS[1] || { bg: 'bg-orange-500/10', text: 'text-orange-400' };
 };
 
 /**
- * Fetch categories from Supabase, merging with defaults
+ * Fetch categories from Supabase with offline caching
  */
 export const fetchCategories = async (userId) => {
     try {
@@ -52,11 +52,9 @@ export const fetchCategories = async (userId) => {
             .order('usage_count', { ascending: false });
 
         if (!error && data && data.length > 0) {
-            // Merge: defaults + custom (avoid name duplicates)
             const customNames = data.map(c => c.name);
             const missingDefaults = DEFAULT_CAT_OBJECTS.filter(d => !customNames.includes(d.name));
             const merged = [...data, ...missingDefaults];
-            // Cache
             localStorage.setItem(`cached_cat_${userId}`, JSON.stringify(merged));
             return merged;
         }
@@ -64,7 +62,6 @@ export const fetchCategories = async (userId) => {
         console.error('Category fetch error:', e);
     }
 
-    // Fallback: try cache, then defaults
     try {
         const cached = localStorage.getItem(`cached_cat_${userId}`);
         if (cached) return JSON.parse(cached);
@@ -73,15 +70,14 @@ export const fetchCategories = async (userId) => {
     return [...DEFAULT_CAT_OBJECTS];
 };
 
-/**
- * CategoryManager — full-screen modal for managing categories with Supabase
- */
+const COMMON_EMOJIS = ['🛒', '🍕', '🚗', '⚡', '💊', '✈️', '🎮', '💼', '📈', '🏷️', '☕', '🎁', '🏋️', '📚', '🎵', '🎬', '🏠', '🐾', '💈', '🎂'];
+
 export const CategoryManager = ({ isOpen, onClose, onCategoriesChange, userId }) => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
-    const [editingCat, setEditingCat] = useState(null); // category object being edited
+    const [editingCat, setEditingCat] = useState(null);
 
     // Form state
     const [editName, setEditName] = useState('');
@@ -134,7 +130,6 @@ export const CategoryManager = ({ isOpen, onClose, onCategoriesChange, userId })
 
         try {
             if (editingCat?.id) {
-                // UPDATE existing in Supabase
                 const { error } = await supabase
                     .from('categories')
                     .update(catData)
@@ -148,13 +143,11 @@ export const CategoryManager = ({ isOpen, onClose, onCategoriesChange, userId })
                     onCategoriesChange?.(updated);
                 }
             } else {
-                // Check for duplicates
                 if (categories.some(c => c.name.toLowerCase() === editName.trim().toLowerCase())) {
                     setSaving(false);
                     return;
                 }
 
-                // INSERT new into Supabase
                 const { data, error } = await supabase
                     .from('categories')
                     .insert([{
@@ -181,7 +174,6 @@ export const CategoryManager = ({ isOpen, onClose, onCategoriesChange, userId })
 
     const handleDelete = async (cat) => {
         if (!cat.id) {
-            // It's a default category (no Supabase id), just remove from state
             const updated = categories.filter(c => c.name !== cat.name);
             setCategories(updated);
             onCategoriesChange?.(updated);
@@ -214,32 +206,35 @@ export const CategoryManager = ({ isOpen, onClose, onCategoriesChange, userId })
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[70] bg-slate-900/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
+            className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
             onClick={onClose}
         >
             <motion.div
-                initial={{ y: 100, opacity: 0 }}
+                initial={{ y: 80, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 100, opacity: 0 }}
-                className="bg-white w-full sm:max-w-md sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl max-h-[85vh] flex flex-col overflow-hidden relative"
+                exit={{ y: 80, opacity: 0 }}
+                className="w-full sm:max-w-md glass-panel border border-[var(--border-main)] sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl max-h-[88vh] flex flex-col overflow-hidden relative"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 pb-2">
+                <div className="flex justify-between items-center p-6 pb-3 border-b border-[var(--border-main)]">
                     <div>
-                        <h3 className="text-xl font-black text-slate-900">Manage Categories</h3>
-                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">Add, edit, or remove transaction categories</p>
+                        <h3 className="text-xl font-black text-[var(--text-main)]">Categories Manager</h3>
+                        <p className="text-[11px] text-[var(--text-muted)] font-medium mt-0.5">Customize transaction classification</p>
                     </div>
-                    <button onClick={onClose} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
-                        <X size={20} />
+                    <button
+                        onClick={onClose}
+                        className="w-9 h-9 rounded-2xl glass-panel flex items-center justify-center text-[var(--text-dim)] hover:text-[var(--text-main)] transition-colors border border-[var(--border-main)]"
+                    >
+                        <X size={18} />
                     </button>
                 </div>
 
                 {/* Category List */}
-                <div className="flex-1 overflow-y-auto px-6 py-3 space-y-1.5">
+                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2 hide-scrollbar">
                     {loading ? (
                         <div className="flex items-center justify-center py-12">
-                            <Loader2 className="animate-spin text-orange-500" size={28} />
+                            <Loader2 className="animate-spin text-orange-400" size={28} />
                         </div>
                     ) : sortedCategories.map((cat, i) => {
                         const IconComp = cat.is_emoji ? null : getIconComponent(cat.icon_key || cat.name);
@@ -248,164 +243,175 @@ export const CategoryManager = ({ isOpen, onClose, onCategoriesChange, userId })
                             <motion.div
                                 key={`${cat.name}-${cat.id || i}`}
                                 layout
-                                className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50/80 hover:bg-slate-100/80 transition-all group"
+                                className="flex items-center gap-3 p-3 rounded-2xl glass-panel border border-[var(--border-main)] hover:border-[var(--border-highlight)] transition-all group"
                             >
-                                <div className={`w-10 h-10 rounded-xl ${catColor.bg} ${catColor.text} flex items-center justify-center flex-shrink-0 text-lg`}>
+                                <div className={`w-10 h-10 rounded-xl ${catColor.bg} ${catColor.text} flex items-center justify-center shrink-0 text-lg border border-[var(--border-main)]`}>
                                     {cat.is_emoji ? cat.icon_key : (IconComp && <IconComp size={18} />)}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <span className="text-sm font-bold text-slate-800 truncate block">{cat.name}</span>
-                                    <span className="text-[10px] text-slate-400 font-medium uppercase">{cat.type} • {cat.usage_count || 0} uses</span>
+                                    <span className="text-sm font-bold text-[var(--text-main)] truncate block">{cat.name}</span>
+                                    <span className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">
+                                        {cat.type} • {cat.usage_count || 0} uses
+                                    </span>
                                 </div>
-                                <button
-                                    onClick={() => startEdit(cat)}
-                                    className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-500 hover:border-blue-200 transition-all opacity-60 group-hover:opacity-100"
-                                >
-                                    <Pencil size={14} />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(cat)}
-                                    className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:border-rose-200 transition-all opacity-60 group-hover:opacity-100"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
+                                <div className="flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        type="button"
+                                        onClick={() => startEdit(cat)}
+                                        className="w-8 h-8 rounded-xl bg-[var(--bg-surface)] hover:bg-orange-500/20 text-orange-400 border border-[var(--border-main)] flex items-center justify-center transition-all"
+                                    >
+                                        <Pencil size={13} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDelete(cat)}
+                                        className="w-8 h-8 rounded-xl bg-[var(--bg-surface)] hover:bg-rose-500/20 text-rose-400 border border-[var(--border-main)] flex items-center justify-center transition-all"
+                                    >
+                                        <Trash2 size={13} />
+                                    </button>
+                                </div>
                             </motion.div>
                         );
                     })}
                 </div>
 
-                {/* Add Button */}
-                <div className="p-6 pt-2">
+                {/* Bottom Add Action */}
+                <div className="p-6 pt-3 border-t border-[var(--border-main)]">
                     <button
+                        type="button"
                         onClick={startAdd}
-                        className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-slate-800 active:scale-[0.97] transition-all shadow-xl shadow-slate-900/10"
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3.5 rounded-2xl font-bold text-sm shadow-lg shadow-orange-500/25 hover:brightness-105 active:scale-[0.98] transition-all"
                     >
                         <Plus size={18} /> Add New Category
                     </button>
                 </div>
 
-                {/* Add/Edit Sheet */}
+                {/* Add/Edit Sub-Sheet */}
                 <AnimatePresence>
                     {showAdd && (
                         <motion.div
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
                             exit={{ y: '100%' }}
-                            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                            className="absolute inset-0 bg-white sm:rounded-[2.5rem] rounded-t-[2.5rem] z-10 flex flex-col"
+                            transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+                            className="absolute inset-0 bg-[var(--bg-secondary)] sm:rounded-[2.5rem] rounded-t-[2.5rem] z-20 flex flex-col"
                         >
-                            {/* Edit Header */}
-                            <div className="flex items-center gap-3 p-6 pb-4">
-                                <button onClick={() => { setShowAdd(false); }} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 hover:bg-slate-100">
-                                    <ChevronLeft size={20} />
+                            <div className="flex items-center gap-3 p-6 pb-4 border-b border-[var(--border-main)]">
+                                <button
+                                    onClick={() => setShowAdd(false)}
+                                    className="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-[var(--text-dim)] hover:text-[var(--text-main)]"
+                                >
+                                    <ChevronLeft size={18} />
                                 </button>
-                                <h4 className="text-lg font-black text-slate-900">{editingCat ? 'Edit Category' : 'New Category'}</h4>
+                                <h4 className="text-lg font-black text-[var(--text-main)]">
+                                    {editingCat ? 'Edit Category' : 'Create Category'}
+                                </h4>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto px-6 space-y-5">
-                                {/* Preview */}
-                                <div className="flex items-center justify-center py-3">
-                                    {(() => {
-                                        const PreviewIcon = editIsEmoji ? null : getIconComponent(editIcon);
-                                        const previewColor = getCategoryColor(editName);
-                                        return (
-                                            <div className="flex flex-col items-center gap-2">
-                                                <div className={`w-16 h-16 rounded-2xl ${previewColor.bg} ${previewColor.text} flex items-center justify-center shadow-lg text-2xl`}>
-                                                    {editIsEmoji ? editIcon : (PreviewIcon && <PreviewIcon size={28} />)}
-                                                </div>
-                                                <span className="text-sm font-bold text-slate-700">{editName || 'Category Name'}</span>
-                                            </div>
-                                        );
-                                    })()}
+                            <div className="flex-1 overflow-y-auto p-6 space-y-5 hide-scrollbar">
+                                {/* Type Selector */}
+                                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-main)]">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditType('expense')}
+                                        className={`py-2 text-xs font-bold rounded-xl transition-all ${
+                                            editType === 'expense' ? 'bg-rose-500 text-white shadow-md' : 'text-[var(--text-dim)]'
+                                        }`}
+                                    >
+                                        Expense
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditType('income')}
+                                        className={`py-2 text-xs font-bold rounded-xl transition-all ${
+                                            editType === 'income' ? 'bg-emerald-500 text-white shadow-md' : 'text-[var(--text-dim)]'
+                                        }`}
+                                    >
+                                        Income
+                                    </button>
                                 </div>
 
-                                {/* Name Input */}
+                                {/* Category Name */}
                                 <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Category Name</label>
+                                    <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1.5 block">
+                                        Category Title
+                                    </label>
                                     <input
                                         type="text"
                                         value={editName}
                                         onChange={e => setEditName(e.target.value)}
-                                        placeholder="e.g. Groceries"
-                                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 font-bold text-slate-900 outline-none focus:border-orange-400 transition-all"
-                                        autoFocus
+                                        placeholder="e.g. Subscriptions, Gym"
+                                        className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-4 py-3 font-bold text-sm text-[var(--text-main)] outline-none focus:border-orange-500 transition-all"
                                     />
                                 </div>
 
-                                {/* Type Toggle */}
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Category Type</label>
-                                    <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl">
-                                        {['expense', 'income'].map(type => (
+                                {/* Icon Mode Switch */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                                            Choose Icon or Emoji
+                                        </label>
+                                        <div className="flex gap-1 text-[11px] font-bold">
                                             <button
-                                                key={type}
-                                                onClick={() => setEditType(type)}
-                                                className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${editType === type
-                                                    ? (type === 'expense' ? 'bg-rose-500 text-white shadow-lg' : 'bg-emerald-500 text-white shadow-lg')
-                                                    : 'text-slate-400'
-                                                    }`}
+                                                type="button"
+                                                onClick={() => setEditIsEmoji(false)}
+                                                className={`px-2.5 py-1 rounded-lg ${!editIsEmoji ? 'bg-orange-500/20 text-orange-400' : 'text-[var(--text-muted)]'}`}
                                             >
-                                                {type}
+                                                Icons
                                             </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Icon Mode Toggle */}
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Choose Icon</label>
-                                        <button
-                                            onClick={() => setEditIsEmoji(!editIsEmoji)}
-                                            className="text-[10px] font-bold text-orange-500 bg-orange-50 px-2.5 py-1 rounded-lg hover:bg-orange-100 transition-colors"
-                                        >
-                                            {editIsEmoji ? '← Use Icons' : 'Use Emoji →'}
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setEditIsEmoji(true)}
+                                                className={`px-2.5 py-1 rounded-lg ${editIsEmoji ? 'bg-orange-500/20 text-orange-400' : 'text-[var(--text-muted)]'}`}
+                                            >
+                                                Emojis
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {editIsEmoji ? (
-                                        <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-100">
-                                            <input
-                                                type="text"
-                                                placeholder="Type an emoji 🎯"
-                                                className="w-full bg-transparent outline-none text-center text-3xl"
-                                                maxLength={2}
-                                                value={editIcon}
-                                                onChange={e => setEditIcon(e.target.value)}
-                                            />
+                                        <div className="grid grid-cols-5 gap-2 max-h-44 overflow-y-auto p-1 hide-scrollbar">
+                                            {COMMON_EMOJIS.map(em => (
+                                                <button
+                                                    key={em}
+                                                    type="button"
+                                                    onClick={() => setEditIcon(em)}
+                                                    className={`h-11 rounded-xl text-xl flex items-center justify-center transition-all ${
+                                                        editIcon === em ? 'bg-orange-500/20 border-2 border-orange-500 scale-105' : 'glass-panel border border-[var(--border-main)] hover:bg-[var(--bg-surface-active)]'
+                                                    }`}
+                                                >
+                                                    {em}
+                                                </button>
+                                            ))}
                                         </div>
                                     ) : (
-                                        <div className="grid grid-cols-7 gap-2 max-h-40 overflow-y-auto">
-                                            {AVAILABLE_ICONS.map(ic => {
-                                                const Ic = ic.component;
-                                                const isActive = editIcon === ic.name;
-                                                return (
-                                                    <button
-                                                        key={ic.name}
-                                                        onClick={() => setEditIcon(ic.name)}
-                                                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isActive
-                                                            ? 'bg-orange-100 text-orange-600 ring-2 ring-orange-400 scale-110'
-                                                            : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
-                                                            }`}
-                                                    >
-                                                        <Ic size={18} />
-                                                    </button>
-                                                );
-                                            })}
+                                        <div className="grid grid-cols-5 gap-2 max-h-44 overflow-y-auto p-1 hide-scrollbar">
+                                            {AVAILABLE_ICONS.map(({ name, component: Comp }) => (
+                                                <button
+                                                    key={name}
+                                                    type="button"
+                                                    onClick={() => setEditIcon(name)}
+                                                    className={`h-11 rounded-xl flex items-center justify-center transition-all ${
+                                                        editIcon === name ? 'bg-orange-500 text-white shadow-md scale-105' : 'glass-panel border border-[var(--border-main)] text-[var(--text-dim)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-active)]'
+                                                    }`}
+                                                >
+                                                    <Comp size={18} />
+                                                </button>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Confirm */}
-                            <div className="p-6 pt-2">
+                            <div className="p-6 border-t border-[var(--border-main)]">
                                 <button
+                                    type="button"
                                     onClick={confirmAddEdit}
                                     disabled={!editName.trim() || saving}
-                                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white py-4 rounded-2xl font-black text-sm hover:shadow-lg hover:shadow-orange-500/20 active:scale-[0.97] transition-all disabled:opacity-40"
+                                    className="w-full bg-gradient-to-r from-orange-500 to-rose-500 text-white py-3.5 rounded-2xl font-bold text-sm shadow-lg shadow-orange-500/25 hover:brightness-105 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
-                                    {saving ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
-                                    {editingCat ? 'Save Changes' : 'Add Category'}
+                                    {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                                    <span>{editingCat ? 'Save Changes' : 'Create Category'}</span>
                                 </button>
                             </div>
                         </motion.div>

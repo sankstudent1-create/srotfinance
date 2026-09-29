@@ -459,63 +459,63 @@ export const VoiceAssistantModal = ({ isOpen, onClose, userName, transactions })
                     initial={{ scale: 0.9, y: 20 }}
                     animate={{ scale: 1, y: 0 }}
                     exit={{ scale: 0.9, y: 20 }}
-                    className="bg-white rounded-[2rem] w-full max-w-sm md:max-w-4xl max-h-[90vh] p-6 text-center relative overflow-hidden flex flex-col items-center shadow-2xl flex-shrink-0"
+                    className="glass-panel rounded-[2.5rem] w-full max-w-sm md:max-w-4xl max-h-[90vh] p-6 sm:p-8 text-center relative overflow-hidden flex flex-col items-center shadow-2xl flex-shrink-0 border border-main"
                     onClick={e => e.stopPropagation()}
                 >
-                    <button onClick={onClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors z-20">
+                    <button onClick={onClose} className="absolute top-4 right-4 p-2 text-dim hover:text-main hover:bg-secondary rounded-full transition-colors z-20">
                         <X size={20} />
                     </button>
-                    <button onClick={() => setShowDiagnostics(!showDiagnostics)} className={`absolute top-4 left-4 p-2 rounded-full transition-colors z-20 ${showDiagnostics ? 'text-rose-500 bg-rose-50' : 'text-slate-400 hover:bg-slate-100'}`}>
+                    <button onClick={() => setShowDiagnostics(!showDiagnostics)} className={`absolute top-4 left-4 p-2 rounded-full transition-colors z-20 ${showDiagnostics ? 'text-orange-400 bg-orange-500/10' : 'text-dim hover:text-main hover:bg-secondary'}`}>
                         <Settings2 size={20} />
                     </button>
 
-                    {/* Dynamic background blobs */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-rose-50 rounded-full blur-2xl -ml-16 -mb-16 pointer-events-none" />
+                    {/* Dynamic background glow */}
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none" />
 
                     <div className={`flex w-full transition-all duration-300 ${showDiagnostics ? 'flex-col md:flex-row gap-6' : 'flex-col justify-center max-w-sm mx-auto'}`}>
 
                         {/* MAIN UI COLUMN */}
                         <div className={`flex flex-col items-center flex-1 w-full ${showDiagnostics ? 'md:max-w-xs' : ''}`}>
-                            <h2 className="text-xl font-black text-slate-800 mb-8 relative z-10 w-full">Voice Assistant</h2>
+                            <h2 className="text-xl font-black text-main mb-8 relative z-10 w-full tracking-tight">Voice Assistant</h2>
 
                             {/* Avatar Ring Animation */}
                             <div className="relative mb-6 flex justify-center w-full z-10">
                                 {state === 'listening' && (
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <motion.div animate={{ scale: [1, 1.4, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-24 h-24 bg-rose-100 rounded-full" />
-                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }} className="absolute w-28 h-28 bg-orange-50 rounded-full" />
+                                        <motion.div animate={{ scale: [1, 1.4, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-24 h-24 bg-rose-500/20 rounded-full" />
+                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }} className="absolute w-28 h-28 bg-orange-500/15 rounded-full" />
                                     </div>
                                 )}
                                 {state === 'processing' && (
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-28 h-28 border-4 border-dashed border-indigo-200 rounded-full" />
+                                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-28 h-28 border-4 border-dashed border-orange-400/40 rounded-full" />
                                     </div>
                                 )}
                                 {state === 'speaking' && (
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-24 h-24 bg-emerald-100 rounded-full" />
+                                        <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-24 h-24 bg-emerald-500/20 rounded-full" />
                                     </div>
                                 )}
 
-                                <div className="relative w-24 h-24 bg-gradient-to-tr from-indigo-500 to-rose-500 rounded-full flex items-center justify-center shadow-xl z-20">
-                                    {state === 'listening' ? <Mic size={40} className="text-white" /> :
-                                        state === 'processing' ? <RefreshCcw size={36} className="text-white animate-spin" /> :
-                                            state === 'speaking' ? <Volume2 size={40} className="text-white animate-pulse" /> :
-                                                <Mic size={40} className="text-white opacity-90" />}
+                                <div className="relative w-24 h-24 bg-gradient-to-tr from-orange-500 via-amber-500 to-rose-500 rounded-full flex items-center justify-center shadow-xl shadow-orange-500/30 z-20">
+                                    {state === 'listening' ? <Mic size={38} className="text-white animate-pulse" /> :
+                                        state === 'processing' ? <RefreshCcw size={34} className="text-white animate-spin" /> :
+                                            state === 'speaking' ? <Volume2 size={38} className="text-white animate-pulse" /> :
+                                                <Mic size={38} className="text-white opacity-95" />}
                                 </div>
                             </div>
 
                             <div className="h-44 w-full relative z-10 flex flex-col items-center space-y-4">
-                                {state === 'listening' && <p className="text-rose-500 font-bold animate-pulse text-lg">Listening...</p>}
-                                {state === 'processing' && <p className="text-indigo-500 font-bold animate-pulse text-lg">Processing...</p>}
+                                {state === 'listening' && <p className="text-rose-500 dark:text-rose-400 font-bold animate-pulse text-base tracking-wide">Listening to you...</p>}
+                                {state === 'processing' && <p className="text-orange-400 font-bold animate-pulse text-base tracking-wide">Analyzing finances...</p>}
 
                                 {/* Display real-time transcript or reply */}
                                 {(state === 'speaking' || state === 'idle' || state === 'listening') && transcript && (
-                                    <div className="flex flex-col gap-3 w-full text-left overflow-y-auto max-h-36 custom-scrollbar px-2">
-                                        <p className="text-xs font-bold text-slate-400 bg-slate-50 p-2 rounded-lg self-end max-w-[90%] break-words border border-slate-100/60 shadow-sm">🗣️ "{transcript}"</p>
+                                    <div className="flex flex-col gap-3 w-full text-left overflow-y-auto max-h-36 custom-scrollbar px-1">
+                                        <p className="text-xs font-bold text-dim bg-secondary/80 p-2.5 rounded-xl self-end max-w-[90%] break-words border border-main shadow-sm">🗣️ "{transcript}"</p>
                                         {aiResponse && (
-                                            <p className="font-semibold text-slate-800 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/80 self-start max-w-[95%] break-words shadow-sm">
+                                            <p className="text-xs sm:text-sm font-semibold text-main bg-card p-3 rounded-xl border border-orange-500/20 self-start max-w-[95%] break-words shadow-md">
                                                 {aiResponse}
                                             </p>
                                         )}
@@ -530,7 +530,7 @@ export const VoiceAssistantModal = ({ isOpen, onClose, userName, transactions })
                                             unlockAudio(); // Critical for iOS Safari TTS fix
                                             initStreamAndListen();
                                         }}
-                                        className="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2"
+                                        className="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white font-black py-4 rounded-2xl hover:brightness-105 transition-all shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 active:scale-95"
                                     >
                                         <Mic size={20} /> Tap to Start
                                     </button>
@@ -539,7 +539,7 @@ export const VoiceAssistantModal = ({ isOpen, onClose, userName, transactions })
                                         onClick={() => {
                                             stopEverything();
                                         }}
-                                        className="w-full bg-rose-100 text-rose-600 font-bold py-3.5 rounded-xl hover:bg-rose-200 transition-colors flex items-center justify-center gap-2"
+                                        className="w-full bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30 font-black py-4 rounded-2xl hover:bg-rose-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
                                     >
                                         <StopCircle size={20} /> Stop Conversation
                                     </button>
@@ -549,30 +549,30 @@ export const VoiceAssistantModal = ({ isOpen, onClose, userName, transactions })
 
                         {/* DIAGNOSTICS COLUMN (Hidden by default) */}
                         {showDiagnostics && (
-                            <div className="flex-1 w-full bg-slate-900 rounded-2xl p-4 text-left overflow-hidden flex flex-col h-[400px] md:h-auto shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] border border-slate-800 relative z-10">
-                                <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-2">
-                                    <h3 className="text-emerald-400 font-mono text-sm font-bold flex items-center gap-2">
+                            <div className="flex-1 w-full bg-card rounded-2xl p-4 text-left overflow-hidden flex flex-col h-[400px] md:h-auto shadow-inner border border-main relative z-10">
+                                <div className="flex items-center justify-between mb-4 border-b border-main pb-2">
+                                    <h3 className="text-emerald-400 font-mono text-xs font-bold flex items-center gap-2">
                                         <ShieldAlert size={16} /> SYSTEM DIAGNOSTICS
                                     </h3>
-                                    <div className="flex gap-2 text-[10px] font-mono text-slate-400 font-bold bg-slate-800 px-2 py-1 rounded">
+                                    <div className="flex gap-2 text-[10px] font-mono text-dim font-bold bg-secondary px-2 py-1 rounded">
                                         Vol: {dbLevel.toFixed(1)} dB Bar:
-                                        <div className="w-16 h-3 bg-slate-700 rounded overflow-hidden relative">
+                                        <div className="w-16 h-3 bg-secondary border border-main rounded overflow-hidden relative">
                                             <div className="absolute top-0 bottom-0 left-0 bg-emerald-500" style={{ width: `${Math.min(100, (dbLevel / 100) * 100)}%` }} />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400 mb-4 bg-slate-800 p-2 rounded">
-                                    <div>State: <span className="text-white">{state}</span></div>
-                                    <div>Looping: <span className={isAutoModeRef.current ? "text-emerald-400" : "text-rose-400"}>{isAutoModeRef.current ? 'ON' : 'OFF'}</span></div>
-                                    <div>Chunks: <span className="text-indigo-300">{audioChunksRef.current.length}</span></div>
-                                    <div>TTS Supp: <span className={audioSupport.speechSynthesis ? "text-emerald-400" : "text-rose-400"}>{audioSupport.speechSynthesis ? 'Yes' : 'No'}</span></div>
+                                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-dim mb-4 bg-secondary p-2 rounded border border-main">
+                                    <div>State: <span className="text-main font-bold">{state}</span></div>
+                                    <div>Looping: <span className={isAutoModeRef.current ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>{isAutoModeRef.current ? 'ON' : 'OFF'}</span></div>
+                                    <div>Chunks: <span className="text-orange-400 font-bold">{audioChunksRef.current.length}</span></div>
+                                    <div>TTS Supp: <span className={audioSupport.speechSynthesis ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>{audioSupport.speechSynthesis ? 'Yes' : 'No'}</span></div>
                                 </div>
 
                                 <div className="flex-1 overflow-y-auto custom-scrollbar font-mono text-[10px] space-y-1.5 flex flex-col-reverse">
                                     {[...logs].reverse().map((log, i) => (
-                                        <div key={i} className={`border-b border-slate-800/50 pb-1 ${log.type === 'error' ? 'text-rose-400' : log.type === 'success' ? 'text-emerald-300' : log.type === 'warning' ? 'text-orange-300' : 'text-slate-300'}`}>
-                                            <span className="text-slate-600 mr-2">[{log.time}]</span>
+                                        <div key={i} className={`border-b border-main/50 pb-1 ${log.type === 'error' ? 'text-rose-400' : log.type === 'success' ? 'text-emerald-300' : log.type === 'warning' ? 'text-orange-300' : 'text-dim'}`}>
+                                            <span className="text-dim/60 mr-2">[{log.time}]</span>
                                             {log.msg}
                                         </div>
                                     ))}
