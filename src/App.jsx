@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { supabase } from './config/supabase';
 import { AuthScreen } from './screens/AuthScreen';
 import { ResetPasswordScreen } from './screens/ResetPasswordScreen';
@@ -11,6 +12,27 @@ import { BannerModal } from './components/modals/BannerModal';
 import { AdminScreen } from './screens/admin/AdminScreen';
 import { BiometricLock } from './components/modals/BiometricLock';
 import { getUserPrefs } from './components/modals/SettingsModal';
+
+// Public SEO pages (light-themed, indexable)
+import AboutPage from './pages/About';
+import FeaturesPage from './pages/Features';
+import PricingPage from './pages/Pricing';
+import ContactPage from './pages/Contact';
+import PrivacyPage from './pages/Privacy';
+import TermsPage from './pages/Terms';
+import CalcHubPage from './pages/calculators/Hub';
+import CalcToolPage from './pages/calculators/ToolPage';
+import BlogIndexPage from './pages/blog/Index';
+import BlogPostPage from './pages/blog/Post';
+
+// Scroll to top on every route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 // --- SYSTEM MANAGER (PWA & SETUP) ---
 const SystemSetup = () => {
@@ -46,7 +68,9 @@ const SystemSetup = () => {
 };
 
 
-export default function App() {
+// The original app shell (auth / dashboard / admin). Rendered for `/`
+// and as the catch-all so unknown paths behave exactly as before.
+function LegacyApp() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recoveryMode, setRecoveryMode] = useState(false);
@@ -178,6 +202,30 @@ export default function App() {
       ) : (
         !session ? <AuthScreen supabase={supabase} /> : <Dashboard session={session} supabase={supabase} />
       )}
+    </>
+  );
+}
+
+// Routed app shell: public SEO pages get their own routes;
+// everything else (including `/` and `/admin/*`) renders the
+// original app shell unchanged via the catch-all.
+export default function App() {
+  return (
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/calculators" element={<CalcHubPage />} />
+        <Route path="/calculators/:tool" element={<CalcToolPage />} />
+        <Route path="/blog" element={<BlogIndexPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="*" element={<LegacyApp />} />
+      </Routes>
     </>
   );
 }

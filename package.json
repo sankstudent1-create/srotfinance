@@ -23,6 +23,7 @@
     "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^7.18.4",
     "react-simple-maps": "^3.0.0",
     "tailwind-merge": "^3.4.0",
     "tesseract.js": "^5.1.1",
