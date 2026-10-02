@@ -192,21 +192,32 @@ export const AuthScreen = () => {
                         {FEATURES.map((f, i) => (
                             <motion.div
                                 key={i}
-                                animate={{ opacity: activeFeature === i ? 1 : 0.4, x: activeFeature === i ? 0 : -4 }}
+                                animate={{ opacity: activeFeature === i ? 1 : 0.75, x: activeFeature === i ? 0 : -4 }}
                                 transition={{ duration: 0.3 }}
                                 className="flex items-center gap-4 cursor-pointer p-2.5 rounded-2xl transition-colors hover:bg-white/5"
                                 onClick={() => setActiveFeature(i)}
                             >
                                 <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 ${
-                                    activeFeature === i ? 'bg-gradient-to-br from-orange-500 to-rose-500 shadow-[0_0_25px_rgba(249,115,22,0.45)] text-white' : 'bg-white/5 border border-white/10 text-white/40'
+                                    activeFeature === i ? 'bg-gradient-to-br from-orange-500 to-rose-500 shadow-[0_0_25px_rgba(249,115,22,0.45)] text-white' : 'bg-white/5 border border-white/10 text-white/60'
                                 }`}>
                                     <f.icon size={20} />
                                 </div>
                                 <div>
-                                    <p className={`text-sm font-bold transition-colors ${activeFeature === i ? 'text-white' : 'text-white/50'}`}>{f.label}</p>
-                                    <p className={`text-xs transition-colors ${activeFeature === i ? 'text-white/70' : 'text-white/30'}`}>{f.desc}</p>
+                                    <p className={`text-sm font-bold transition-colors ${activeFeature === i ? 'text-white' : 'text-white/75'}`}>{f.label}</p>
+                                    <p className={`text-xs transition-colors ${activeFeature === i ? 'text-white/70' : 'text-white/50'}`}>{f.desc}</p>
                                 </div>
                             </motion.div>
+                        ))}
+                    </div>
+                    {/* Carousel dots */}
+                    <div className="flex gap-1.5 mt-4 ml-2">
+                        {FEATURES.map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setActiveFeature(i)}
+                                aria-label={`Feature ${i + 1}`}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${activeFeature === i ? 'w-6 bg-orange-500' : 'w-1.5 bg-white/20 hover:bg-white/40'}`}
+                            />
                         ))}
                     </div>
 

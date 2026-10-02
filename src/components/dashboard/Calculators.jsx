@@ -427,7 +427,7 @@ const AgeCalculator = ({ onPrint, onDownload, onShare, isSharing, translate }) =
     }, [dob, now]);
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 pb-8 space-y-6">
             <div>
                 <label className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2 block">
                     Date of Birth
@@ -868,7 +868,7 @@ export const CalculatorModal = ({
                                     </div>
                                     <div className="glass-panel p-4 text-center border-orange-500/30">
                                         <p className="text-[10px] text-orange-400 font-bold uppercase tracking-wider">{result.isEMI ? 'Total Payment' : translate('net_value')}</p>
-                                        <p className="text-lg sm:text-xl font-black font-mono text-orange-400 mt-1">
+                                        <p className="text-base sm:text-lg font-black font-mono text-orange-400 mt-1 break-all leading-tight">
                                             ₹{Math.round(result.netTotal).toLocaleString('en-IN')}
                                         </p>
                                     </div>

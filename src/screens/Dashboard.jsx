@@ -1423,7 +1423,7 @@ export const Dashboard = ({ session }) => {
                                         <Mic size={20} strokeWidth={2} />
                                         <div className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full animate-ping" />
                                     </div>
-                                    <span className="text-[9px] font-bold uppercase tracking-wide mt-1">Siri</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-wide mt-1">AI Help</span>
                                 </button>
                                 <button
                                     onClick={() => setShowSettings(true)}
@@ -1783,7 +1783,7 @@ export const Dashboard = ({ session }) => {
                         </div>
 
                         {/* Render full PrintView here for preview with zoom */}
-                        <div className="flex-1 overflow-auto p-4 sm:p-8 flex items-start justify-center">
+                        <div className="flex-1 overflow-auto p-4 sm:p-8 flex items-start justify-center preview-mode">
                             <div
                                 className="bg-white shadow-xl max-w-[210mm] w-full transition-transform origin-top"
                                 style={{ transform: `scale(${previewZoom})`, marginBottom: `${(previewZoom - 1) * 100}%` }}

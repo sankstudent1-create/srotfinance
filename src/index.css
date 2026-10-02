@@ -422,6 +422,17 @@ input[type="range"]::-moz-range-thumb {
     display: none !important;
 }
 
+/* In the report-preview overlay the PrintView must flow inside the centered
+   container, not break out with fixed positioning. */
+.preview-mode .print-active {
+    position: static;
+    width: auto;
+    height: auto;
+    z-index: auto;
+    overflow: visible;
+    display: block !important;
+}
+
 .print-active {
     position: fixed;
     top: 0;
