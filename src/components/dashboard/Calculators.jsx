@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     TrendingUp, Coins, Lock, ShieldCheck, Percent, RotateCcw,
     Download, Mail, Share2, Loader2, X, Info, ChevronDown, ChevronUp,
-    IndianRupee, Scale, FileText, Calendar, Sparkles, ArrowRight
+    IndianRupee, Scale, FileText, Calendar, Sparkles, ArrowRight, Landmark
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,6 +14,8 @@ const EN_Translations = {
     tool_ppf: "PPF Scheme",
     tool_interest: "Interest Calculator",
     tool_age: "Age Calculator",
+    tool_emi: "EMI Calculator",
+    emi_desc: "Home / Personal / Auto Loans",
     sip_desc: "Equity Mutual Funds (SIP)",
     lumpsum_desc: "One-time Mutual Fund Investment",
     fd_desc: "Guaranteed Bank Savings",
@@ -23,6 +25,10 @@ const EN_Translations = {
     monthly_invest: "Monthly Investment (₹)",
     yearly_invest: "Yearly Investment (₹)",
     invest_amt: "Investment Amount (₹)",
+    loan_amount: "Loan Amount (₹)",
+    loan_rate: "Interest Rate (% p.a)",
+    loan_tenure: "Loan Tenure (Years)",
+    emi_result: "Monthly EMI",
     time_period: "Time Period (Years)",
     exp_ratio: "Expense Ratio (%)",
     return_rate: "Expected Return Rate (% p.a)",
@@ -132,6 +138,23 @@ const SCHEME_TAX_INFO = {
             "Interest from Govt Tax-Free Bonds is 100% exempt from income tax.",
         ],
         tip: "💡 Always report all interest income in your annual ITR under 'Income from Other Sources'."
+    },
+    emi: {
+        name: "EMI / Loan Calculator",
+        section: "Loans — Home, Personal, Auto",
+        taxRules: [
+            { label: "Home Loan Principal", value: "80C deduction up to ₹1.5L/year" },
+            { label: "Home Loan Interest", value: "Sec 24(b) up to ₹2L/year (self-occupied)" },
+            { label: "Personal / Auto Loan", value: "No tax deduction on EMI" },
+            { label: "Prepayment", value: "Allowed; check foreclosure charges" },
+        ],
+        exemptions: [
+            "Home loan principal repaid qualifies for Section 80C deduction up to ₹1.5L per year (Old Regime).",
+            "Home loan interest up to ₹2L per year is deductible under Section 24(b) for a self-occupied house.",
+            "No tax benefit on personal, auto or consumer-durable loan EMIs.",
+            "Part-prepayments directly cut the principal and reduce total interest — prepay early in the tenure for maximum saving.",
+        ],
+        tip: "💡 Even one extra EMI per year as prepayment can shave years off a home loan and save lakhs in interest."
     }
 };
 
@@ -206,6 +229,39 @@ const calculateSimpleInterest = (p, n, r) => {
     }
     const tax = interest * 0.10;
     return { invested: p, total: p + interest, returns: interest, tax, netTotal: (p + interest) - tax, projections };
+};
+
+// EMI = P * r * (1+r)^n / ((1+r)^n - 1), r = monthly rate, n = months
+const calculateEMI = (p, annualRate, years) => {
+    const n = Math.max(1, Math.round((years || 5) * 12));
+    const r = Math.max(0, annualRate || 0) / 100 / 12;
+    let emi;
+    if (r === 0) {
+        emi = p / n;
+    } else {
+        const pow = Math.pow(1 + r, n);
+        emi = p * r * pow / (pow - 1);
+    }
+    const total = emi * n;
+    const interest = Math.max(0, total - p);
+
+    // Year-by-year amortisation: principal paid, interest paid, balance
+    const projections = [];
+    let balance = p;
+    const totalYears = Math.ceil(n / 12);
+    for (let y = 1; y <= totalYears; y++) {
+        let yInt = 0, yPrin = 0;
+        for (let m = 1; m <= 12 && (y - 1) * 12 + m <= n; m++) {
+            const intPart = balance * r;
+            const prinPart = Math.min(emi - intPart, balance);
+            yInt += intPart;
+            yPrin += prinPart;
+            balance = Math.max(0, balance - prinPart);
+        }
+        projections.push({ year: y, invested: yPrin, total: yInt, balance });
+    }
+
+    return { invested: p, total, returns: interest, tax: 0, netTotal: total, emi, projections, isEMI: true };
 };
 
 // --- TAX INFO ACCORDION COMPONENT ---
@@ -308,8 +364,25 @@ const getZodiac = (month, day) => {
 
 const AgeCalculator = ({ onPrint, onDownload, onShare, isSharing, translate }) => {
     const [dob, setDob] = useState('');
+    const [birthY, setBirthY] = useState('');
+    const [birthM, setBirthM] = useState('');
+    const [birthD, setBirthD] = useState('');
     const [ageData, setAgeData] = useState(null);
     const [now, setNow] = useState(new Date());
+
+    const currentYear = new Date().getFullYear();
+    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // Combine dropdowns into an ISO date; clamps day to the month's length
+    useEffect(() => {
+        if (birthY && birthM && birthD) {
+            const maxD = new Date(parseInt(birthY, 10), parseInt(birthM, 10), 0).getDate();
+            const d = Math.min(parseInt(birthD, 10), maxD);
+            setDob(`${birthY}-${birthM}-${String(d).padStart(2, '0')}`);
+        } else {
+            setDob('');
+        }
+    }, [birthY, birthM, birthD]);
 
     useEffect(() => {
         const id = setInterval(() => setNow(new Date()), 1000);
@@ -359,13 +432,41 @@ const AgeCalculator = ({ onPrint, onDownload, onShare, isSharing, translate }) =
                 <label className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2 block">
                     Date of Birth
                 </label>
-                <input
-                    type="date"
-                    value={dob}
-                    max={new Date().toISOString().split('T')[0]}
-                    onChange={e => setDob(e.target.value)}
-                    className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-5 py-4 font-bold text-[var(--text-main)] text-base outline-none focus:border-pink-500 transition-all"
-                />
+                <div className="grid grid-cols-3 gap-2.5">
+                    <select
+                        value={birthD}
+                        onChange={e => setBirthD(e.target.value)}
+                        className="bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-3 py-4 font-bold text-[var(--text-main)] text-base outline-none focus:border-pink-500 transition-all appearance-none text-center"
+                        aria-label="Birth day"
+                    >
+                        <option value="">Day</option>
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                            <option key={d} value={String(d).padStart(2, '0')}>{d}</option>
+                        ))}
+                    </select>
+                    <select
+                        value={birthM}
+                        onChange={e => setBirthM(e.target.value)}
+                        className="bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-3 py-4 font-bold text-[var(--text-main)] text-base outline-none focus:border-pink-500 transition-all appearance-none text-center"
+                        aria-label="Birth month"
+                    >
+                        <option value="">Month</option>
+                        {MONTHS.map((m, i) => (
+                            <option key={m} value={String(i + 1).padStart(2, '0')}>{m}</option>
+                        ))}
+                    </select>
+                    <select
+                        value={birthY}
+                        onChange={e => setBirthY(e.target.value)}
+                        className="bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-3 py-4 font-bold text-[var(--text-main)] text-base outline-none focus:border-pink-500 transition-all appearance-none text-center"
+                        aria-label="Birth year"
+                    >
+                        <option value="">Year</option>
+                        {Array.from({ length: currentYear - 1899 }, (_, i) => currentYear - i).map(y => (
+                            <option key={y} value={String(y)}>{y}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             {ageData ? (
@@ -501,16 +602,19 @@ export const CalculatorModal = ({
         fd: { name: 'Fixed Deposit', icon: Lock, color: 'text-amber-400 bg-amber-500/10 border-amber-500/20', desc: 'Guaranteed Bank Savings' },
         ppf: { name: 'PPF Scheme', icon: ShieldCheck, color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20', desc: 'Tax-Free Govt Scheme' },
         interest: { name: 'Interest Calculator', icon: Percent, color: 'text-orange-400 bg-orange-500/10 border-orange-500/20', desc: 'Simple Loan & Deposit' },
+        emi: { name: 'EMI Calculator', icon: Landmark, color: 'text-rose-400 bg-rose-500/10 border-rose-500/20', desc: 'Home / Personal / Auto Loans' },
         age: { name: 'Age Calculator', icon: Calendar, color: 'text-pink-400 bg-pink-500/10 border-pink-500/20', desc: 'Birthday & Milestones' },
     };
 
     const currentTool = tools[toolId] || tools.sip;
 
-    const handleCalculate = () => {
-        const p = parseFloat(data.amount) || 0;
-        const n = parseFloat(data.duration) || 0;
-        const r = parseFloat(data.rate) || 0;
-        const er = parseFloat(data.expense_ratio) || 0;
+    // Recalculates from EXPLICIT values (not stale state) so typed input,
+    // sliders and result labels always stay in sync.
+    const recalc = (d = data) => {
+        const p = parseFloat(d.amount) || 0;
+        const n = parseFloat(d.duration) || 0;
+        const r = parseFloat(d.rate) || 0;
+        const er = parseFloat(d.expense_ratio) || 0;
 
         let res = null;
         switch (toolId) {
@@ -529,6 +633,9 @@ export const CalculatorModal = ({
             case 'interest':
                 res = calculateSimpleInterest(p, n || 1, r || 10);
                 break;
+            case 'emi':
+                res = calculateEMI(p, r || 9, n || 5);
+                break;
             default:
                 break;
         }
@@ -546,6 +653,7 @@ export const CalculatorModal = ({
                 fd: { amount: '100000', duration: '5', rate: '7.1', expense_ratio: '0' },
                 ppf: { amount: '150000', duration: '15', rate: '7.1', expense_ratio: '0' },
                 interest: { amount: '50000', duration: '2', rate: '10', expense_ratio: '0' },
+                emi: { amount: '1000000', duration: '20', rate: '9', expense_ratio: '0' },
             };
             const currentDefaults = defaults[toolId] || defaults.sip;
             setData(currentDefaults);
@@ -559,6 +667,7 @@ export const CalculatorModal = ({
                 else if (toolId === 'fd') setResult(calculateFD(p, n, r));
                 else if (toolId === 'ppf') setResult(calculatePPF(p, n));
                 else if (toolId === 'interest') setResult(calculateSimpleInterest(p, n, r));
+                else if (toolId === 'emi') setResult(calculateEMI(p, r, n));
             }, 60);
         }
     }, [toolId]);
@@ -617,7 +726,7 @@ export const CalculatorModal = ({
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
                                     <label className="text-xs font-black text-[var(--text-muted)] uppercase tracking-wider">
-                                        {toolId === 'sip' ? translate('monthly_invest') : toolId === 'ppf' ? translate('yearly_invest') : translate('invest_amt')}
+                                        {toolId === 'sip' ? translate('monthly_invest') : toolId === 'ppf' ? translate('yearly_invest') : toolId === 'emi' ? translate('loan_amount') : translate('invest_amt')}
                                     </label>
                                     <span className="font-mono font-bold text-sm text-orange-400">
                                         ₹{parseFloat(data.amount || 0).toLocaleString('en-IN')}
@@ -629,9 +738,10 @@ export const CalculatorModal = ({
                                         type="number"
                                         value={data.amount}
                                         onChange={e => {
-                                            setData({ ...data, amount: e.target.value });
+                                            const next = { ...data, amount: e.target.value };
+                                            setData(next);
+                                            recalc(next);
                                         }}
-                                        onBlur={handleCalculate}
                                         className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl pl-10 pr-4 py-3.5 font-bold text-[var(--text-main)] text-base outline-none focus:border-orange-500 transition-all"
                                         placeholder="5000"
                                     />
@@ -639,12 +749,13 @@ export const CalculatorModal = ({
                                 <input
                                     type="range"
                                     min={toolId === 'ppf' ? 500 : 500}
-                                    max={toolId === 'ppf' ? 150000 : 500000}
-                                    step={500}
-                                    value={data.amount || 500}
+                                    max={toolId === 'emi' ? 10000000 : toolId === 'ppf' ? 150000 : 500000}
+                                    step={toolId === 'emi' ? 10000 : 500}
+                                    value={Math.min(parseFloat(data.amount) || 500, toolId === 'emi' ? 10000000 : toolId === 'ppf' ? 150000 : 500000)}
                                     onChange={e => {
-                                        setData({ ...data, amount: e.target.value });
-                                        handleCalculate();
+                                        const next = { ...data, amount: e.target.value };
+                                        setData(next);
+                                        recalc(next);
                                     }}
                                     className="w-full"
                                 />
@@ -654,7 +765,7 @@ export const CalculatorModal = ({
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
                                     <label className="text-xs font-black text-[var(--text-muted)] uppercase tracking-wider">
-                                        {translate('time_period')}
+                                        {toolId === 'emi' ? translate('loan_tenure') : translate('time_period')}
                                     </label>
                                     <span className="font-mono font-bold text-sm text-[var(--text-main)]">
                                         {data.duration} Years
@@ -666,8 +777,9 @@ export const CalculatorModal = ({
                                     max={toolId === 'ppf' ? 30 : 35}
                                     value={data.duration || 1}
                                     onChange={e => {
-                                        setData({ ...data, duration: e.target.value });
-                                        handleCalculate();
+                                        const next = { ...data, duration: e.target.value };
+                                        setData(next);
+                                        recalc(next);
                                     }}
                                     className="w-full"
                                 />
@@ -679,7 +791,7 @@ export const CalculatorModal = ({
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center">
                                             <label className="text-xs font-black text-[var(--text-muted)] uppercase tracking-wider">
-                                                Return Rate (%)
+                                                {toolId === 'emi' ? translate('loan_rate') : 'Return Rate (%)'}
                                             </label>
                                             <span className="font-mono font-bold text-sm text-emerald-400">{data.rate}%</span>
                                         </div>
@@ -688,8 +800,9 @@ export const CalculatorModal = ({
                                             step="0.1"
                                             value={data.rate}
                                             onChange={e => {
-                                                setData({ ...data, rate: e.target.value });
-                                                handleCalculate();
+                                                const next = { ...data, rate: e.target.value };
+                                                setData(next);
+                                                recalc(next);
                                             }}
                                             className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-4 py-3 font-bold text-[var(--text-main)] text-sm outline-none focus:border-orange-500 transition-all"
                                         />
@@ -708,8 +821,9 @@ export const CalculatorModal = ({
                                                 step="0.1"
                                                 value={data.expense_ratio}
                                                 onChange={e => {
-                                                    setData({ ...data, expense_ratio: e.target.value });
-                                                    handleCalculate();
+                                                    const next = { ...data, expense_ratio: e.target.value };
+                                                    setData(next);
+                                                    recalc(next);
                                                 }}
                                                 className="w-full bg-[var(--bg-surface)] border border-[var(--border-main)] rounded-2xl px-4 py-3 font-bold text-[var(--text-main)] text-sm outline-none focus:border-orange-500 transition-all"
                                             />
@@ -727,21 +841,33 @@ export const CalculatorModal = ({
                                 className="space-y-6 pt-4 border-t border-[var(--border-main)]"
                             >
                                 {/* Key Metrics Cards */}
+                                {result.isEMI && (
+                                    <div className="glass-panel p-6 text-center border-rose-500/30 relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 via-orange-500 to-amber-400" />
+                                        <p className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest mb-2">{translate('emi_result')}</p>
+                                        <p className="text-4xl font-black font-mono text-rose-400">
+                                            ₹{Math.round(result.emi).toLocaleString('en-IN')}
+                                        </p>
+                                        <p className="text-xs text-[var(--text-muted)] mt-2 font-medium">
+                                            Total Interest ₹{Math.round(result.returns).toLocaleString('en-IN')} • Total Payment ₹{Math.round(result.total).toLocaleString('en-IN')}
+                                        </p>
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div className="glass-panel p-4 text-center">
-                                        <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">{translate('invested')}</p>
+                                        <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">{result.isEMI ? 'Loan Amount' : translate('invested')}</p>
                                         <p className="text-base sm:text-lg font-black font-mono text-[var(--text-main)] mt-1">
                                             ₹{Math.round(result.invested).toLocaleString('en-IN')}
                                         </p>
                                     </div>
                                     <div className="glass-panel p-4 text-center">
-                                        <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">{translate('wealth_created')}</p>
-                                        <p className="text-base sm:text-lg font-black font-mono text-emerald-400 mt-1">
-                                            +₹{Math.round(result.returns).toLocaleString('en-IN')}
+                                        <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-wider">{result.isEMI ? 'Total Interest' : translate('wealth_created')}</p>
+                                        <p className={`text-base sm:text-lg font-black font-mono mt-1 ${result.isEMI ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                            {result.isEMI ? '' : '+'}₹{Math.round(result.returns).toLocaleString('en-IN')}
                                         </p>
                                     </div>
                                     <div className="glass-panel p-4 text-center border-orange-500/30">
-                                        <p className="text-[10px] text-orange-400 font-bold uppercase tracking-wider">{translate('net_value')}</p>
+                                        <p className="text-[10px] text-orange-400 font-bold uppercase tracking-wider">{result.isEMI ? 'Total Payment' : translate('net_value')}</p>
                                         <p className="text-lg sm:text-xl font-black font-mono text-orange-400 mt-1">
                                             ₹{Math.round(result.netTotal).toLocaleString('en-IN')}
                                         </p>
@@ -752,10 +878,10 @@ export const CalculatorModal = ({
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-xs font-bold">
                                         <span className="text-[var(--text-dim)]">
-                                            Invested: {((result.invested / result.total) * 100).toFixed(0)}%
+                                            {result.isEMI ? 'Principal' : 'Invested'}: {((result.invested / result.total) * 100).toFixed(0)}%
                                         </span>
                                         <span className="text-emerald-400">
-                                            Gains: {((result.returns / result.total) * 100).toFixed(0)}%
+                                            {result.isEMI ? 'Interest' : 'Gains'}: {((result.returns / result.total) * 100).toFixed(0)}%
                                         </span>
                                     </div>
                                     <div className="w-full h-3 rounded-full bg-[var(--bg-surface)] border border-[var(--border-main)] overflow-hidden flex">
@@ -787,7 +913,7 @@ export const CalculatorModal = ({
                                         onClick={() => setShowProjections(!showProjections)}
                                         className="w-full py-3 px-4 rounded-2xl glass-panel border border-[var(--border-main)] flex items-center justify-between text-xs font-bold text-[var(--text-dim)] hover:text-[var(--text-main)] transition-colors"
                                     >
-                                        <span>View Year-by-Year Growth Table</span>
+                                        <span>{result.isEMI ? 'View Year-by-Year Amortisation' : 'View Year-by-Year Growth Table'}</span>
                                         {showProjections ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                     </button>
 
@@ -795,8 +921,8 @@ export const CalculatorModal = ({
                                         <div className="mt-3 max-h-56 overflow-y-auto glass-panel p-3 rounded-2xl border border-[var(--border-main)] space-y-1.5 hide-scrollbar">
                                             <div className="grid grid-cols-3 text-[10px] font-black uppercase text-[var(--text-muted)] pb-1 border-b border-[var(--border-main)]">
                                                 <span>Year</span>
-                                                <span className="text-right">Invested</span>
-                                                <span className="text-right">Maturity</span>
+                                                <span className="text-right">{result.isEMI ? 'Principal Paid' : 'Invested'}</span>
+                                                <span className="text-right">{result.isEMI ? 'Interest Paid' : 'Maturity'}</span>
                                             </div>
                                             {result.projections.map((p) => (
                                                 <div key={p.year} className="grid grid-cols-3 text-xs font-mono py-1 border-b border-[var(--border-subtle)] last:border-0">

@@ -12,6 +12,7 @@ export const TOOLS = [
     { id: 'fd', name: 'Fixed Deposit', icon: Shield, bg: 'bg-amber-100', color: 'text-amber-600' },
     { id: 'ppf', name: 'PPF', icon: Briefcase, bg: 'bg-indigo-100', color: 'text-indigo-600' },
     { id: 'interest', name: 'Interest', icon: Percent, bg: 'bg-slate-100', color: 'text-slate-600' },
+    { id: 'emi', name: 'EMI Calc', icon: Landmark, bg: 'bg-rose-100', color: 'text-rose-600' },
     { id: 'age', name: 'Age Calc', icon: Calendar, bg: 'bg-pink-100', color: 'text-pink-600' },
 ];
 

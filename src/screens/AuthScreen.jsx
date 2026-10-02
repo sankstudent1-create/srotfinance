@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    TrendingUp, Mail, Lock, ArrowRight, Loader2, Sparkles, User,
+    TrendingUp, Mail, Lock, ArrowRight, Loader2, User,
     AlertCircle, WifiOff, RefreshCw, BarChart3, Shield, Zap, Eye, EyeOff, CheckCircle2
 } from 'lucide-react';
 import { supabase } from '../config/supabase';
@@ -128,11 +128,9 @@ export const AuthScreen = () => {
         }
     };
 
-    const handleGuestDemo = () => {
-        setEmail('demo@srotfinance.app');
-        setPassword('demo123456');
-        setError('Demo credentials filled! If demo account exists on your Supabase, click Sign In.');
-    };
+    // Demo Mode removed (Oct 2026): the button filled demo@srotfinance.app credentials for a
+    // Supabase account that was never seeded, so sign-in always failed with
+    // "Incorrect email or password". Re-add only after a real demo account exists.
 
     return (
         <div className="min-h-screen w-full font-sans bg-[#07080D] flex lg:grid lg:grid-cols-2 text-white antialiased selection:bg-orange-500/30 selection:text-white">
@@ -469,13 +467,13 @@ export const AuthScreen = () => {
                         </div>
 
                         {/* Social Buttons */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="w-full">
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 type="button"
                                 onClick={handleGoogleLogin}
-                                className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:border-orange-500/40 hover:bg-orange-500/10 py-3 rounded-2xl font-bold text-xs text-white transition-all"
+                                className="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:border-orange-500/40 hover:bg-orange-500/10 py-3 rounded-2xl font-bold text-xs text-white transition-all"
                             >
                                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -484,17 +482,6 @@ export const AuthScreen = () => {
                                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                                 </svg>
                                 <span>Google</span>
-                            </motion.button>
-
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                type="button"
-                                onClick={handleGuestDemo}
-                                className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:border-orange-500/40 hover:bg-orange-500/10 py-3 rounded-2xl font-bold text-xs text-white transition-all"
-                            >
-                                <Sparkles size={15} className="text-orange-400" />
-                                <span>Demo Mode</span>
                             </motion.button>
                         </div>
 
