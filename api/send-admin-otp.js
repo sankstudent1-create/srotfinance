@@ -54,13 +54,13 @@ export default async function handler(req, res) {
         const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
 
         const mailOptions = {
-            from: `"Orange Finance Security" <${fromEmail}>`,
+            from: `"Srot Finance Security" <${fromEmail}>`,
             to: email,
             subject: 'Admin 2FA Authorization Code',
             html: `
                 <div style="font-family: Arial, sans-serif; background-color: #f1f5f9; padding: 40px; text-align: center;">
                     <div style="max-w: 500px; margin: 0 auto; background: white; padding: 40px; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-                        <img src="https://fin.swinfosystems.online/favicon.ico" alt="Orange Finance Logo" width="60" style="margin-bottom: 20px;" />
+                        <img src="https://srotfinance.vercel.app/favicon.ico" alt="Srot Finance Logo" width="60" style="margin-bottom: 20px;" />
                         <h2 style="color: #0f172a; margin: 0 0 10px 0;">Admin Portal Access</h2>
                         <p style="color: #64748b; font-size: 14px; margin-bottom: 30px;">
                             You are attempting to access the high-security admin dashboard. 

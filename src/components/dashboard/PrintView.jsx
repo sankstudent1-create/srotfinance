@@ -116,7 +116,7 @@ const PageFooter = ({ page, total }) => (
             <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>CONFIDENTIAL</span>
         </div>
         <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
-            {page && total ? `Page ${page} of ${total}` : 'srotfinance.com'}
+            {page && total ? `Page ${page} of ${total}` : 'srotfinance.vercel.app'}
         </div>
     </div>
 );

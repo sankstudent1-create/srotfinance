@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         const payload = JSON.stringify({
             title,
             body,
-            icon: icon || 'https://fin.swinfosystems.online/favicon.ico',
+            icon: icon || 'https://srotfinance.vercel.app/favicon.ico',
             image: req.body.image || null,
             data: { url: url || '/' }
         });

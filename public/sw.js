@@ -1,5 +1,5 @@
 /* ================================================================== */
-/*  Orange Finance — Service Worker  v10                               */
+/*  Srot Finance — Service Worker  v10                               */
 /*  Strategy: Cache-First for static, Network-First for API          */
 /* ================================================================== */
 const CACHE_VERSION = 'of-v12';
@@ -193,7 +193,7 @@ async function syncPendingTransactions() {
 
 /* ── PUSH NOTIFICATIONS ─────────────────────────────────────────── */
 self.addEventListener('push', (event) => {
-  let payload = { title: 'Orange Finance', body: 'You have a new notification' };
+  let payload = { title: 'Srot Finance', body: 'You have a new notification' };
   try {
     if (event.data) {
       payload = event.data.json();
@@ -217,7 +217,7 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || 'Orange Finance', notificationOptions)
+    self.registration.showNotification(payload.title || 'Srot Finance', notificationOptions)
   );
 });
 

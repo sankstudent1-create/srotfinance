@@ -145,7 +145,7 @@ export const AdminLogin = ({ onLoginSuccess }) => {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="admin@srotfinance.com"
+                                        placeholder="admin@swinfosystems.online"
                                         className="w-full pl-12 pr-4 py-3.5 bg-secondary/80 border border-main rounded-2xl text-sm font-semibold text-main placeholder:text-dim/50 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 transition-all"
                                     />
                                 </div>
