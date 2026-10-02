@@ -20,20 +20,32 @@ export const fmt = (v) => `₹${Math.round(v || 0).toLocaleString('en-IN')}`;
 export const fmtNum = (v) => Number(v || 0).toLocaleString('en-IN');
 export const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-/* Brand logo as a data URL (cached). The file is named .png but holds JPEG
-   bytes — reading it as a blob keeps the real mime type. */
+/* Brand logo as a data URL (cached). The declared Content-Type can't always be
+   trusted (a misnamed file once served JPEG bytes as image/png, which made
+   the PDF renderer drop the image), so the real format is sniffed from the
+   file's magic bytes. */
+const sniffMime = (b) => {
+    if (b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return 'image/jpeg';
+    if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47) return 'image/png';
+    if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return 'image/gif';
+    if (b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46) return 'image/webp';
+    return null;
+};
 let logoPromise = null;
 export const getLogoDataUrl = () => {
     if (!logoPromise) {
-        logoPromise = fetch('/logo.png')
-            .then((r) => { if (!r.ok) throw new Error('logo fetch failed'); return r.blob(); })
-            .then((blob) => new Promise((resolve, reject) => {
-                const fr = new FileReader();
-                fr.onload = () => resolve(fr.result);
-                fr.onerror = reject;
-                fr.readAsDataURL(blob);
-            }))
-            .catch(() => { logoPromise = null; return null; });
+        logoPromise = (async () => {
+            const r = await fetch('/logo.png');
+            if (!r.ok) throw new Error('logo fetch failed');
+            const buf = await r.arrayBuffer();
+            const bytes = new Uint8Array(buf);
+            const mime = sniffMime(bytes) || 'image/png';
+            let bin = '';
+            for (let i = 0; i < bytes.length; i += 8192) {
+                bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+            }
+            return `data:${mime};base64,${btoa(bin)}`;
+        })().catch(() => { logoPromise = null; return null; });
     }
     return logoPromise;
 };

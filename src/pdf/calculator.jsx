@@ -127,7 +127,7 @@ const SummaryPage = ({ data, user, logo, qr }) => {
     const years = parseFloat(inputs['Time Period (Years)']) || 10;
 
     return (
-        <Page size="A4" style={pageStyle} wrap={false}>
+        <Page size="A4" style={pageStyle}>
             <Watermark logo={logo} />
             <ReportHeader logo={logo} user={user} subtitle={`${toolName} Report`} />
             <Eyebrow color={C.orange}>{toolName} Analysis</Eyebrow>
@@ -262,7 +262,7 @@ const BreakdownPage = ({ data, chunk, chunkIndex, isLastChunk, pageNum, totalPag
     const colW = ['16%', '22%', '24%', '14%', '24%'];
 
     return (
-        <Page size="A4" style={pageStyle} wrap={false}>
+        <Page size="A4" style={pageStyle}>
             <Watermark logo={logo} />
             <ReportHeader
                 logo={logo} user={user}

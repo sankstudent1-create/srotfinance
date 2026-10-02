@@ -71,7 +71,7 @@ export const AgeDoc = ({ data, user, logo, qr }) => {
 
     return (
         <Document title="Age & Life Report — Srot Finance" author="Srot Finance">
-            <Page size="A4" style={pageStyle} wrap={false}>
+            <Page size="A4" style={pageStyle}>
                 <Watermark logo={logo} />
                 <ReportHeader logo={logo} user={user} subtitle="Age & Life Report" />
                 <Eyebrow color={PINK}>Life Milestones Analysis</Eyebrow>

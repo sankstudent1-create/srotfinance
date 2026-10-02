@@ -47,14 +47,20 @@ export const pageStyle = {
 };
 
 const styles = StyleSheet.create({
-    /* Ghost logo watermark, repeated on every page */
-    watermark: {
+    /* Ghost logo watermark, repeated on every page.
+       NOTE: `fixed` must sit on the wrapping View (like header/footer) —
+       a fixed+absolute Image itself does not render in the browser build. */
+    watermarkWrap: {
         position: 'absolute',
         top: 290,
         left: 158,
         width: 280,
         height: 280,
-        opacity: 0.05,
+    },
+    watermarkImg: {
+        width: 280,
+        height: 280,
+        opacity: 0.07,
         transform: 'rotate(-18deg)',
     },
     /* Fixed header */
@@ -120,7 +126,11 @@ const styles = StyleSheet.create({
 });
 
 export const Watermark = ({ logo }) =>
-    logo ? <Image src={logo} fixed style={styles.watermark} /> : null;
+    logo ? (
+        <View fixed style={styles.watermarkWrap}>
+            <Image src={logo} style={styles.watermarkImg} />
+        </View>
+    ) : null;
 
 export const ReportHeader = ({ logo, user, subtitle }) => (
     <View fixed style={styles.header}>

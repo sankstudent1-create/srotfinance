@@ -107,7 +107,7 @@ const CategoryBreakdown = ({ transactions, type }) => {
 const colW = ['15%', '32%', '20%', '13%', '20%'];
 
 const LogPage = ({ transactions, chunk, isFirst, isLast, stats, filterLabel, user, logo, qr }) => (
-    <Page size="A4" style={pageStyle} wrap={false}>
+    <Page size="A4" style={pageStyle}>
         <Watermark logo={logo} />
         <ReportHeader logo={logo} user={user} subtitle="Financial Report" />
         {isFirst && (
@@ -176,7 +176,7 @@ export const AnalyticsDoc = ({ user, stats, transactions, filterLabel, logo, qr 
 
     return (
         <Document title="Spending Analysis — Srot Finance" author="Srot Finance">
-            <Page size="A4" style={pageStyle} wrap={false}>
+            <Page size="A4" style={pageStyle}>
                 <Watermark logo={logo} />
                 <ReportHeader logo={logo} user={user} subtitle="Financial Report" />
                 {filterLabel ? (
