@@ -1,8 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 /* ================================================================== */
 /*  HELPERS                                                             */
 /* ================================================================== */
+const SITE = 'https://srotfinance.vercel.app';
+const toolPathFor = (toolName) => {
+    const t = (toolName || '').toLowerCase();
+    if (t.includes('sip')) return '/calculators/sip-calculator';
+    if (t.includes('lump')) return '/calculators/lumpsum-calculator';
+    if (t.includes('emi') || t.includes('loan')) return '/calculators/emi-calculator';
+    if (t.includes('ppf')) return '/calculators/ppf-calculator';
+    if (t.includes('fixed') || t.includes('fd')) return '/calculators/fd-calculator';
+    if (t.includes('interest')) return '/calculators/interest-calculator';
+    if (t.includes('age')) return '/calculators/age-calculator';
+    return '/calculators';
+};
+
+/* QR code rendered as an image (code-split so the main bundle stays lean) */
+const QrMark = ({ url, size = 30 }) => {
+    const [src, setSrc] = useState(null);
+    useEffect(() => {
+        let live = true;
+        import('qrcode')
+            .then((m) => (m.default || m).toDataURL(url, {
+                width: 160, margin: 1, color: { dark: '#0f172a', light: '#ffffff' },
+            }))
+            .then((d) => { if (live) setSrc(d); })
+            .catch(() => {});
+        return () => { live = false; };
+    }, [url]);
+    if (!src) return <div style={{ width: size, height: size, background: '#f1f5f9', borderRadius: 6 }} />;
+    return <img src={src} alt="Scan to open" style={{ width: size, height: size, borderRadius: 6, display: 'block' }} />;
+};
 const fmt = (v) => `₹${Math.round(v || 0).toLocaleString('en-IN')}`;
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 const fmtDay = (d) => new Date(d).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -125,7 +154,7 @@ const PageHeader = ({ user, subtitle, page, totalPages }) => (
 /* ================================================================== */
 /*  SHARED: PAGE FOOTER                                                 */
 /* ================================================================== */
-const PageFooter = ({ page, total }) => (
+const PageFooter = ({ page, total, qrUrl }) => (
     <div style={{
         marginTop: 'auto',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -138,8 +167,18 @@ const PageFooter = ({ page, total }) => (
             <span style={{ fontSize: 8, color: '#cbd5e1' }}>|</span>
             <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>CONFIDENTIAL</span>
         </div>
-        <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
-            {page && total ? `Page ${page} of ${total}` : 'srotfinance.vercel.app'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {qrUrl && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <QrMark url={qrUrl} size={28} />
+                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        Scan to open
+                    </span>
+                </div>
+            )}
+            <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
+                {page && total ? `Page ${page} of ${total}` : 'srotfinance.vercel.app'}
+            </div>
         </div>
     </div>
 );
@@ -325,7 +364,7 @@ export const CalculatorReport = ({ data, user }) => {
                     </p>
                 </div>
 
-                <PageFooter page={1} total={totalPages} />
+                <PageFooter page={1} total={totalPages} qrUrl={SITE + toolPathFor(toolName)} />
             </div>
 
             {/* ── PAGE 2 onwards — Year-wise Analysis & Tax ──────────────────────── */}
@@ -452,7 +491,7 @@ export const CalculatorReport = ({ data, user }) => {
                             </div>
                         )}
 
-                        <PageFooter page={pageNum} total={totalPages} />
+                        <PageFooter page={pageNum} total={totalPages} qrUrl={SITE + toolPathFor(toolName)} />
                     </div>
                 );
             })}
@@ -716,7 +755,7 @@ export const AnalyticsReport = ({ user, stats, transactions, filterLabel }) => (
                 </tfoot>
             </table>
 
-            <PageFooter />
+            <PageFooter qrUrl={SITE + "/"} />
         </div>
     </>
 );
@@ -826,7 +865,7 @@ export const AgeReport = ({ data, user }) => {
                 </div>
             </div>
 
-            <PageFooter page={1} total={1} />
+            <PageFooter page={1} total={1} qrUrl={SITE + "/calculators/age-calculator"} />
         </div>
     );
 };

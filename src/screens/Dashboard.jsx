@@ -768,7 +768,18 @@ export const Dashboard = ({ session }) => {
                     }),
                     new Promise((r) => setTimeout(r, 2500)),
                 ]);
-            } catch (e) { /* logo load failure must not block the PDF */ }
+                // Wait for every image inside the report (logo, QR codes) to finish
+                await Promise.race([
+                    Promise.all(
+                        Array.from(container.querySelectorAll('img')).map(
+                            (img) => img.complete ? Promise.resolve() : new Promise((r) => {
+                                img.onload = r; img.onerror = r;
+                            })
+                        )
+                    ),
+                    new Promise((r) => setTimeout(r, 3000)),
+                ]);
+            } catch (e) { /* image load failure must not block the PDF */ }
             const waitMs = calcData ? 800 : 1200;
             setTimeout(resolve, waitMs);
         });
@@ -793,7 +804,7 @@ export const Dashboard = ({ session }) => {
             for (let i = 0; i < strictPages.length; i++) {
                 const pageEl = strictPages[i];
                 const canvas = await html2canvas(pageEl, {
-                    scale: 1.5,
+                    scale: 2,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
@@ -813,11 +824,11 @@ export const Dashboard = ({ session }) => {
                     }
                 });
 
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const imgData = canvas.toDataURL('image/png');
                 if (i > 0) pdf.addPage();
                 
                 const currentPdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, currentPdfHeight, undefined, 'FAST');
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, currentPdfHeight, undefined, 'FAST');
             }
         } else {
             // ANALYTICS: Single flowing page captured and sliced automatically
@@ -844,14 +855,14 @@ export const Dashboard = ({ session }) => {
                 }
             });
 
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imgData = canvas.toDataURL('image/png');
             const totalPdfHeight = (canvas.height * pdfWidth) / canvas.width;
             let yOffset = 0;
 
             // Use (totalPdfHeight - 0.5) tolerance to prevent a blank final page due to sub-pixel DPI rounding
             while (yOffset < totalPdfHeight - 0.5) {
                 if (yOffset > 0) pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', 0, -yOffset, pdfWidth, totalPdfHeight, undefined, 'FAST');
+                pdf.addImage(imgData, 'PNG', 0, -yOffset, pdfWidth, totalPdfHeight, undefined, 'FAST');
                 yOffset += pageHeight;
             }
         }
