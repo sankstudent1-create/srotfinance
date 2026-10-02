@@ -17,10 +17,8 @@ export const AdminPush = ({ users, showToast }) => {
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
     // Targeting
-    const [targetType, setTargetType] = useState('all'); // all, active_only, specific
+    const [targetType, setTargetType] = useState('all'); // all | specific
     const [targetUsers, setTargetUsers] = useState([]);
-
-    const activeDeviceCount = users.filter(u => u.push_subscribed).length; // Just dummy approximation if not tracked directly in users array
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
@@ -91,14 +89,20 @@ export const AdminPush = ({ users, showToast }) => {
             return showToast("Title and message are required for push.", "error");
         }
 
-        if (!window.confirm("Broadcast this push notification globally?")) return;
+        const targetIds = targetType === 'specific' ? targetUsers : users.map(u => u.id);
+        if (targetIds.length === 0) {
+            return showToast("No target users selected.", "error");
+        }
+
+        if (!window.confirm(targetType === 'specific' ? `Send push to ${targetIds.length} selected user(s)?` : "Broadcast this push notification globally?")) return;
 
         setIsSending(true);
         try {
             const payload = {
                 title,
                 body: message,
-                icon: 'https://srotfinance.vercel.app/favicon.ico'
+                icon: 'https://srotfinance.vercel.app/favicon.ico',
+                targetUserIds: targetIds
             };
 
             if (linkUrl.trim()) payload.url = linkUrl.trim();
@@ -209,6 +213,42 @@ export const AdminPush = ({ users, showToast }) => {
                                 placeholder="Type the push notification text here..."
                                 className="w-full h-24 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 outline-none resize-none focus:ring-2 focus:ring-orange-500 transition-all"
                             />
+                        </div>
+
+                        {/* Targeting */}
+                        <div>
+                            <label className="block text-xs font-black text-slate-700 uppercase tracking-widest mb-2">Audience</label>
+                            <div className="flex gap-2 mb-3">
+                                <button
+                                    onClick={() => setTargetType('all')}
+                                    className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all ${targetType === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                >
+                                    All Users ({users.length})
+                                </button>
+                                <button
+                                    onClick={() => setTargetType('specific')}
+                                    className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all ${targetType === 'specific' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                >
+                                    Specific Users ({targetUsers.length})
+                                </button>
+                            </div>
+                            {targetType === 'specific' && (
+                                <div className="max-h-44 overflow-y-auto border border-slate-200 rounded-xl p-2 space-y-1 bg-slate-50">
+                                    {users.map(u => (
+                                        <label key={u.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white cursor-pointer transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={targetUsers.includes(u.id)}
+                                                onChange={e => setTargetUsers(prev => e.target.checked ? [...prev, u.id] : prev.filter(id => id !== u.id))}
+                                                className="w-4 h-4 rounded text-orange-500 focus:ring-orange-500 border-slate-300"
+                                            />
+                                            <span className="text-xs font-bold text-slate-700 truncate">{u.full_name || 'No Name'}</span>
+                                            <span className="text-[10px] text-slate-400 truncate ml-auto">{u.email}</span>
+                                        </label>
+                                    ))}
+                                    {users.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No users loaded.</p>}
+                                </div>
+                            )}
                         </div>
 
                         {/* Big Image Feature */}
@@ -328,7 +368,7 @@ export const AdminPush = ({ users, showToast }) => {
                         {isSending ? (
                             <><Loader2 size={18} className="animate-spin" /> Broadcasting...</>
                         ) : (
-                            <><Send size={18} /> Launch Global Alert</>
+                            <><Send size={18} /> {targetType === 'specific' ? `Send to ${targetUsers.length} User${targetUsers.length === 1 ? '' : 's'}` : 'Launch Global Alert'}</>
                         )}
                     </button>
 
