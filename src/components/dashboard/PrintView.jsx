@@ -140,6 +140,8 @@ export const CalculatorReport = ({ data, user }) => {
     const retPct = 100 - invPct;
 
     const taxInfo = result.taxInfo || null;
+    const isEMI = !!result.isEMI;
+    const emi = result.emi || 0;
     
     // Chunking logic
     const chunks = [];
@@ -207,26 +209,27 @@ export const CalculatorReport = ({ data, user }) => {
                                 background: 'rgba(249, 115, 22, 0.15)', border: '1px solid rgba(249, 115, 22, 0.3)',
                                 borderRadius: 16, padding: '20px'
                             }}>
-                                <p style={{ fontSize: 9, color: '#fdb777', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Net Maturity Value</p>
+                                <p style={{ fontSize: 9, color: '#fdb777', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{isEMI ? 'Total Repayment' : 'Net Maturity Value'}</p>
                                 <p className="mont" style={{ fontSize: 28, fontWeight: 950, color: 'white', letterSpacing: '-0.02em' }}>{fmt(netTotal)}</p>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
-                                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: '#f97316', color: 'white' }}>High Growth</span>
+                                    {!isEMI && <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: '#f97316', color: 'white' }}>High Growth</span>}
+                                    {isEMI && emi > 0 && <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: '#f97316', color: 'white' }}>{fmt(Math.round(emi))}/month EMI</span>}
                                     {tax > 0 && <span style={{ fontSize: 8, color: '#fca5a5', fontWeight: 600 }}>Net after tax</span>}
                                 </div>
                             </div>
 
                             {/* Invested */}
                             <div style={{ padding: '8px 4px' }}>
-                                <p style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Total Capital</p>
+                                <p style={{ fontSize: 9, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>{isEMI ? 'Loan Amount' : 'Total Capital'}</p>
                                 <p className="mont" style={{ fontSize: 22, fontWeight: 900, color: 'white' }}>{fmt(invested)}</p>
                                 <p style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>Principal amount</p>
                             </div>
 
                             {/* Returns */}
                             <div style={{ padding: '8px 4px' }}>
-                                <p style={{ fontSize: 9, color: '#34d399', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Wealth Gain</p>
-                                <p className="mont" style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>+{fmt(returns)}</p>
-                                <p style={{ fontSize: 10, color: '#10b981', fontWeight: 700, marginTop: 4 }}>{gainPct}% ROI</p>
+                                <p style={{ fontSize: 9, color: '#34d399', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>{isEMI ? 'Total Interest' : 'Wealth Gain'}</p>
+                                <p className="mont" style={{ fontSize: 22, fontWeight: 900, color: '#34d399' }}>{isEMI ? '' : '+'}{fmt(returns)}</p>
+                                <p style={{ fontSize: 10, color: '#10b981', fontWeight: 700, marginTop: 4 }}>{gainPct}% {isEMI ? 'of loan' : 'ROI'}</p>
                             </div>
                         </div>
 
@@ -240,7 +243,7 @@ export const CalculatorReport = ({ data, user }) => {
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                         <div style={{ width: 8, height: 8, borderRadius: 2, background: '#34d399' }} />
-                                        <span style={{ fontSize: 9, color: '#cbd5e1', fontWeight: 600 }}>Profit ({retPct.toFixed(0)}%)</span>
+                                        <span style={{ fontSize: 9, color: '#cbd5e1', fontWeight: 600 }}>{isEMI ? 'Interest' : 'Profit'} ({retPct.toFixed(0)}%)</span>
                                     </div>
                                 </div>
                                 <span style={{ fontSize: 9, color: '#64748b', fontWeight: 800 }}>FUNDING RATIO</span>
@@ -306,14 +309,14 @@ export const CalculatorReport = ({ data, user }) => {
                         {isFirstChunk && (
                             <>
                                 <h2 className="mont" style={{ fontSize: 24, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.04em', marginBottom: 16 }}>
-                                    Growth Trajectory
+                                    {isEMI ? 'Amortisation Schedule' : 'Growth Trajectory'}
                                 </h2>
                                 {/* Section label */}
                                 <p style={{
                                     fontSize: 8, color: '#f97316', fontWeight: 700, textTransform: 'uppercase',
                                     letterSpacing: '0.15em', marginBottom: 12
                                 }}>
-                                    Compounding at work — {gainPct}% total returns · {multiplier}× multiplier
+                                    {isEMI ? `Amortisation schedule — ${gainPct}% interest on loan` : `Compounding at work — ${gainPct}% total returns · ${multiplier}× multiplier`}
                                 </p>
 
                                 {taxInfo && (
@@ -350,7 +353,7 @@ export const CalculatorReport = ({ data, user }) => {
                                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
                                     <thead>
                                         <tr style={{ background: '#0f172a' }}>
-                                            {['Year', 'Invested (₹)', 'Profit / Returns (₹)', 'Growth %', 'Total Value (₹)'].map((h, i) => (
+                                            {(isEMI ? ['Year', 'Principal Paid (₹)', 'Interest Paid (₹)', 'Interest %', 'Total Paid (₹)'] : ['Year', 'Invested (₹)', 'Profit / Returns (₹)', 'Growth %', 'Total Value (₹)']).map((h, i) => (
                                                 <th key={h} style={{
                                                     padding: '10px 13px',
                                                     textAlign: i === 0 ? 'left' : 'right',
@@ -362,7 +365,8 @@ export const CalculatorReport = ({ data, user }) => {
                                     </thead>
                                     <tbody>
                                         {chunk.map((p, i) => {
-                                            const profit = p.total - p.invested;
+                                            const profit = isEMI ? p.total : p.total - p.invested;
+                                            const rowTotal = isEMI ? p.invested + p.total : p.total;
                                             const growthPct = p.invested > 0 ? ((profit / p.invested) * 100).toFixed(1) : '0';
                                             return (
                                                 <tr key={i} style={{
@@ -371,13 +375,13 @@ export const CalculatorReport = ({ data, user }) => {
                                                 }}>
                                                     <td style={{ padding: '8px 13px', fontWeight: 700, color: '#374151', fontSize: 11 }}>Year {p.year}</td>
                                                     <td style={{ padding: '8px 13px', textAlign: 'right', color: '#64748b', fontFamily: 'monospace' }}>{fmt(p.invested)}</td>
-                                                    <td style={{ padding: '8px 13px', textAlign: 'right', color: '#10b981', fontWeight: 700, fontFamily: 'monospace' }}>+{fmt(profit)}</td>
+                                                    <td style={{ padding: '8px 13px', textAlign: 'right', color: '#10b981', fontWeight: 700, fontFamily: 'monospace' }}>{isEMI ? '' : '+'}{fmt(profit)}</td>
                                                     <td style={{ padding: '8px 13px', textAlign: 'right' }}>
                                                         <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: profit > 0 ? '#ecfdf5' : '#f1f5f9', color: profit > 0 ? '#065f46' : '#64748b' }}>
-                                                            +{growthPct}%
+                                                            {isEMI ? '' : '+'}{growthPct}%
                                                         </span>
                                                     </td>
-                                                    <td style={{ padding: '8px 13px', textAlign: 'right', fontWeight: 900, color: '#0f172a', fontSize: 12, fontFamily: 'monospace' }}>{fmt(p.total)}</td>
+                                                    <td style={{ padding: '8px 13px', textAlign: 'right', fontWeight: 900, color: '#0f172a', fontSize: 12, fontFamily: 'monospace' }}>{fmt(rowTotal)}</td>
                                                 </tr>
                                             );
                                         })}
@@ -385,8 +389,8 @@ export const CalculatorReport = ({ data, user }) => {
                                     {isLastChunk && (
                                         <tfoot>
                                             <tr style={{ background: '#f97316' }}>
-                                                <td colSpan={2} style={{ padding: '10px 13px', fontSize: 9, fontWeight: 800, color: 'white' }}>Final Maturity</td>
-                                                <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 800, color: 'white', fontSize: 10 }}>+{fmt(returns)} profit</td>
+                                                <td colSpan={2} style={{ padding: '10px 13px', fontSize: 9, fontWeight: 800, color: 'white' }}>{isEMI ? 'Final Repayment' : 'Final Maturity'}</td>
+                                                <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 800, color: 'white', fontSize: 10 }}>{isEMI ? `${fmt(returns)} interest` : `+${fmt(returns)} profit`}</td>
                                                 <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 700, color: 'rgba(255,255,255,0.8)', fontSize: 9 }}>{gainPct}%</td>
                                                 <td style={{ padding: '10px 13px', textAlign: 'right', fontWeight: 900, color: 'white', fontSize: 14 }}>{fmt(netTotal)}</td>
                                             </tr>

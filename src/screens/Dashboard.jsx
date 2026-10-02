@@ -169,6 +169,19 @@ export const Dashboard = ({ session }) => {
     const [calculatorPrintData, setCalculatorPrintData] = useState(null);
     const [showThemePicker, setShowThemePicker] = useState(false);
 
+    // Escape closes the report-preview overlay so it can never trap the UI
+    useEffect(() => {
+        if (!isPrinting) return;
+        const onKey = (e) => {
+            if (e.key === 'Escape') {
+                setIsPrinting(false);
+                setCalculatorPrintData(null);
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [isPrinting]);
+
     // Toast
     const [toast, setToast] = useState(null);
 
@@ -689,12 +702,16 @@ export const Dashboard = ({ session }) => {
 
     const handleEditTransaction = (tx) => {
         setEditTransaction(tx);
+        // Normalise to YYYY-MM-DD: <input type="date"> rejects full ISO timestamps,
+        // which left the field blank ("mm/dd/yyyy") on edit.
+        const rawDate = tx.date ? String(tx.date).slice(0, 10) : '';
+        const safeDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : new Date().toISOString().split('T')[0];
         setTxForm({
             title: tx.title,
             amount: tx.amount.toString(),
             type: tx.type,
             category: tx.category,
-            date: tx.date
+            date: safeDate
         });
         setShowTransaction(true);
     };
@@ -875,10 +892,11 @@ export const Dashboard = ({ session }) => {
     };
 
     const getFormattedInputs = (toolName, inputData) => {
+        const isEMI = toolName.toLowerCase().includes('emi');
         const inputLabels = {
-            amount: toolName.includes('SIP') ? 'Monthly Investment (₹)' : 'Investment Amount (₹)',
-            duration: 'Time Period (Years)',
-            rate: 'Expected Return Rate (%)',
+            amount: toolName.includes('SIP') ? 'Monthly Investment (₹)' : isEMI ? 'Loan Amount (₹)' : 'Investment Amount (₹)',
+            duration: isEMI ? 'Loan Tenure (Years)' : 'Time Period (Years)',
+            rate: isEMI ? 'Interest Rate (% p.a)' : 'Expected Return Rate (%)',
             expense_ratio: 'Expense Ratio (%)',
         };
         return Object.fromEntries(
@@ -1000,13 +1018,17 @@ export const Dashboard = ({ session }) => {
     return (
         <>
             {/* PRINT VIEW (Hidden, shown only during print) */}
+            {/* NOTE: isPrinting is always false here. The report-preview overlay renders its own
+                PrintView copy; letting this root instance go 'print-active' would paint a fixed
+                full-screen white layer (z-99999) over the preview toolbar's Close/Download
+                buttons, trapping the UI. PDF export uses its own off-screen container. */}
             <PrintView
                 user={user}
                 stats={stats}
                 transactions={filteredTransactions}
                 filterLabel={filterLabel}
                 calculatorData={calculatorPrintData}
-                isPrinting={isPrinting}
+                isPrinting={false}
                 variant={printVariant}
             />
 
@@ -1182,8 +1204,8 @@ export const Dashboard = ({ session }) => {
                                     )}
 
                                     {/* Bottom Row: Mini Tools */}
-                                    <div className="glass-panel p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-6 gap-4 border border-white/5">
-                                        {TOOLS.slice(0, 6).map(tool => (
+                                    <div className="glass-panel p-6 rounded-3xl grid grid-cols-3 sm:grid-cols-7 gap-4 border border-white/5">
+                                        {TOOLS.map(tool => (
                                             <motion.button
                                                 key={tool.id}
                                                 whileHover={{ y: -2, scale: 1.07, boxShadow: '0 0 20px rgba(255,165,0,0.4)' }}
