@@ -25,7 +25,7 @@ export function PublicHeader() {
               {n.label}
             </Link>
           ))}
-          <Link to="/" className="inline-flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors">
+          <Link to="/login" className="inline-flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors">
             Open App <ArrowRight size={15} />
           </Link>
         </nav>
@@ -40,7 +40,7 @@ export function PublicHeader() {
               {n.label}
             </Link>
           ))}
-          <Link to="/" onClick={() => setOpen(false)} className="mt-2 inline-flex items-center justify-center gap-1.5 bg-orange-500 text-white text-sm font-bold px-4 py-3 rounded-xl">
+          <Link to="/login" onClick={() => setOpen(false)} className="mt-2 inline-flex items-center justify-center gap-1.5 bg-orange-500 text-white text-sm font-bold px-4 py-3 rounded-xl">
             Open App <ArrowRight size={15} />
           </Link>
         </nav>
@@ -129,7 +129,7 @@ export function CTASection({ title = 'Start managing your money smarter', subtit
         <Calculator className="mx-auto mb-4 opacity-90" size={36} />
         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{title}</h2>
         <p className="mt-3 text-orange-50 max-w-xl mx-auto">{subtitle}</p>
-        <Link to="/" className="inline-flex items-center gap-2 mt-6 bg-white text-orange-600 font-bold px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors">
+        <Link to="/login" className="inline-flex items-center gap-2 mt-6 bg-white text-orange-600 font-bold px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors">
           Open Srot Finance <ArrowRight size={16} />
         </Link>
       </div>

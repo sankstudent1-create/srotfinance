@@ -749,7 +749,7 @@ export const Dashboard = ({ session }) => {
         );
 
         // Step 2: Render and wait for settlement
-        await new Promise((resolve) => {
+        await new Promise(async (resolve) => {
             root.render(
                 <div id="print-root-temp" style={{ background: '#fff', width: '210mm', minHeight: '297mm', padding: '1px' }}>
                     <PrintStyles />
@@ -758,6 +758,17 @@ export const Dashboard = ({ session }) => {
             );
             
             // Fast DOM settlement timer to ensure fonts, gradients, and layout are finalized
+            // Also make sure the brand logo is fully loaded before html2canvas captures
+            try {
+                await Promise.race([
+                    new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = resolve; img.onerror = resolve;
+                        img.src = '/logo.png';
+                    }),
+                    new Promise((r) => setTimeout(r, 2500)),
+                ]);
+            } catch (e) { /* logo load failure must not block the PDF */ }
             const waitMs = calcData ? 800 : 1200;
             setTimeout(resolve, waitMs);
         });

@@ -52,6 +52,29 @@ export const PrintStyles = () => (
 );
 
 /* ================================================================== */
+/*  SHARED: WATERMARK (ghost brand mark behind every page)            */
+/* ================================================================== */
+const PdfWatermark = () => (
+    <div
+        aria-hidden="true"
+        style={{
+            position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+        }}
+    >
+        <span style={{
+            transform: 'rotate(-28deg)', whiteSpace: 'nowrap',
+            fontSize: 72, fontWeight: 900, letterSpacing: '0.06em',
+            color: 'rgba(15,23,42,0.038)', fontFamily: "'Outfit', sans-serif",
+            userSelect: 'none',
+        }}>
+            SROT FINANCE
+        </span>
+    </div>
+);
+
+/* ================================================================== */
 /*  SHARED: PAGE HEADER                                                 */
 /* ================================================================== */
 const PageHeader = ({ user, subtitle, page, totalPages }) => (
@@ -61,14 +84,13 @@ const PageHeader = ({ user, subtitle, page, totalPages }) => (
     }}>
         {/* Brand */}
         <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 5 }}>
-                <div style={{
-                    width: 30, height: 30, background: 'linear-gradient(135deg,#f97316,#ec4899)',
-                    borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <span style={{ color: 'white', fontSize: 13, fontWeight: 900 }}>₹</span>
-                </div>
-                <span className="mont" style={{ fontSize: 17, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.035em' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                <img
+                    src="/logo.png"
+                    alt="Srot Finance logo"
+                    style={{ width: 46, height: 46, borderRadius: 12, objectFit: 'cover' }}
+                />
+                <span className="mont" style={{ fontSize: 23, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.035em' }}>
                     Srot Finance
                 </span>
             </div>
@@ -168,6 +190,7 @@ export const CalculatorReport = ({ data, user }) => {
             <PrintStyles />
             {/* ── PAGE 1 — Summary ──────────────────────── */}
             <div className="print-page strict-page">
+                <PdfWatermark />
                 <PageHeader user={user} subtitle={`${toolName} Report`} page={1} totalPages={totalPages} />
 
                 {/* Tool name eyebrow */}
@@ -312,6 +335,7 @@ export const CalculatorReport = ({ data, user }) => {
 
                 return (
                     <div key={pageNum} className="print-page pg-break strict-page">
+                        <PdfWatermark />
                         <PageHeader user={user} subtitle={isFirstChunk ? "Tax & Breakdown" : "Yearly Breakdown"} page={pageNum} totalPages={totalPages} />
                         
                         {isFirstChunk && (
@@ -494,6 +518,7 @@ export const AnalyticsReport = ({ user, stats, transactions, filterLabel }) => (
     <>
         {/* Single flowing page */}
         <div className="print-page" style={{ paddingBottom: '10mm' }}>
+            <PdfWatermark />
             <PrintStyles />
             <PageHeader user={user} subtitle="Financial Report" />
 
@@ -704,6 +729,7 @@ export const AgeReport = ({ data, user }) => {
     
     return (
         <div className="print-page strict-page">
+            <PdfWatermark />
             <PrintStyles />
             <PageHeader user={user} subtitle="Age & Life Report" page={1} totalPages={1} />
 
