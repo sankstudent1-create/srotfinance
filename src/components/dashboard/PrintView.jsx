@@ -52,7 +52,7 @@ export const PrintStyles = () => (
 );
 
 /* ================================================================== */
-/*  SHARED: WATERMARK (ghost brand mark behind every page)            */
+/*  SHARED: WATERMARK (ghost logo behind every page)                  */
 /* ================================================================== */
 const PdfWatermark = () => (
     <div
@@ -63,14 +63,15 @@ const PdfWatermark = () => (
             overflow: 'hidden',
         }}
     >
-        <span style={{
-            transform: 'rotate(-28deg)', whiteSpace: 'nowrap',
-            fontSize: 72, fontWeight: 900, letterSpacing: '0.06em',
-            color: 'rgba(15,23,42,0.038)', fontFamily: "'Outfit', sans-serif",
-            userSelect: 'none',
-        }}>
-            SROT FINANCE
-        </span>
+        <img
+            src="/logo.png"
+            alt=""
+            style={{
+                width: 420, height: 420, objectFit: 'contain',
+                transform: 'rotate(-18deg)', opacity: 0.05,
+                userSelect: 'none',
+            }}
+        />
     </div>
 );
 
