@@ -52,7 +52,6 @@ export const posts = [
         "<strong>Use XIRR thinking:</strong> the calculator shows point-to-point returns; real SIPs earn the internal rate across uneven markets, so treat the output as a centre line, not a promise.",
         "<strong>Revisit yearly:</strong> bump the amount with every salary hike and the 10-year number in this post starts looking like the floor, not the ceiling."
       ] },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "Is ₹5,000 per month enough for a SIP?", a: "It is an excellent starting point. ₹5,000/month for 10 years at 12% builds about ₹11.6 lakh, and the habit matters more than the amount. Increase it 10% yearly as your salary grows and the same SIP can cross ₹20 lakh." },
         { q: "What is a good return assumption for a SIP calculator?", a: "For equity SIPs over 10+ years, 10–12% is the standard planning range in India. Use 10% for conservative planning and 12% as the base case. For goals under 5 years, use debt-fund assumptions of 6–7% instead." },
@@ -111,7 +110,6 @@ export const posts = [
       { t: "note", title: "Don't invest just for 80C", html: "A tax deduction is a discount, not a reason. ELSS at a 30% loss still beats PPF with a 31% tax saving if held long enough — but buying an unsuitable product in March to save tax is the oldest mistake in Indian personal finance." },
       { t: "h2", text: "A practical allocation for FY 2025-26" },
       { t: "p", html: "If you are in the old regime and under 40, a common split is ₹1,00,000 in ELSS via monthly SIP (₹8,333/month) for growth and ₹50,000 in PPF for the guaranteed, tax-free anchor. Add NPS's extra ₹50,000 under 80CCD(1B) only after the core ₹1.5L is placed — its till-60 lock-in makes it the last rupee in, not the first. In the new regime, skip the 80C framing entirely and allocate purely on goal horizon: equity funds for 7+ years, PPF or FDs for capital safety." },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "Which gives higher returns, PPF or ELSS?", a: "Historically ELSS, by a wide margin — 12% vs 7.1% over 15 years turns ₹1.5L/year into ~₹56 lakh vs ~₹38 lakh. But ELSS returns are market-linked and volatile; PPF's are guaranteed and fully tax-free." },
         { q: "Is NPS better than PPF for tax saving?", a: "NPS offers an extra ₹50,000 deduction under 80CCD(1B) beyond 80C, which PPF does not. But NPS locks money till age 60 with mandatory annuity purchase, while PPF matures in 15 years with full tax-free withdrawal." },
@@ -167,7 +165,6 @@ export const posts = [
         "<strong>Job change:</strong> carry the step-up habit to the new salary — reset the base higher rather than restarting small.",
         "<strong>Windfalls:</strong> bonuses and arrears make excellent one-time top-ups alongside the annual hike; they compound from the earliest possible date."
       ] },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "What is a step-up SIP?", a: "A SIP where the monthly amount automatically increases by a fixed percentage or amount at set intervals — typically 10% every year — so your investments grow alongside your income." },
         { q: "Is 10% annual step-up too aggressive?", a: "For most salaried Indians with 8–12% annual increments, 10% is comfortable because the hike is funded by the raise itself. If increments are uncertain, start with 5%." },
@@ -230,7 +227,6 @@ export const posts = [
       { t: "p", html: "Gold jewellery is an emergency fund of last resort — selling it in a crisis means distress pricing and making charges lost forever. Chit funds and committees carry default risk exactly when the economy is stressed. Cash at home beyond a week's expenses earns nothing and is unsafe. The sweep-in FD plus liquid fund combination remains the cleanest answer: regulated, liquid within a day, and earning 6.5–7% while it waits." },
       { t: "h2", text: "Rebuilding after you use it" },
       { t: "p", html: "The fund fails most often <em>after</em> it works — you handle the emergency brilliantly, then never refill the account. Treat any withdrawal as a zero-interest loan from your future self: set the SIP back to the emergency account the very next month, before lifestyle spending expands into the gap. Households that automate the rebuild typically restore the fund within 6–9 months; those that <em>plan to rebuild soon</em> often take two years." },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "Is 6 months of expenses enough for an emergency fund in India?", a: "For a single-income salaried household, 6 months is the standard recommendation. Dual-income families can manage with 3–6 months; freelancers and business owners should target 9–12 months." },
         { q: "Should I count my salary or my expenses?", a: "Always expenses — and only essential ones. A ₹1L salary with ₹60k essential expenses needs a ₹3.6L fund (6 months), not ₹6L." },
@@ -292,7 +288,6 @@ export const posts = [
         "<strong>Senior citizens:</strong> the extra 0.50% plus the higher TDS threshold (₹1 lakh) makes FDs genuinely attractive post-retirement.",
         "<strong>Tax-saver FDs:</strong> 5-year lock-in with 80C benefit, but post-tax returns usually lose to ELSS — pick them only for the guaranteed portion of your 80C."
       ] },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "Which bank gives the highest FD interest rate in 2026?", a: "Small finance banks (AU, Equitas, Ujjivan and peers) typically offer 8–8.5% on 2–3 year FDs, roughly 1–1.5 points above large private and PSU banks. Rates change often, so verify on the bank's site before investing." },
         { q: "What is FD laddering?", a: "Splitting a lump sum into multiple FDs with staggered maturities (e.g., 1–5 years). One FD matures each year, giving regular liquidity while most of the money still earns long-tenure rates." },
@@ -348,7 +343,6 @@ export const posts = [
       ] },
       { t: "h2", text: "When to break the rule" },
       { t: "p", html: "50/30/20 is training wheels, not a religion. Aggressive debt payoff (avalanche mode) justifies a temporary 60/20/20; a low-income starter household may need 70/20/10 until the next increment. The rule earns its keep in exactly one situation: the comfortable middle, where lifestyle quietly expands to consume every raise. If your savings rate has a fixed floor and rises with income, you are following the spirit of 50/30/20 whatever the exact split." },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "Does the 50/30/20 rule work in India?", a: "Yes, as a template — with tweaks. Metro rents often push needs above 50%, so Indian households commonly run 55/25/20 or 60/20/20. The non-negotiable part is the fixed savings percentage." },
         { q: "Should I use gross or in-hand salary for 50/30/20?", a: "Always in-hand (take-home) salary. Using gross salary inflates every bucket with money that actually goes to tax and EPF." },
@@ -396,7 +390,6 @@ export const posts = [
       { t: "p", html: "One extra EMI a year is part-prepayment — but should you ever foreclose the entire loan? Only after the emergency fund is full, high-interest debt is zero, and retirement investing is on track. A common mistake is draining all savings to close a 9% loan while carrying 36% credit-card debt or holding zero liquid buffer. Sequence it: kill the costliest debt first, build the safety net, fund the future — then attack the home loan. And when you do foreclose, collect the original property documents and the no-dues certificate from the bank in the same month." },
       { t: "h2", text: "The balance-transfer alternative" },
       { t: "p", html: "If your rate is above 9.5%, get quotes for a home-loan balance transfer before prepaying aggressively — moving a ₹50L loan from 9.5% to 8.75% saves roughly ₹4.3 lakh in interest over 20 years with zero extra outgo, and most banks now process transfers in 2–3 weeks. Just watch for processing fees (typically 0.25–0.50%) and confirm the new lender also offers free part-prepayments, so the one-extra-EMI strategy keeps working after the switch." },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "How much does one extra EMI per year save on a home loan?", a: "On a ₹50L, 20-year loan at 9%, one extra EMI yearly cuts the tenure from 240 to 198 months and saves about ₹11.6 lakh in interest — you become debt-free 3.5 years early." },
         { q: "Is there a prepayment penalty on home loans in India?", a: "No prepayment charges are allowed on floating-rate home loans taken by individuals, per RBI guidelines. Fixed-rate loans from banks and all loans from HFCs may levy charges — check your loan agreement." },
@@ -429,9 +422,9 @@ export const posts = [
       { t: "p", html: "ELSS gains are equity gains: <strong>LTCG at 12.5% on gains above ₹1.25 lakh per financial year</strong> (holding over 12 months, which the 3-year lock-in guarantees). Dividends, if any, are taxed at your slab rate. Practical tip: if your ELSS gains are large, redeem across two financial years to use the ₹1.25 lakh exemption twice." },
       { t: "table", head: ["You invested (80C)", "Value after 5 yrs @12%", "Gain", "LTCG tax (single FY)"], rows: [
         ["₹1.5L × 5 yrs = ₹7.5L", "₹9.53 lakh*", "₹2.03 lakh", "~₹9,700"],
-        ["₹1.5L × 10 yrs = ₹15L", "₹26.30 lakh*", "₹11.30 lakh", "~₹12.56 lakh"]
+        ["₹1.5L × 10 yrs = ₹15L", "₹26.30 lakh*", "₹11.30 lakh", "~₹1.26 lakh"]
       ] },
-      { t: "p", html: "*Approximate, assuming 12% CAGR and year-start investments. The 10-year row shows why staggering redemptions across financial years matters — ₹12.5 lakh tax in one year is avoidable." },
+      { t: "p", html: "*Approximate, assuming 12% CAGR and year-start investments. The 10-year row shows why staggering redemptions across financial years matters — ₹1.26 lakh tax in one year is avoidable." },
       { t: "h2", text: "Fitting ELSS into your 80C plan" },
       { t: "ul", items: [
         "<strong>Old regime + long horizon:</strong> ELSS is usually the highest-returning 80C option. Our <a href=\"/blog/ppf-vs-elss-vs-nps-80c-tax-saving\">PPF vs ELSS vs NPS comparison</a> shows it beating PPF by ~₹18 lakh over 15 years on ₹1.5L/year.",
@@ -446,7 +439,6 @@ export const posts = [
         "<strong>Keep powder dry:</strong> hold 10–20% of your yearly ELSS budget as dry powder for 5%+ market dips.",
         "<strong>Don't time the 80C deadline:</strong> March panic-buying at market peaks is the worst version of lumpsum investing — spread purchases across the year."
       ] },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "What is the lock-in period for ELSS?", a: "3 years per instalment — the shortest among 80C options (PPF: 15 years, NSC: 5 years, NPS: till 60). Each SIP instalment is locked for 3 years from its own date." },
         { q: "Is ELSS better as SIP or lumpsum?", a: "Lumpsum wins in steadily rising markets; SIP wins in volatile markets and suits salaried cash flows. Over long periods the difference is small — consistency matters more than the mode." },
@@ -495,7 +487,6 @@ export const posts = [
       { t: "note", title: "Don't optimise what you should eliminate", html: "Hunting for a cheaper OTT plan while keeping three of them is optimising the leak. The highest-ROI financial move is cancellation, not comparison." },
       { t: "h2", text: "Make the fix stick: the monthly money date" },
       { t: "p", html: "One 30-minute cleanup decays within months unless it becomes a ritual. Schedule a <em>money date</em> on the 1st of every month: 20 minutes reviewing last month's statement for new leaks, cancelling anything unused, and confirming the SIP went through. Couples who do this together report the biggest wins — most leaks are invisible precisely because nobody is looking. Twelve money dates a year will save more than any single budgeting app ever will." },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "How do I find all my UPI AutoPay subscriptions?", a: "In GPay: Settings → Autopay. In PhonePe: profile → AutoPay. BHIM and Paytm have similar mandate sections under profile/settings. Review this list every quarter." },
         { q: "Is food delivery really that expensive?", a: "A ₹300 dish typically bills at ₹400–450 after packaging, delivery, platform and surge fees — 30–50% over menu price. At 8 orders a month that is ₹3,200+, versus ~₹800 for home-cooked equivalents." },
@@ -551,7 +542,6 @@ export const posts = [
         "<strong>Bucket the corpus at 50:</strong> 3 years of expenses in liquid funds, 7–10 years in debt or arbitrage funds, the rest in equity for longevity.",
         "<strong>Don't stop investing at 50:</strong> with a 35-year retirement ahead, the equity portion must keep growing to fight inflation — retirement is a phase change in asset allocation, not the end of investing."
       ] },
-      { t: "h2", text: "Frequently asked questions" },
       { t: "faq", items: [
         { q: "How much corpus do I need to retire at 50 in India?", a: "Roughly 25× your annual expenses at age 50. For a 30-year-old spending ₹60k/month today, that is about ₹5.9 crore — requiring a ~₹59k monthly SIP at 12% for 20 years." },
         { q: "Is ₹5 crore enough to retire in India?", a: "It depends on your spending and age. ₹5 crore supports about ₹16–17 lakh/year in inflation-adjusted withdrawals for 30+ years. For a ₹1L/month lifestyle at 50, you would need closer to ₹7–8 crore." },

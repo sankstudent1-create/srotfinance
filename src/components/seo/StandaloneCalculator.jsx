@@ -143,11 +143,23 @@ export default function StandaloneCalculator({ toolId }) {
                 </div>
               )}
               <div className="space-y-3">
-                {[
-                  [isEMI ? 'Loan Amount' : 'Invested', inr(result.invested), 'text-slate-900'],
-                  [isEMI ? 'Total Interest' : 'Est. Returns', (isEMI ? '' : '+') + inr(result.returns), isEMI ? 'text-rose-600' : 'text-emerald-600'],
-                  [isEMI ? 'Total Payable' : 'Total Value', inr(result.netTotal), 'text-slate-900'],
-                ].map(([l, v, c]) => (
+                {(() => {
+                  const rows = isEMI ? [
+                    ['Loan Amount', inr(result.invested), 'text-slate-900'],
+                    ['Total Interest', inr(result.returns), 'text-rose-600'],
+                    ['Total Payable', inr(result.netTotal), 'text-slate-900'],
+                  ] : [
+                    ['Invested', inr(result.invested), 'text-slate-900'],
+                    ['Est. Returns (pre-tax)', '+' + inr(result.returns), 'text-emerald-600'],
+                  ];
+                  if (!isEMI && result.tax > 0) {
+                    rows.push(['Est. Tax', '−' + inr(result.tax), 'text-amber-600']);
+                  }
+                  if (!isEMI) {
+                    rows.push(['Total Value (post-tax)', inr(result.netTotal), 'text-slate-900']);
+                  }
+                  return rows;
+                })().map(([l, v, c]) => (
                   <div key={l} className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-slate-200">
                     <span className="text-sm font-semibold text-slate-500">{l}</span>
                     <span className={`text-lg font-extrabold ${c}`}>{v}</span>
