@@ -29,7 +29,6 @@ import { DigitalIDModal } from '../components/modals/DigitalIDModal';
 import { CategoryManager, fetchCategories, getCategoryIcon, getCategoryColor } from '../components/modals/CategoryManager';
 import { useOfflineSync } from '../hooks/useOfflineSync';
 import { createPDF, getPDFFile, getCalcPDFFile } from '../utils/pdfGenerator';
-import { generateCalculatorPDF } from '../utils/reportGenerator';
 import { playSound } from '../hooks/useSoundEngine';
 import { MONTH_NAMES, TOOLS, DEFAULT_CATEGORIES, ICON_MAP } from '../config/constants';
 
