@@ -18,10 +18,7 @@ import { TransactionItem } from '../components/dashboard/TransactionItem';
 import { TrendBarChart } from '../components/dashboard/TrendBarChart';
 import { AnalyticsDashboard } from '../components/dashboard/Analytics';
 import { CalculatorModal } from '../components/dashboard/Calculators';
-import { PrintView, PrintStyles, AnalyticsReport as PrintableReport } from '../components/dashboard/PrintView';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import ReactDOM from 'react-dom/client';
+import { PrintView, PrintStyles } from '../components/dashboard/PrintView';
 import { SettingsModal, getUserPrefs } from '../components/modals/SettingsModal';
 import { ReceiptScanner } from '../components/modals/ReceiptScanner';
 import { SupportModal } from '../components/modals/SupportModal';
@@ -719,163 +716,26 @@ export const Dashboard = ({ session }) => {
 
     // High-quality PDF Generator (html2canvas) - Ultra Stable & Silent
     const generateHighQualityPDF = async (calcData = null) => {
-        // Ensure fonts are fully loaded
-        try { await document.fonts.ready; } catch (e) { console.warn('Fonts loading delay', e); }
-        console.log('🚀 Initiating Silent PDF Engine...', { type: calcData ? 'Calculator' : 'Full Analytics' });
-
-        // Step 1: Create a silent off-screen container
-        const container = document.createElement('div');
-        container.id = 'pdf-hidden-container';
-        // Rendered far off-screen so user sees NOTHING. No flickers.
-        container.style.cssText = `
-            position: absolute;
-            left: -10000px;
-            top: -10000px;
-            width: 210mm;
-            min-height: 297mm;
-            background: #ffffff;
-            z-index: -9999;
-            pointer-events: none;
-            overflow: visible;
-        `;
-        document.body.appendChild(container);
-        const root = ReactDOM.createRoot(container);
-
-        // Content selection
-        const Content = calcData ? (
-            <PrintView user={user} calculatorData={calcData} isPrinting={true} />
-        ) : (
-            <PrintableReport user={user} stats={stats} transactions={filteredTransactions} filterLabel={filterLabel} />
-        );
-
-        // Step 2: Render and wait for settlement
-        await new Promise(async (resolve) => {
-            root.render(
-                <div id="print-root-temp" style={{ background: '#fff', width: '210mm', minHeight: '297mm', padding: '1px' }}>
-                    <PrintStyles />
-                    {Content}
-                </div>
-            );
-            
-            // Fast DOM settlement timer to ensure fonts, gradients, and layout are finalized
-            // Also make sure the brand logo is fully loaded before html2canvas captures
-            try {
-                await Promise.race([
-                    new Promise((resolve) => {
-                        const img = new Image();
-                        img.onload = resolve; img.onerror = resolve;
-                        img.src = '/logo.png';
-                    }),
-                    new Promise((r) => setTimeout(r, 2500)),
-                ]);
-                // Wait for every image inside the report (logo, QR codes) to finish
-                await Promise.race([
-                    Promise.all(
-                        Array.from(container.querySelectorAll('img')).map(
-                            (img) => img.complete ? Promise.resolve() : new Promise((r) => {
-                                img.onload = r; img.onerror = r;
-                            })
-                        )
-                    ),
-                    new Promise((r) => setTimeout(r, 3000)),
-                ]);
-            } catch (e) { /* image load failure must not block the PDF */ }
-            const waitMs = calcData ? 800 : 1200;
-            setTimeout(resolve, waitMs);
+        // Vector PDF engine: true text (razor-sharp at any zoom, selectable,
+        // tiny files). The renderer + fonts load on demand so the main bundle
+        // stays lean.
+        console.log('🚀 Initiating Vector PDF Engine...', { type: calcData ? 'Calculator' : 'Full Analytics' });
+        const kind = calcData
+            ? (calcData.toolName?.toLowerCase().includes('age') ? 'age' : 'calculator')
+            : 'analytics';
+        const { buildReportBlob } = await import('../pdf/index.jsx');
+        const pdfBlob = await buildReportBlob({
+            kind,
+            calcData,
+            user,
+            stats,
+            transactions: filteredTransactions,
+            filterLabel,
         });
-
-        const captureTarget = container.querySelector('#print-root-temp');
-        if (!captureTarget) {
-            console.error('❌ PDF Engine: Capture target lost.');
-            document.body.removeChild(container);
-            return null;
-        }
-
-        // Step 3 & 4: Capture & Assembly
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = 210;
-        const pageHeight = 297;
-        
-        const strictPages = Array.from(captureTarget.querySelectorAll('.strict-page'));
-
-        if (strictPages.length > 0) {
-            // CALCULATORS: Capture each pre-paginated .strict-page individually. 
-            // Completely eliminates cross-page text bleeding and iOS maximum canvas memory crashes.
-            for (let i = 0; i < strictPages.length; i++) {
-                const pageEl = strictPages[i];
-                const canvas = await html2canvas(pageEl, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    width: 794,
-                    height: pageEl.scrollHeight,
-                    windowWidth: 1200,
-                    windowHeight: Math.max(1200, captureTarget.scrollHeight + 100),
-                    onclone: (doc) => {
-                        const containerClone = doc.getElementById('pdf-hidden-container');
-                        if (containerClone) { containerClone.style.left = '0px'; containerClone.style.top = '0px'; }
-                        const el = doc.getElementById('print-root-temp');
-                        if (el) {
-                            el.style.opacity = '1'; el.style.visibility = 'visible'; el.style.display = 'block';
-                            el.style.position = 'relative'; el.style.left = '0'; el.style.top = '0'; el.style.transform = 'none';
-                        }
-                    }
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                if (i > 0) pdf.addPage();
-                
-                const currentPdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, currentPdfHeight, undefined, 'FAST');
-            }
-        } else {
-            // ANALYTICS: Single flowing page captured and sliced automatically
-            const canvas = await html2canvas(captureTarget, {
-                scale: 1.5,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                width: 794,
-                height: captureTarget.scrollHeight,
-                windowWidth: 1200,
-                windowHeight: Math.max(1200, captureTarget.scrollHeight + 100),
-                scrollX: 0,
-                scrollY: 0,
-                onclone: (doc) => {
-                    const containerClone = doc.getElementById('pdf-hidden-container');
-                    if (containerClone) { containerClone.style.left = '0px'; containerClone.style.top = '0px'; }
-                    const el = doc.getElementById('print-root-temp');
-                    if (el) {
-                        el.style.opacity = '1'; el.style.visibility = 'visible'; el.style.display = 'block';
-                        el.style.position = 'relative'; el.style.left = '0'; el.style.top = '0'; el.style.transform = 'none';
-                    }
-                }
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            const totalPdfHeight = (canvas.height * pdfWidth) / canvas.width;
-            let yOffset = 0;
-
-            // Use (totalPdfHeight - 0.5) tolerance to prevent a blank final page due to sub-pixel DPI rounding
-            while (yOffset < totalPdfHeight - 0.5) {
-                if (yOffset > 0) pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, -yOffset, pdfWidth, totalPdfHeight, undefined, 'FAST');
-                yOffset += pageHeight;
-            }
-        }
-
-        // Step 5: Finalization & Cleanup
-        root.unmount();
-        document.body.removeChild(container);
-
-        const pdfBlob = pdf.output('blob');
         const defaultName = calcData
             ? `${calcData.toolName.replace(/\s+/g, '_')}_Analysis`
             : `SrotFin_Report_${(filterLabel || 'All_Time').replace(/\s+/g, '_')}`;
-        
+
         console.log('✅ PDF Generation Complete.');
         return new File([pdfBlob], `${defaultName}.pdf`, { type: 'application/pdf' });
     };
