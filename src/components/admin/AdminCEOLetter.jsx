@@ -11,7 +11,7 @@ export const AdminCEOLetter = ({ user, stats, customMessage, subject, includeSta
             {/* Header / Letterpad Branding */}
             <div style={{ borderBottom: '2px solid #f97316', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '28px', color: '#0f172a', fontWeight: '900', letterSpacing: '-1px' }}>Orange<span style={{ color: '#f97316' }}>Finance</span></h1>
+                    <h1 style={{ margin: 0, fontSize: '28px', color: '#0f172a', fontWeight: '900', letterSpacing: '-1px' }}>Srot<span style={{ color: '#f97316' }}>Finance</span></h1>
                     <p style={{ margin: 0, fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Official Administrative Communication</p>
                 </div>
                 <div style={{ textAlign: 'right', fontSize: '10px', color: '#94a3b8', lineHeight: '1.4' }}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { supabase } from './config/supabase';
 import { AuthScreen } from './screens/AuthScreen';
 import { ResetPasswordScreen } from './screens/ResetPasswordScreen';
@@ -11,6 +12,28 @@ import { BannerModal } from './components/modals/BannerModal';
 import { AdminScreen } from './screens/admin/AdminScreen';
 import { BiometricLock } from './components/modals/BiometricLock';
 import { getUserPrefs } from './components/modals/SettingsModal';
+
+// Public SEO pages (light-themed, indexable)
+import HomePage from './pages/Home';
+import AboutPage from './pages/About';
+import FeaturesPage from './pages/Features';
+import PricingPage from './pages/Pricing';
+import ContactPage from './pages/Contact';
+import PrivacyPage from './pages/Privacy';
+import TermsPage from './pages/Terms';
+import CalcHubPage from './pages/calculators/Hub';
+import CalcToolPage from './pages/calculators/ToolPage';
+import BlogIndexPage from './pages/blog/Index';
+import BlogPostPage from './pages/blog/Post';
+
+// Scroll to top on every route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 // --- SYSTEM MANAGER (PWA & SETUP) ---
 const SystemSetup = () => {
@@ -46,7 +69,9 @@ const SystemSetup = () => {
 };
 
 
-export default function App() {
+// The original app shell (auth / dashboard / admin). Rendered for `/`
+// and as the catch-all so unknown paths behave exactly as before.
+function LegacyApp() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recoveryMode, setRecoveryMode] = useState(false);
@@ -178,6 +203,96 @@ export default function App() {
       ) : (
         !session ? <AuthScreen supabase={supabase} /> : <Dashboard session={session} supabase={supabase} />
       )}
+    </>
+  );
+}
+
+// Routed app shell: public SEO pages get their own routes;
+// `/` shows the public landing page to logged-out visitors (and the
+// dashboard to logged-in users); `/login` is the sign-in screen;
+// everything else renders the original app shell via the catch-all.
+function SplashLoader() {
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#07080D]">
+            <div className="w-16 h-16 bg-gradient-to-tr from-orange-500 to-rose-500 rounded-3xl flex items-center justify-center shadow-2xl animate-pulse mb-6">
+                <Loader2 className="animate-spin text-white" size={32} />
+            </div>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest animate-pulse">Srot Finance</p>
+        </div>
+    );
+}
+
+// `/`: landing page for visitors, full app for signed-in users.
+// Password-recovery hashes always go to the app shell.
+function HomeRoute() {
+    const [session, setSession] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [recovery, setRecovery] = useState(false);
+
+    useEffect(() => {
+        if (window.location.hash.includes('type=recovery')) {
+            setRecovery(true);
+            setLoading(false);
+            return;
+        }
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setLoading(false);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+            if (event === 'PASSWORD_RECOVERY') { setRecovery(true); return; }
+            setSession(s);
+            setLoading(false);
+        });
+        return () => subscription.unsubscribe();
+    }, []);
+
+    if (loading) return <SplashLoader />;
+    if (recovery) return <LegacyApp />;
+    return session ? <LegacyApp /> : <HomePage />;
+}
+
+// `/login`: sign-in screen. Signed-in users bounce to the dashboard.
+function LoginRoute() {
+    const [session, setSession] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setLoading(false);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+            setSession(s);
+            setLoading(false);
+        });
+        return () => subscription.unsubscribe();
+    }, []);
+
+    if (loading) return <SplashLoader />;
+    if (session) return <Navigate to="/" replace />;
+    return (<><SystemSetup /><AuthScreen /></>);
+}
+
+export default function App() {
+  return (
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<HomeRoute />} />
+        <Route path="/login" element={<LoginRoute />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/calculators" element={<CalcHubPage />} />
+        <Route path="/calculators/:tool" element={<CalcToolPage />} />
+        <Route path="/blog" element={<BlogIndexPage />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="*" element={<LegacyApp />} />
+      </Routes>
     </>
   );
 }
