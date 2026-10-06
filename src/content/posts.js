@@ -3,6 +3,61 @@
 
 export const posts = [
   {
+  slug: "rbi-repo-rate-october-2026-emi-impact",
+  title: "RBI Repo Rate October 2026: What a Hike to 5.50% Does to Your EMI",
+  description: "RBI's MPC meets Oct 5–7 with the repo rate decision due Oct 7. Most economists expect a 25 bps hike to 5.50% — here is the exact EMI and FD math, and what to do before your loan resets.",
+  date: "2026-10-06",
+  updated: "2026-10-06",
+  author: "Srot Finance Team",
+  category: "Interest Rates",
+  readMins: 7,
+  keywords: ["rbi repo rate october 2026", "rbi mpc meeting october 2026", "repo rate hike emi impact", "emi increase calculator", "fd rates after repo hike"],
+  calculatorLink: "/calculators/emi-calculator",
+  calculatorName: "EMI Calculator",
+  blocks: [
+    { t: "h2", text: "The short answer" },
+    { t: "p", html: "The RBI's six-member Monetary Policy Committee meets <strong>October 5–7, with the decision due at 10:00 AM IST on Wednesday, October 7</strong>. The repo rate has sat at <strong>5.25%</strong> through the last four reviews. This time, most economists expect a <strong>25 basis-point hike to 5.50%</strong> — the first increase since February 2023. On a ₹50 lakh home loan over 20 years, that hike adds roughly <strong>₹795 to your monthly EMI</strong>. Fixed-rate loans do not move; floating-rate loans reset on their review dates, usually with a 1–3 month lag." },
+    { t: "h2", text: "Why a hike is on the table" },
+    { t: "p", html: "Three forces are pushing the RBI toward a hike. <strong>August CPI inflation hit 4.82%</strong>, above the RBI's 4% medium-term target for the third straight month — and broadening, with nearly half of the CPI basket now running at 4% or more, up from a third in March. The <strong>re-escalation of the West Asia conflict</strong> has pushed up crude oil and commodity prices. And the <strong>rupee has slid about 6% this year</strong>, with global central banks — including the US Fed — raising rates again, pressuring the RBI to defend the currency with a hike of its own." },
+    { t: "ul", items: [
+      "<strong>Reuters poll (61 economists):</strong> 35 expect a 25 bps hike to 5.50% at this meeting, with another hike likely in December.",
+      "<strong>Business Standard poll:</strong> 8 of 10 economists expect the 25 bps increase.",
+      "<strong>Bank economists' poll (businessline):</strong> 11 of the 12 chief economists at major banks expect the hike — the very people who set home-loan rates. Seven expect the RBI to keep a neutral stance; two see a shift to 'withdrawal of accommodation'.",
+      "<strong>The dissenters:</strong> some, like L&amp;T's chief economist and Bank of Baroda's Madan Sabnavis, expect the RBI to hold — arguing there is no demand-led inflation or overheating yet.",
+      "<strong>This may be just the start:</strong> most bank economists see 50–75 bps of cumulative tightening by the end of FY27 (repo ending at 6.00%), and Bank of America has doubled its call to a full 100 bps cycle — 25 bps in October, 50 bps across Q4 2026, and 50 bps in H1 2027, ending at 6.25%.",
+      "<strong>Context:</strong> the RBI cut 125 bps through 2025 (last cut: December 2025 to 5.25%) and has paused through all of 2026 so far."
+    ] },
+    { t: "h2", text: "The EMI math: what 25 bps actually costs you" },
+    { t: "p", html: "A quarter-point sounds small. Over a long tenure it is not. Here is the worked EMI math (EMI = P × r × (1+r)<sup>n</sup> / ((1+r)<sup>n</sup> − 1)) for common loans:" },
+    { t: "table", head: ["Loan", "Rate now", "EMI now", "EMI at +25 bps", "Extra per month"], rows: [
+      ["₹50 lakh home loan, 20 years", "8.50%", "₹43,391", "₹44,186", "₹795"],
+      ["₹30 lakh home loan, 20 years", "9.00%", "₹26,992", "₹27,476", "₹484"],
+      ["₹10 lakh personal loan, 5 years", "13.00%", "₹22,753", "₹22,881", "₹128"]
+    ] },
+    { t: "example", title: "The compounding sting", html: "On the ₹50 lakh loan, that ₹795/month over 20 years is <strong>₹1,90,800 in extra interest</strong> — nearly 4% of the loan amount, paid purely because of a 0.25% rate move. Shorten the tenure by prepaying and most of it disappears; keep the EMI and stretch the tenure and you pay it all." },
+    { t: "h2", text: "The other side: FD savers finally get a win" },
+    { t: "p", html: "A repo hike is bad news for borrowers and <strong>good news for savers</strong>. Banks typically pass higher policy rates to deposit rates within weeks. If you have been waiting to lock in an FD, a hike is your cue: long-tenure FDs booked right after a hike capture the higher rate for years. Ladder across 1, 3 and 5-year tenures instead of betting everything on one maturity." },
+    { t: "cta", title: "Check your FD options", text: "See what your deposit earns at today's rates — then compare again after October 7.", label: "Open FD Calculator", to: "/calculators/fd-calculator" },
+    { t: "h2", text: "What to do before your loan resets" },
+    { t: "ul", items: [
+      "<strong>Floating-rate borrowers:</strong> your EMI changes only on the loan's reset date — check whether yours is 3, 6 or 12 months away. The hike reaches you with a lag, so you have time to act.",
+      "<strong>Prepay into tenure, not EMI.</strong> When you prepay, ask the bank to reduce the tenure and keep the EMI. On long loans this saves far more interest than lowering the EMI.",
+      "<strong>Check your spread.</strong> Banks add their own margin over the repo-linked rate. If your spread looks rich versus current offers, ask for a reset or refinance — a hike meeting is exactly when banks compete for good borrowers.",
+      "<strong>Fixed-rate loans:</strong> nothing changes. Your rate is locked for the full tenure.",
+      "<strong>New borrowers:</strong> if the hike lands on Oct 7, borrowing gets more expensive from then. Sanctioned-but-undisbursed loans usually move to the new rate — disburse before the reset if you can."
+    ] },
+    { t: "note", title: "After the decision", html: "This post will be updated on October 7 with the actual RBI decision and revised numbers. Bookmark it — or better, run your own loan through the calculator below with both rate scenarios." },
+    { t: "faq", items: [
+      { q: "Will my EMI rise immediately if RBI hikes on October 7?", a: "No. Floating-rate home loans reset on fixed review dates (typically every 3, 6 or 12 months), so the hike reaches your EMI with a lag of 1–3 months. Fixed-rate loans never change." },
+      { q: "How much does a 25 bps hike add to a home loan EMI?", a: "Roughly ₹795/month on a ₹50 lakh, 20-year loan at 8.50%, and about ₹484/month on a ₹30 lakh loan at 9.00%. The longer your tenure, the larger the total extra interest." },
+      { q: "Is a repo rate hike good for FD investors?", a: "Yes. Banks usually raise FD rates within weeks of a repo hike. It is a good time to lock in longer-tenure FDs at the higher rate." },
+      { q: "Should I prepay my home loan before the hike?", a: "Prepaying always helps, but the hike itself is not a deadline — your reset date is. When you prepay, reduce the tenure rather than the EMI to maximise interest saved." },
+      { q: "What is the current repo rate?", a: "5.25%, unchanged through the last four RBI reviews. A 25 bps hike on October 7 would take it to 5.50% — the first increase since February 2023." }
+    ] },
+    { t: "cta", title: "Run your own numbers", text: "Plug in your loan amount, rate and tenure to see your exact EMI — then add 0.25% to preview the hike.", label: "Open EMI Calculator", to: "/calculators/emi-calculator" }
+  ]
+},
+  {
     slug: "sip-calculator-how-much-5000-month-10-years",
     title: "SIP Calculator: What ₹5,000/Month Becomes in 10 Years",
     description: "How much does a ₹5,000 monthly SIP grow to in 10 years? Worked math at 8–15% returns, year-by-year table, LTCG tax rules and calculator tips.",
