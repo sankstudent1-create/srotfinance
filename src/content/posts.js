@@ -5,9 +5,9 @@ export const posts = [
   {
   slug: "rbi-repo-rate-october-2026-emi-impact",
   title: "RBI Repo Rate October 2026: What a Hike to 5.50% Does to Your EMI",
-  description: "RBI's MPC meets Oct 5–7 with the repo rate decision due Oct 7. Most economists expect a 25 bps hike to 5.50% — here is the exact EMI and FD math, and what to do before your loan resets.",
+  description: "RBI's MPC hiked the repo rate 25 bps to 5.50% on Oct 7, 2026 — the first increase since February 2023. Here is the exact EMI and FD math under the new rate, and what to do before your loan resets.",
   date: "2026-10-06",
-  updated: "2026-10-06",
+  updated: "2026-10-07",
   author: "Srot Finance Team",
   category: "Interest Rates",
   readMins: 7,
@@ -16,7 +16,7 @@ export const posts = [
   calculatorName: "EMI Calculator",
   blocks: [
     { t: "h2", text: "The short answer" },
-    { t: "p", html: "The RBI's six-member Monetary Policy Committee meets <strong>October 5–7, with the decision due at 10:00 AM IST on Wednesday, October 7</strong>. The repo rate has sat at <strong>5.25%</strong> through the last four reviews. This time, most economists expect a <strong>25 basis-point hike to 5.50%</strong> — the first increase since February 2023. On a ₹50 lakh home loan over 20 years, that hike adds roughly <strong>₹795 to your monthly EMI</strong>. Fixed-rate loans do not move; floating-rate loans reset on their review dates, usually with a 1–3 month lag." },
+    { t: "p", html: "<strong>Update (Oct 7, 2026):</strong> The RBI hiked the repo rate by 25 bps to <strong>5.50%</strong> — the first increase since February 2023. The EMI numbers below are now live policy: on a ₹50 lakh home loan over 20 years, that's roughly <strong>₹795 extra per month</strong>. The RBI's six-member Monetary Policy Committee <strong>met October 5–7 and hiked the repo rate to 5.50% on Wednesday, October 7</strong>. The repo rate has sat at <strong>5.25%</strong> through the last four reviews. This time, most economists expect a <strong>25 basis-point hike to 5.50%</strong> — the first increase since February 2023. On a ₹50 lakh home loan over 20 years, that hike adds roughly <strong>₹795 to your monthly EMI</strong>. Fixed-rate loans do not move; floating-rate loans reset on their review dates, usually with a 1–3 month lag." },
     { t: "h2", text: "Why a hike is on the table" },
     { t: "p", html: "Three forces are pushing the RBI toward a hike. <strong>August CPI inflation hit 4.82%</strong>, above the RBI's 4% medium-term target for the third straight month — and broadening, with nearly half of the CPI basket now running at 4% or more, up from a third in March. The <strong>re-escalation of the West Asia conflict</strong> has pushed up crude oil and commodity prices. And the <strong>rupee has slid about 6% this year</strong>, with global central banks — including the US Fed — raising rates again, pressuring the RBI to defend the currency with a hike of its own." },
     { t: "ul", items: [
@@ -52,7 +52,7 @@ export const posts = [
       { q: "How much does a 25 bps hike add to a home loan EMI?", a: "Roughly ₹795/month on a ₹50 lakh, 20-year loan at 8.50%, and about ₹484/month on a ₹30 lakh loan at 9.00%. The longer your tenure, the larger the total extra interest." },
       { q: "Is a repo rate hike good for FD investors?", a: "Yes. Banks usually raise FD rates within weeks of a repo hike. It is a good time to lock in longer-tenure FDs at the higher rate." },
       { q: "Should I prepay my home loan before the hike?", a: "Prepaying always helps, but the hike itself is not a deadline — your reset date is. When you prepay, reduce the tenure rather than the EMI to maximise interest saved." },
-      { q: "What is the current repo rate?", a: "5.25%, unchanged through the last four RBI reviews. A 25 bps hike on October 7 would take it to 5.50% — the first increase since February 2023." }
+      { q: "What is the current repo rate?", a: "5.50%, after the RBI's 25 bps hike on October 7, 2026 — the first increase since February 2023." }
     ] },
     { t: "cta", title: "Run your own numbers", text: "Plug in your loan amount, rate and tenure to see your exact EMI — then add 0.25% to preview the hike.", label: "Open EMI Calculator", to: "/calculators/emi-calculator" }
   ]
