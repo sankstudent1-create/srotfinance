@@ -4,7 +4,7 @@ import { X, Heart, ArrowRight, QrCode, Smartphone, Copy, Check, ExternalLink, Sh
 import { QRCodeSVG } from 'qrcode.react';
 
 const UPI_ID = 'agriwadi464881.rzp@icici';
-const MERCHANT_NAME = 'Agriwadi - Swinfosystems';
+const MERCHANT_NAME = 'Srot Finance';
 const APP_NAME = 'Srot Finance';
 
 const TIERS = [

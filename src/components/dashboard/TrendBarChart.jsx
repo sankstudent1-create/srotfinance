@@ -42,6 +42,12 @@ export const TrendBarChart = ({ transactions = [], type = 'expense', range = 7 }
 
     return (
         <div className="h-56 w-full relative pt-6 flex flex-col justify-between">
+            {!hasData && (
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center pointer-events-none">
+                    <p className="text-sm font-bold text-[var(--text-dim)]">No activity in the last {range} days</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">Add a transaction to see your trend</p>
+                </div>
+            )}
             {/* Background Grid Lines */}
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
                 {[1, 0.75, 0.5, 0.25, 0].map((tick, i) => (
@@ -107,15 +113,18 @@ export const TrendBarChart = ({ transactions = [], type = 'expense', range = 7 }
 
             {/* X-axis Labels */}
             <div className="flex justify-between items-center px-2 sm:px-4 pt-2 border-t border-[var(--border-main)]">
-                {dailyData.map((d, i) => (
-                    <div key={i} className="flex-1 text-center">
-                        <span className={`text-[10px] sm:text-[11px] font-bold tracking-tight select-none transition-colors ${
-                            hoveredBar === i ? 'text-orange-400' : 'text-[var(--text-muted)]'
-                        }`}>
-                            {d.label}
-                        </span>
-                    </div>
-                ))}
+                {dailyData.map((d, i) => {
+                    const isToday = i === dailyData.length - 1;
+                    return (
+                        <div key={i} className="flex-1 text-center">
+                            <span className={`text-[10px] sm:text-[11px] font-bold tracking-tight select-none transition-colors ${
+                                isToday ? 'text-orange-400' : hoveredBar === i ? 'text-orange-400' : 'text-[var(--text-muted)]'
+                            }`}>
+                                {isToday ? 'Today' : d.label}
+                            </span>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

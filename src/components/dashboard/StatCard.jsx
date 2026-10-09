@@ -81,7 +81,7 @@ export const StatCard = ({ label, value = 0, icon: Icon, type = 'balance', subti
 
                 <div className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border backdrop-blur-md ${cfg.light}`}>
                     <Trend size={14} />
-                    <span>{type === 'balance' ? 'Live' : type === 'income' ? '+Cash' : '-Spend'}</span>
+                    <span>{type === 'balance' ? 'Live' : type === 'income' ? 'Inflow' : 'Outflow'}</span>
                 </div>
             </div>
 

@@ -63,10 +63,10 @@ export default async function handler(req, res) {
                             <table role="presentation" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td style="vertical-align:middle;">
-                                        <img src="https://fin.swinfosystems.online/favicon.ico" alt="Orange Finance" width="44" height="44" style="display:block;border-radius:12px;">
+                                        <img src="https://srotfinance.vercel.app/favicon.ico" alt="Srot Finance" width="44" height="44" style="display:block;border-radius:12px;">
                                     </td>
                                     <td style="padding-left:14px;vertical-align:middle;">
-                                        <span style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:#1e293b;letter-spacing:-0.5px;">Orange Finance</span>
+                                        <span style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:#1e293b;letter-spacing:-0.5px;">Srot Finance</span>
                                         <br>
                                         <span style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;">by Swinfosystems</span>
                                     </td>
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
                                 <tr>
                                     <td style="padding:36px 40px 20px;">
                                         <p style="margin:0 0 16px;font-family:'Outfit',sans-serif;font-size:16px;color:#334155;line-height:1.7;font-weight:600;">Hi there! 📊</p>
-                                        <p style="margin:0 0 24px;font-family:'Outfit',sans-serif;font-size:15px;color:#475569;line-height:1.7;">Your financial intelligence report from <strong style="color:#f97316;">Orange Finance</strong> is attached below as a PDF. Here's a quick summary:</p>
+                                        <p style="margin:0 0 24px;font-family:'Outfit',sans-serif;font-size:15px;color:#475569;line-height:1.7;">Your financial intelligence report from <strong style="color:#f97316;">Srot Finance</strong> is attached below as a PDF. Here's a quick summary:</p>
                                         ${stats ? `
                                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
                                             <tr>
@@ -138,13 +138,13 @@ export default async function handler(req, res) {
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.05);overflow:hidden;">
                                 <tr>
                                     <td style="padding:40px 40px 0;text-align:center;">
-                                        <img src="https://fin.swinfosystems.online/favicon.ico" alt="Orange Finance" width="56" height="56" style="display:inline-block;border-radius:16px;box-shadow:0 4px 12px rgba(249,115,22,0.2);">
-                                        <h1 style="margin:20px 0 0;font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:#1e293b;letter-spacing:-0.5px;">Message from Orange Finance</h1>
+                                        <img src="https://srotfinance.vercel.app/favicon.ico" alt="Srot Finance" width="56" height="56" style="display:inline-block;border-radius:16px;box-shadow:0 4px 12px rgba(249,115,22,0.2);">
+                                        <h1 style="margin:20px 0 0;font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:#1e293b;letter-spacing:-0.5px;">Message from Srot Finance</h1>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="padding:32px 40px;">
-                                        <p style="margin:0 0 24px;font-family:'Outfit',sans-serif;font-size:16px;color:#334155;line-height:1.8;white-space:pre-wrap;">${customMessage || 'We have sent you an official communication from Orange Finance.'}</p>
+                                        <p style="margin:0 0 24px;font-family:'Outfit',sans-serif;font-size:16px;color:#334155;line-height:1.8;white-space:pre-wrap;">${customMessage || 'We have sent you an official communication from Srot Finance.'}</p>
                                         <p style="margin:0;font-family:'Outfit',sans-serif;font-size:14px;color:#64748b;line-height:1.6;padding-top:20px;border-top:1px solid #f1f5f9;">
                                             📎 A special <strong>PDF letter</strong> is attached below for you to download and save.
                                         </p>
@@ -163,7 +163,7 @@ export default async function handler(req, res) {
                                             <tr>
                                                 <td style="padding:14px 18px;">
                                                     <p style="margin:0;font-family:'Outfit',sans-serif;font-size:12px;color:#64748b;line-height:1.6;">
-                                                        🔒 This report was generated and emailed securely from your Orange Finance account. No one else has access to this data.
+                                                        🔒 This report was generated and emailed securely from your Srot Finance account. No one else has access to this data.
                                                     </p>
                                                 </td>
                                             </tr>
@@ -178,9 +178,9 @@ export default async function handler(req, res) {
                     <tr>
                         <td style="padding:32px 20px 0;text-align:center;">
                             <p style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#64748b;">
-                                Orange Finance</p>
+                                Srot Finance</p>
                             <p style="margin:0 0 4px;font-family:'Outfit',sans-serif;font-size:11px;color:#94a3b8;">
-                                <a href="https://fin.swinfosystems.online" style="color:#f97316;text-decoration:none;font-weight:600;">fin.swinfosystems.online</a>
+                                <a href="https://srotfinance.vercel.app" style="color:#f97316;text-decoration:none;font-weight:600;">srotfinance.vercel.app</a>
                             </p>
                             <p style="margin:12px 0 0;font-family:'Outfit',sans-serif;font-size:10px;color:#cbd5e1;font-weight:600;letter-spacing:1px;text-transform:uppercase;">
                                 Secured by Supabase & Swinfosystems
@@ -196,7 +196,7 @@ export default async function handler(req, res) {
 </html>`;
 
         await transporter.sendMail({
-            from: `"Orange Finance" <${fromEmail}>`,
+            from: `"Srot Finance" <${fromEmail}>`,
             to,
             subject: subject || `📊 Your Financial Report — ${periodLabel}`,
             html: emailHTML,

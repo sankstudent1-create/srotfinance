@@ -45,8 +45,8 @@ export const handlePayment = async ({ amount, user, onSuccess, onError }) => {
         key: keyId,
         amount: amount * 100, // paise
         currency: 'INR',
-        name: 'Fin by Swinfosystems',
-        description: `Support by ${username} to Fin by Swinfosystems for ${domain}.`,
+        name: 'Srot Finance',
+        description: `Support by ${username} to Srot Finance for ${domain}.`,
         image: 'https://api.dicebear.com/7.x/shapes/svg?seed=orange',
         handler: (response) => {
             if (onSuccess) onSuccess(response);

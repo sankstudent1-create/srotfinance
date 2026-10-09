@@ -5,7 +5,7 @@ import { X, ShieldCheck, QrCode, Fingerprint, Calendar, Sparkles } from 'lucide-
 export const DigitalIDModal = ({ isOpen, onClose, user }) => {
     if (!isOpen) return null;
 
-    const domain = window.location.hostname || 'srotfinance.app';
+    const domain = window.location.hostname || 'srotfinance.vercel.app';
     const joinDate = new Date(user?.created_at || Date.now()).toLocaleDateString('en-IN', {
         day: '2-digit', month: 'short', year: 'numeric'
     });

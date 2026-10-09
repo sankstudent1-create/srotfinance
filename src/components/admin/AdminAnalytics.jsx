@@ -3,7 +3,7 @@ import { supabase } from '../../config/supabase';
 import { Activity, MapPin, MonitorSmartphone, Clock, Loader2, Save, Image as ImageIcon } from 'lucide-react';
 import { AdminMapAnimation } from './AdminMapAnimation';
 
-export const AdminAnalytics = () => {
+export const AdminAnalytics = ({ showToast }) => {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalSessions: 0,
@@ -61,14 +61,15 @@ export const AdminAnalytics = () => {
     const handleSaveSettings = async () => {
         setSavingSettings(true);
         try {
-            await supabase.from('app_settings').upsert({
+            const { error } = await supabase.from('app_settings').upsert({
                 id: 1,
                 ...settings,
                 updated_at: new Date().toISOString()
             });
-            alert('Settings saved successfully!');
+            if (error) throw error;
+            showToast ? showToast('Announcement settings saved', 'success') : alert('Settings saved successfully!');
         } catch (err) {
-            alert('Failed to save settings.');
+            showToast ? showToast('Failed to save settings', 'error') : alert('Failed to save settings.');
         }
         setSavingSettings(false);
     };

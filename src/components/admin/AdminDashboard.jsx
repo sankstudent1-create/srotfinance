@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../config/supabase';
-import { LogOut, Users, FileText, Database, ShieldCheck, Search, Loader2, Trash2, Mail, Send, CheckCircle, AlertTriangle, MonitorSmartphone, Activity, BarChart2, CheckSquare, Image as ImageIcon } from 'lucide-react';
+import { LogOut, Users, FileText, Database, ShieldCheck, Search, Loader2, Trash2, Mail, Send, CheckCircle, AlertTriangle, MonitorSmartphone, Activity, BarChart2, CheckSquare, Image as ImageIcon, Crown, UserCog, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AdminCampaigns } from './AdminCampaigns';
 import { AdminAnalytics } from './AdminAnalytics';
@@ -27,9 +27,24 @@ export const AdminDashboard = ({ session, onLogout }) => {
     const [pushModalOpen, setPushModalOpen] = useState(false);
     const [pushMessage, setPushMessage] = useState('');
 
+    // Role management (requires admin_roles_setup.sql)
+    const [myRole, setMyRole] = useState(null);
+    const [changingRole, setChangingRole] = useState(false);
+
     useEffect(() => {
         loadUsers();
+        loadMyRole();
     }, []);
+
+    const loadMyRole = async () => {
+        try {
+            const { data } = await supabase.rpc('admin_get_my_role');
+            setMyRole(data || null);
+        } catch (err) {
+            // RPC missing (migration not run yet) — role features stay hidden
+            setMyRole(null);
+        }
+    };
 
     const loadUsers = async () => {
         setLoading(true);
@@ -76,6 +91,66 @@ export const AdminDashboard = ({ session, onLogout }) => {
         setUserSessions(sessions || []);
     };
 
+    const handleSetRole = async (userId, newRole) => {
+        const roleLabel = newRole === 'none' ? 'remove admin access from' : `promote to ${newRole}`;
+        if (!window.confirm(`Are you sure you want to ${roleLabel} this user?`)) return;
+        setChangingRole(true);
+        try {
+            const { error } = await supabase.rpc('admin_set_role', { target_user_id: userId, new_role: newRole });
+            if (error) throw error;
+            showToast(newRole === 'none' ? 'Admin access removed' : `User promoted to ${newRole}`, 'success');
+            loadUsers();
+        } catch (err) {
+            showToast(err.message || 'Failed to update role', 'error');
+        } finally {
+            setChangingRole(false);
+        }
+    };
+
+    // Build a minimal valid one-page PDF (no dependency) for the account summary email
+    const buildSummaryPdfBase64 = (user, totals, topCats) => {
+        const esc = (s) => String(s ?? '').replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+        const rows = [
+            [20, 'Srot Finance - Account Summary'],
+            [11, `Prepared for ${user.full_name || 'Member'} (${user.email})`],
+            [11, `Generated ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`],
+            [11, ''],
+            [13, 'Totals'],
+            [11, `Total Income: Rs. ${(totals.income || 0).toLocaleString('en-IN')}`],
+            [11, `Total Expense: Rs. ${(totals.expense || 0).toLocaleString('en-IN')}`],
+            [11, `Net Balance: Rs. ${((totals.income || 0) - (totals.expense || 0)).toLocaleString('en-IN')}`],
+            [11, `Transactions: ${totals.count || 0}`],
+            [11, ''],
+            [13, 'Top Expense Categories'],
+            ...topCats.map(([name, amt]) => [11, `${name}: Rs. ${amt.toLocaleString('en-IN')}`]),
+        ];
+        let y = 760;
+        let stream = '';
+        rows.forEach(([size, text]) => {
+            if (!text) { y -= 10; return; }
+            stream += `BT /F1 ${size} Tf 50 ${y} Td (${esc(text)}) Tj ET\n`;
+            y -= size + 8;
+        });
+        const objects = [
+            '<< /Type /Catalog /Pages 2 0 R >>',
+            '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+            '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+            '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+            `<< /Length ${stream.length} >>\nstream\n${stream}endstream`,
+        ];
+        let pdf = '%PDF-1.4\n';
+        const offsets = [];
+        objects.forEach((body, i) => {
+            offsets.push(pdf.length);
+            pdf += `${i + 1} 0 obj\n${body}\nendobj\n`;
+        });
+        const xrefPos = pdf.length;
+        pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+        offsets.forEach(o => { pdf += `${String(o).padStart(10, '0')} 00000 n \n`; });
+        pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+        return btoa(unescape(encodeURIComponent(pdf)));
+    };
+
     const handleDeleteUser = async (userId) => {
         if (!window.confirm("CRITICAL WARNING: This will permanently delete the user and ALL their data! Proceed?")) return;
         try {
@@ -102,28 +177,39 @@ export const AdminDashboard = ({ session, onLogout }) => {
     };
 
     const handleGenerateUserReport = async () => {
-        // Implement report generation logic to email users
-        if (!window.confirm(`Send an automated activity email to ${selectedUser.email}?`)) return;
-
-        // This is a placeholder since rendering the full Analytics PDF for another user 
-        // requires rendering the chart components. For an admin panel, a summary email can be sent.
+        // Sends a REAL account summary: totals computed from the user's loaded
+        // transactions + a minimal valid PDF attachment (no fabricated data).
+        if (!window.confirm(`Send an account summary email to ${selectedUser.email}?`)) return;
         try {
             setLoadingTx(true);
+            const totals = userTransactions.reduce((acc, tx) => {
+                const amt = Number(tx.amount) || 0;
+                if (tx.type === 'income') acc.income += amt; else acc.expense += amt;
+                acc.count += 1;
+                return acc;
+            }, { income: 0, expense: 0, count: 0 });
+            const catTotals = {};
+            userTransactions.forEach(tx => {
+                if (tx.type !== 'income') catTotals[tx.category || 'Other'] = (catTotals[tx.category || 'Other'] || 0) + (Number(tx.amount) || 0);
+            });
+            const topCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const pdfBase64 = buildSummaryPdfBase64(selectedUser, totals, topCats);
             const res = await fetch('/api/send-report', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     to: selectedUser.email,
-                    subject: 'Message from Srot Finance Admin',
-                    reportName: 'Admin_Notification.pdf',
-                    filterLabel: 'System Notification',
-                    stats: { income: 0, expense: 0, balance: 0 },
-                    pdfBase64: 'JVB...' // dummy or real generated base64 
+                    subject: 'Your Srot Finance Account Summary',
+                    reportName: 'SrotFinance_Summary.pdf',
+                    filterLabel: 'Account Summary',
+                    stats: { income: totals.income, expense: totals.expense, balance: totals.income - totals.expense },
+                    customMessage: `Hi ${selectedUser.full_name || 'there'},\n\nHere is a summary of your Srot Finance account activity.\n\nTotal Income: Rs.${totals.income.toLocaleString('en-IN')}\nTotal Expense: Rs.${totals.expense.toLocaleString('en-IN')}\nNet Balance: Rs.${(totals.income - totals.expense).toLocaleString('en-IN')}\n\nSent by the Srot Finance admin team.`,
+                    pdfBase64
                 })
             });
             const result = await res.json();
             if (!res.ok) throw new Error(result.error);
-            showToast('Email sent to user', 'success');
+            showToast('Summary email sent to user', 'success');
         } catch (err) {
             showToast('Failed to send email. Check API logs.', 'error');
         } finally {
@@ -152,7 +238,11 @@ export const AdminDashboard = ({ session, onLogout }) => {
                         </div>
                         <div>
                             <h1 className="text-xl font-black tracking-tight flex items-center gap-2 text-white">
-                                Admin <span className="hidden sm:inline">Console</span> <span className="bg-rose-500/20 text-rose-300 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black border border-rose-500/30">SuperUser</span>
+                                Admin <span className="hidden sm:inline">Console</span> {myRole === 'superuser' ? (
+                                    <span className="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black border border-amber-500/30">SuperUser</span>
+                                ) : (
+                                    <span className="bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black border border-blue-500/30">Admin</span>
+                                )}
                             </h1>
                             <p className="text-[11px] text-slate-400 font-medium hidden sm:block">Logged in as {session.user.email}</p>
                         </div>
@@ -274,7 +364,15 @@ export const AdminDashboard = ({ session, onLogout }) => {
                                                 {u.full_name?.charAt(0) || u.email.charAt(0).toUpperCase()}
                                             </div>
                                             <div className="truncate">
-                                                <p className={`text-sm font-bold truncate ${selectedUser?.id === u.id ? 'text-white' : 'text-slate-900'}`}>{u.full_name || 'No Name'}</p>
+                                                <p className={`text-sm font-bold truncate flex items-center gap-1.5 ${selectedUser?.id === u.id ? 'text-white' : 'text-slate-900'}`}>
+                                                    <span className="truncate">{u.full_name || 'No Name'}</span>
+                                                    {u.admin_role === 'superuser' && (
+                                                        <span className="shrink-0 text-[8px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-600 border border-amber-500/30 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Crown size={8} /> Super</span>
+                                                    )}
+                                                    {u.admin_role === 'admin' && (
+                                                        <span className="shrink-0 text-[8px] font-black uppercase tracking-wider bg-blue-500/15 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><Shield size={8} /> Admin</span>
+                                                    )}
+                                                </p>
                                                 <p className={`text-[10px] font-semibold truncate ${selectedUser?.id === u.id ? 'text-slate-400' : 'text-slate-500'}`}>{u.email}</p>
                                             </div>
                                         </button>
@@ -301,10 +399,21 @@ export const AdminDashboard = ({ session, onLogout }) => {
                                             )}
                                         </div>
                                         <div>
-                                            <h2 className="text-2xl font-black text-slate-900">{selectedUser.full_name || 'Anonymous User'}</h2>
+                                            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2 flex-wrap">
+                                                {selectedUser.full_name || 'Anonymous User'}
+                                                {selectedUser.admin_role === 'superuser' && (
+                                                    <span className="text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-300 px-2.5 py-1 rounded-full flex items-center gap-1"><Crown size={11} /> Superuser</span>
+                                                )}
+                                                {selectedUser.admin_role === 'admin' && (
+                                                    <span className="text-[10px] font-black uppercase tracking-widest bg-blue-100 text-blue-700 border border-blue-300 px-2.5 py-1 rounded-full flex items-center gap-1"><Shield size={11} /> Admin</span>
+                                                )}
+                                            </h2>
                                             <p className="text-sm font-semibold text-slate-500">{selectedUser.email}</p>
                                             <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">
                                                 Joined {new Date(selectedUser.created_at).toLocaleDateString()}
+                                                {selectedUser.last_sign_in_at && (
+                                                    <span className="normal-case tracking-normal"> • Last active {new Date(selectedUser.last_sign_in_at).toLocaleDateString()}</span>
+                                                )}
                                             </p>
                                         </div>
                                     </div>
@@ -390,14 +499,68 @@ export const AdminDashboard = ({ session, onLogout }) => {
 
                                 {activeUserTab === 'actions' && (
                                     <div className="space-y-4">
+                                        {/* Access Control — superusers only */}
+                                        {myRole === 'superuser' ? (
+                                            <div className="p-5 border border-violet-200 rounded-2xl bg-violet-50">
+                                                <div className="flex gap-4 items-center mb-4">
+                                                    <div className="w-12 h-12 bg-violet-100 text-violet-600 rounded-xl flex items-center justify-center">
+                                                        <UserCog size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-violet-900">Access Control</h4>
+                                                        <p className="text-xs font-medium text-violet-700 mt-0.5">
+                                                            Current role: <span className="font-black uppercase">{selectedUser.admin_role || 'regular user'}</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {selectedUser.id === session.user.id ? (
+                                                    <p className="text-xs font-bold text-violet-500 italic">You cannot change your own role. Ask another superuser.</p>
+                                                ) : (
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {selectedUser.admin_role !== 'admin' && (
+                                                            <button
+                                                                onClick={() => handleSetRole(selectedUser.id, 'admin')}
+                                                                disabled={changingRole}
+                                                                className="px-4 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-blue-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                                                            >
+                                                                <Shield size={14} /> Make Admin
+                                                            </button>
+                                                        )}
+                                                        {selectedUser.admin_role !== 'superuser' && (
+                                                            <button
+                                                                onClick={() => handleSetRole(selectedUser.id, 'superuser')}
+                                                                disabled={changingRole}
+                                                                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs rounded-xl shadow-md hover:brightness-105 transition-all flex items-center gap-2 disabled:opacity-50"
+                                                            >
+                                                                <Crown size={14} /> Make Superuser
+                                                            </button>
+                                                        )}
+                                                        {selectedUser.admin_role && (
+                                                            <button
+                                                                onClick={() => handleSetRole(selectedUser.id, 'none')}
+                                                                disabled={changingRole}
+                                                                className="px-4 py-2.5 bg-white text-slate-600 border border-slate-300 font-bold text-xs rounded-xl hover:bg-slate-100 transition-all disabled:opacity-50"
+                                                            >
+                                                                Remove Admin Access
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : myRole === 'admin' ? (
+                                            <div className="p-4 border border-slate-200 rounded-2xl bg-slate-50 flex items-center gap-3">
+                                                <ShieldCheck size={18} className="text-slate-400 shrink-0" />
+                                                <p className="text-xs font-medium text-slate-500">Role changes require a <span className="font-bold text-slate-700">superuser</span>. Your role: <span className="font-bold text-slate-700 uppercase">admin</span>.</p>
+                                            </div>
+                                        ) : null}
                                         <div className="p-5 border border-slate-200 rounded-2xl flex items-center justify-between bg-slate-50">
                                             <div className="flex gap-4 items-center">
                                                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
                                                     <Mail size={20} />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-sm font-black text-slate-900">Email System Notification</h4>
-                                                    <p className="text-xs font-medium text-slate-500 mt-0.5">Send a direct message or dummy report to this user.</p>
+                                                    <h4 className="text-sm font-black text-slate-900">Email Account Summary</h4>
+                                                    <p className="text-xs font-medium text-slate-500 mt-0.5">Send this user a real summary of their income, expenses and top categories.</p>
                                                 </div>
                                             </div>
                                             <button
@@ -526,7 +689,7 @@ export const AdminDashboard = ({ session, onLogout }) => {
                 </div>
             ) : activeMasterTab === 'analytics' ? (
                 <div className="max-w-7xl mx-auto px-6 py-8">
-                    <AdminAnalytics />
+                    <AdminAnalytics showToast={showToast} />
                 </div>
             ) : activeMasterTab === 'push' ? (
                 <div className="max-w-7xl mx-auto px-6 py-8">

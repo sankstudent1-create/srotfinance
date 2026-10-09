@@ -159,7 +159,7 @@ const SCHEME_TAX_INFO = {
 };
 
 // --- Math Formulas ---
-const calculateSIP = (p, n, r, er = 0) => {
+export const calculateSIP = (p, n, r, er = 0) => {
     const netR = Math.max(0.1, r - er);
     const i = netR / 100 / 12;
     const invested = p * n;
@@ -179,7 +179,7 @@ const calculateSIP = (p, n, r, er = 0) => {
     return { invested, total, returns, tax, netTotal: total - tax, projections };
 };
 
-const calculateLumpsum = (p, n, r, er = 0) => {
+export const calculateLumpsum = (p, n, r, er = 0) => {
     const netR = Math.max(0.1, r - er);
     const total = p * Math.pow(1 + netR / 100, n);
     const returns = Math.max(0, total - p);
@@ -194,7 +194,7 @@ const calculateLumpsum = (p, n, r, er = 0) => {
     return { invested: p, total, returns, tax, netTotal: total - tax, projections };
 };
 
-const calculateFD = (p, n, r) => {
+export const calculateFD = (p, n, r) => {
     const total = p * Math.pow(1 + r / 100, n);
     const returns = Math.max(0, total - p);
     const tax = returns * 0.10; // Estimated 10% TDS
@@ -207,7 +207,7 @@ const calculateFD = (p, n, r) => {
     return { invested: p, total, returns, tax, netTotal: total - tax, projections };
 };
 
-const calculatePPF = (p, n) => {
+export const calculatePPF = (p, n) => {
     const r = 7.1;
     let total = 0;
     let invested = 0;
@@ -220,7 +220,7 @@ const calculatePPF = (p, n) => {
     return { invested, total, returns: total - invested, tax: 0, netTotal: total, projections };
 };
 
-const calculateSimpleInterest = (p, n, r) => {
+export const calculateSimpleInterest = (p, n, r) => {
     const interest = (p * r * n) / 100;
     const projections = [];
     for (let y = 1; y <= n; y++) {
@@ -232,7 +232,7 @@ const calculateSimpleInterest = (p, n, r) => {
 };
 
 // EMI = P * r * (1+r)^n / ((1+r)^n - 1), r = monthly rate, n = months
-const calculateEMI = (p, annualRate, years) => {
+export const calculateEMI = (p, annualRate, years) => {
     const n = Math.max(1, Math.round((years || 5) * 12));
     const r = Math.max(0, annualRate || 0) / 100 / 12;
     let emi;
@@ -427,7 +427,7 @@ const AgeCalculator = ({ onPrint, onDownload, onShare, isSharing, translate }) =
     }, [dob, now]);
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 pb-8 space-y-6">
             <div>
                 <label className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-2 block">
                     Date of Birth
@@ -868,7 +868,7 @@ export const CalculatorModal = ({
                                     </div>
                                     <div className="glass-panel p-4 text-center border-orange-500/30">
                                         <p className="text-[10px] text-orange-400 font-bold uppercase tracking-wider">{result.isEMI ? 'Total Payment' : translate('net_value')}</p>
-                                        <p className="text-lg sm:text-xl font-black font-mono text-orange-400 mt-1">
+                                        <p className="text-base sm:text-lg font-black font-mono text-orange-400 mt-1 break-all leading-tight">
                                             ₹{Math.round(result.netTotal).toLocaleString('en-IN')}
                                         </p>
                                     </div>

@@ -1,8 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 /* ================================================================== */
 /*  HELPERS                                                             */
 /* ================================================================== */
+const SITE = 'https://srotfinance.vercel.app';
+const toolPathFor = (toolName) => {
+    const t = (toolName || '').toLowerCase();
+    if (t.includes('sip')) return '/calculators/sip-calculator';
+    if (t.includes('lump')) return '/calculators/lumpsum-calculator';
+    if (t.includes('emi') || t.includes('loan')) return '/calculators/emi-calculator';
+    if (t.includes('ppf')) return '/calculators/ppf-calculator';
+    if (t.includes('fixed') || t.includes('fd')) return '/calculators/fd-calculator';
+    if (t.includes('interest')) return '/calculators/interest-calculator';
+    if (t.includes('age')) return '/calculators/age-calculator';
+    return '/calculators';
+};
+
+/* QR code rendered as an image (code-split so the main bundle stays lean) */
+const QrMark = ({ url, size = 30 }) => {
+    const [src, setSrc] = useState(null);
+    useEffect(() => {
+        let live = true;
+        import('qrcode')
+            .then((m) => (m.default || m).toDataURL(url, {
+                width: 160, margin: 1, color: { dark: '#0f172a', light: '#ffffff' },
+            }))
+            .then((d) => { if (live) setSrc(d); })
+            .catch(() => {});
+        return () => { live = false; };
+    }, [url]);
+    if (!src) return <div style={{ width: size, height: size, background: '#f1f5f9', borderRadius: 6 }} />;
+    return <img src={src} alt="Scan to open" style={{ width: size, height: size, borderRadius: 6, display: 'block' }} />;
+};
 const fmt = (v) => `₹${Math.round(v || 0).toLocaleString('en-IN')}`;
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 const fmtDay = (d) => new Date(d).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -52,6 +81,30 @@ export const PrintStyles = () => (
 );
 
 /* ================================================================== */
+/*  SHARED: WATERMARK (ghost logo behind every page)                  */
+/* ================================================================== */
+const PdfWatermark = () => (
+    <div
+        aria-hidden="true"
+        style={{
+            position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+        }}
+    >
+        <img
+            src="/logo.png"
+            alt=""
+            style={{
+                width: 420, height: 420, objectFit: 'contain',
+                transform: 'rotate(-18deg)', opacity: 0.05,
+                userSelect: 'none',
+            }}
+        />
+    </div>
+);
+
+/* ================================================================== */
 /*  SHARED: PAGE HEADER                                                 */
 /* ================================================================== */
 const PageHeader = ({ user, subtitle, page, totalPages }) => (
@@ -61,14 +114,13 @@ const PageHeader = ({ user, subtitle, page, totalPages }) => (
     }}>
         {/* Brand */}
         <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 5 }}>
-                <div style={{
-                    width: 30, height: 30, background: 'linear-gradient(135deg,#f97316,#ec4899)',
-                    borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <span style={{ color: 'white', fontSize: 13, fontWeight: 900 }}>₹</span>
-                </div>
-                <span className="mont" style={{ fontSize: 17, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.035em' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                <img
+                    src="/logo.png"
+                    alt="Srot Finance logo"
+                    style={{ width: 46, height: 46, borderRadius: 12, objectFit: 'cover' }}
+                />
+                <span className="mont" style={{ fontSize: 23, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.035em' }}>
                     Srot Finance
                 </span>
             </div>
@@ -102,7 +154,7 @@ const PageHeader = ({ user, subtitle, page, totalPages }) => (
 /* ================================================================== */
 /*  SHARED: PAGE FOOTER                                                 */
 /* ================================================================== */
-const PageFooter = ({ page, total }) => (
+const PageFooter = ({ page, total, qrUrl }) => (
     <div style={{
         marginTop: 'auto',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -115,8 +167,18 @@ const PageFooter = ({ page, total }) => (
             <span style={{ fontSize: 8, color: '#cbd5e1' }}>|</span>
             <span style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>CONFIDENTIAL</span>
         </div>
-        <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
-            {page && total ? `Page ${page} of ${total}` : 'srotfinance.com'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {qrUrl && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <QrMark url={qrUrl} size={28} />
+                    <span style={{ fontSize: 7, color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        Scan to open
+                    </span>
+                </div>
+            )}
+            <div style={{ fontSize: 8, color: '#94a3b8', fontWeight: 600 }}>
+                {page && total ? `Page ${page} of ${total}` : 'srotfinance.vercel.app'}
+            </div>
         </div>
     </div>
 );
@@ -168,6 +230,7 @@ export const CalculatorReport = ({ data, user }) => {
             <PrintStyles />
             {/* ── PAGE 1 — Summary ──────────────────────── */}
             <div className="print-page strict-page">
+                <PdfWatermark />
                 <PageHeader user={user} subtitle={`${toolName} Report`} page={1} totalPages={totalPages} />
 
                 {/* Tool name eyebrow */}
@@ -246,7 +309,7 @@ export const CalculatorReport = ({ data, user }) => {
                                         <span style={{ fontSize: 9, color: '#cbd5e1', fontWeight: 600 }}>{isEMI ? 'Interest' : 'Profit'} ({retPct.toFixed(0)}%)</span>
                                     </div>
                                 </div>
-                                <span style={{ fontSize: 9, color: '#64748b', fontWeight: 800 }}>FUNDING RATIO</span>
+                                <span style={{ fontSize: 9, color: '#64748b', fontWeight: 800 }}>CAPITAL SPLIT</span>
                             </div>
                             <div style={{ height: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 99, overflow: 'hidden', display: 'flex' }}>
                                 <div style={{ width: `${invPct}%`, height: '100%', background: '#f97316' }} />
@@ -261,26 +324,32 @@ export const CalculatorReport = ({ data, user }) => {
                     <div className="no-break" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 20, padding: '24px' }}>
                         <h3 style={{ fontSize: 10, fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Input Parameters</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {Object.entries(inputs).map(([label, val]) => (
-                                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                                    <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>{label}</span>
-                                    <span className="mont" style={{ fontSize: 16, fontWeight: 900, color: '#0f172a' }}>{val}</span>
-                                </div>
-                            ))}
+                            {Object.entries(inputs).map(([label, val]) => {
+                                const num = parseFloat(String(val).replace(/,/g, ''));
+                                const display = label.includes('(₹)') && !isNaN(num)
+                                    ? `₹${Math.round(num).toLocaleString('en-IN')}`
+                                    : String(val);
+                                return (
+                                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+                                        <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>{label}</span>
+                                        <span className="mont" style={{ fontSize: 16, fontWeight: 900, color: '#0f172a' }}>{display}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
                     {/* Right: Insights */}
                     <div className="no-break" style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: 20, padding: '24px' }}>
-                        <h3 style={{ fontSize: 10, fontWeight: 900, color: '#4338ca', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Investment Insights</h3>
+                        <h3 style={{ fontSize: 10, fontWeight: 900, color: '#4338ca', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>{isEMI ? 'Loan Insights' : 'Investment Insights'}</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             <div style={{ background: 'white', borderRadius: 12, padding: '12px 16px', border: '1px solid #dee5ff' }}>
-                                <p style={{ fontSize: 9, color: '#64748b', fontWeight: 700, marginBottom: 4 }}>WEALTH MULTIPLIER</p>
-                                <p className="mont" style={{ fontSize: 24, fontWeight: 950, color: '#0f172a' }}>{multiplier}× <span style={{ fontSize: 12, color: '#10b981' }}>Total Assets</span></p>
+                                <p style={{ fontSize: 9, color: '#64748b', fontWeight: 700, marginBottom: 4 }}>{isEMI ? 'INTEREST BURDEN' : 'WEALTH MULTIPLIER'}</p>
+                                <p className="mont" style={{ fontSize: 24, fontWeight: 950, color: '#0f172a' }}>{isEMI ? `${gainPct}%` : `${multiplier}×`} <span style={{ fontSize: 12, color: '#10b981' }}>{isEMI ? 'of loan amount' : 'growth on principal'}</span></p>
                             </div>
                             <div style={{ background: 'white', borderRadius: 12, padding: '12px 16px', border: '1px solid #dee5ff' }}>
-                                <p style={{ fontSize: 9, color: '#64748b', fontWeight: 700, marginBottom: 4 }}>MONTHLY AVG GROWTH</p>
-                                <p className="mont" style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>{fmt(returns / (inputs['Duration (Years)'] * 12 || 120))}/mo</p>
+                                <p style={{ fontSize: 9, color: '#64748b', fontWeight: 700, marginBottom: 4 }}>{isEMI ? 'TOTAL REPAYMENT' : 'MONTHLY AVG GROWTH'}</p>
+                                <p className="mont" style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>{isEMI ? fmt(netTotal) : `${fmt(returns / (parseFloat(inputs['Time Period (Years)']) * 12 || 120))}/mo`}</p>
                             </div>
                         </div>
                     </div>
@@ -289,11 +358,13 @@ export const CalculatorReport = ({ data, user }) => {
                 {/* Disclaimer */}
                 <div style={{ background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: 12, padding: '12px 16px', marginBottom: 20 }}>
                     <p style={{ fontSize: 8, color: '#92400e', lineHeight: 1.5 }}>
-                        **Disclaimer:** This report is for informational purposes. Market investments are subject to risk. Returns projected are estimated based on your inputs and do not guarantee future performance. Tax estimates follow FY 2025-26 guidelines.
+                        {isEMI
+                            ? '**Disclaimer:** This amortisation schedule is an estimate based on your inputs at a fixed interest rate. Actual EMI schedules vary with floating rates, part-prepayments, and lender terms. Tax benefits mentioned apply per current Income Tax rules; consult a tax advisor.'
+                            : `**Disclaimer:** This report is for informational purposes. Market investments are subject to risk. Returns projected are estimated based on your inputs and do not guarantee future performance. Tax estimates follow FY ${new Date().getFullYear()}-${String(new Date().getFullYear() + 1).slice(2)} guidelines.`}
                     </p>
                 </div>
 
-                <PageFooter page={1} total={totalPages} />
+                <PageFooter page={1} total={totalPages} qrUrl={SITE + toolPathFor(toolName)} />
             </div>
 
             {/* ── PAGE 2 onwards — Year-wise Analysis & Tax ──────────────────────── */}
@@ -304,6 +375,7 @@ export const CalculatorReport = ({ data, user }) => {
 
                 return (
                     <div key={pageNum} className="print-page pg-break strict-page">
+                        <PdfWatermark />
                         <PageHeader user={user} subtitle={isFirstChunk ? "Tax & Breakdown" : "Yearly Breakdown"} page={pageNum} totalPages={totalPages} />
                         
                         {isFirstChunk && (
@@ -407,9 +479,9 @@ export const CalculatorReport = ({ data, user }) => {
                         {isLastChunk && (
                             <div className="no-break" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 20 }}>
                                 {[
-                                    { label: 'Total Invested', value: fmt(invested), color: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
-                                    { label: 'Wealth Created', value: `+${fmt(returns)}`, color: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
-                                    { label: 'Net Maturity', value: fmt(netTotal), color: '#f97316', bg: '#fff7ed', border: '#fed7aa' },
+                                    { label: isEMI ? 'Loan Amount' : 'Total Invested', value: fmt(invested), color: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
+                                    { label: isEMI ? 'Total Interest' : 'Wealth Created', value: `${isEMI ? '' : '+'}${fmt(returns)}`, color: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
+                                    { label: isEMI ? 'Total Repayment' : 'Net Maturity', value: fmt(netTotal), color: '#f97316', bg: '#fff7ed', border: '#fed7aa' },
                                 ].map(({ label, value, color, bg, border }) => (
                                     <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '12px 14px', textAlign: 'center' }}>
                                         <p style={{ fontSize: 8, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{label}</p>
@@ -419,7 +491,7 @@ export const CalculatorReport = ({ data, user }) => {
                             </div>
                         )}
 
-                        <PageFooter page={pageNum} total={totalPages} />
+                        <PageFooter page={pageNum} total={totalPages} qrUrl={SITE + toolPathFor(toolName)} />
                     </div>
                 );
             })}
@@ -486,6 +558,7 @@ export const AnalyticsReport = ({ user, stats, transactions, filterLabel }) => (
     <>
         {/* Single flowing page */}
         <div className="print-page" style={{ paddingBottom: '10mm' }}>
+            <PdfWatermark />
             <PrintStyles />
             <PageHeader user={user} subtitle="Financial Report" />
 
@@ -682,7 +755,7 @@ export const AnalyticsReport = ({ user, stats, transactions, filterLabel }) => (
                 </tfoot>
             </table>
 
-            <PageFooter />
+            <PageFooter qrUrl={SITE + "/"} />
         </div>
     </>
 );
@@ -696,6 +769,7 @@ export const AgeReport = ({ data, user }) => {
     
     return (
         <div className="print-page strict-page">
+            <PdfWatermark />
             <PrintStyles />
             <PageHeader user={user} subtitle="Age & Life Report" page={1} totalPages={1} />
 
@@ -791,7 +865,7 @@ export const AgeReport = ({ data, user }) => {
                 </div>
             </div>
 
-            <PageFooter page={1} total={1} />
+            <PageFooter page={1} total={1} qrUrl={SITE + "/calculators/age-calculator"} />
         </div>
     );
 };

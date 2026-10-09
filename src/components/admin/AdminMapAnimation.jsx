@@ -9,15 +9,16 @@ export const AdminMapAnimation = ({ sessions }) => {
     const [markers, setMarkers] = useState([]);
     const [hoveredLocation, setHoveredLocation] = useState(null);
 
-    // Default static points if data isn't enough to make it look active (for aesthetics)
-    // Only used to make the map look active if real data has no coordinates
-    const fallbackLocations = [
-        { loc: 'New York, USA', lat: 40.7128, lon: -74.0060 },
-        { loc: 'London, UK', lat: 51.5074, lon: -0.1278 },
-        { loc: 'Singapore', lat: 1.3521, lon: 103.8198 },
-        { loc: 'Mumbai, India', lat: 19.0760, lon: 72.8777 },
-        { loc: 'Sydney, Australia', lat: -33.8688, lon: 151.2093 }
-    ];
+    // Small coordinate lookup so real "City, Country" session strings can be
+    // plotted. Only real session data ever reaches the map.
+    const cityCoords = {
+        'mumbai': [72.8777, 19.0760], 'delhi': [77.2090, 28.6139], 'pune': [73.8567, 18.5204],
+        'bengaluru': [77.5946, 12.9716], 'bangalore': [77.5946, 12.9716], 'chennai': [80.2707, 13.0827],
+        'kolkata': [88.3639, 22.5726], 'hyderabad': [78.4867, 17.3850], 'ahmedabad': [72.5714, 23.0225],
+        'jaipur': [75.7873, 26.9124], 'lucknow': [80.9462, 26.8467], 'kochi': [76.2673, 9.9312],
+        'new york': [-74.0060, 40.7128], 'london': [-0.1278, 51.5074], 'singapore': [103.8198, 1.3521],
+        'sydney': [151.2093, -33.8688], 'dubai': [55.2708, 25.2048]
+    };
 
     useEffect(() => {
         let activeMarkers = [];
@@ -39,14 +40,14 @@ export const AdminMapAnimation = ({ sessions }) => {
                             });
                         }
                     } else if (session.geo_location.includes(',')) {
-                        // String like "Mumbai, India", we could match it to a fallback or simulate
-                        const match = fallbackLocations.find(f => f.loc.toLowerCase().includes(session.geo_location.split(',')[0].toLowerCase()));
-                        if (match) {
+                        // String like "Mumbai, India" — plot only if we know the city
+                        const coords = cityCoords[session.geo_location.split(',')[0].trim().toLowerCase()];
+                        if (coords) {
                             activeMarkers.push({
                                 id: session.id,
                                 loc: session.geo_location,
-                                lat: match.lat,
-                                lon: match.lon,
+                                lat: coords[1],
+                                lon: coords[0],
                                 device: session.user_devices?.device_name || 'Unknown',
                                 time: new Date(session.session_start).toLocaleTimeString()
                             });
@@ -58,23 +59,8 @@ export const AdminMapAnimation = ({ sessions }) => {
             }
         });
 
-        // Add some random fallbacks to make the map look alive if we have fewer than 3 points
-        if (activeMarkers.length < 3) {
-            fallbackLocations.forEach((fb, index) => {
-                if (!activeMarkers.find(m => m.loc === fb.loc)) {
-                    activeMarkers.push({
-                        id: `fallback-${index}`,
-                        loc: fb.loc,
-                        lat: fb.lat,
-                        lon: fb.lon,
-                        device: 'Simulated Device',
-                        time: new Date().toLocaleTimeString(),
-                        isSimulated: true
-                    });
-                }
-            });
-        }
-
+        // Only real session locations are shown. No simulated markers —
+        // the map must never fabricate user activity.
         setMarkers(activeMarkers);
     }, [sessions]);
 
@@ -152,6 +138,15 @@ export const AdminMapAnimation = ({ sessions }) => {
                 {/* Animated Pulsing overlays for aesthetics */}
                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-white/20"></div>
 
+                {/* Honest empty state — no fabricated activity */}
+                {markers.length === 0 && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+                        <MapPin size={32} className="text-slate-300 mb-3" />
+                        <p className="text-sm font-bold text-slate-500">No located sessions yet</p>
+                        <p className="text-xs text-slate-400 mt-1 max-w-[260px]">Markers appear here when user sessions include location data.</p>
+                    </div>
+                )}
+
                 {/* Tooltip Overlay */}
                 <AnimatePresence>
                     {hoveredLocation && (
@@ -170,9 +165,6 @@ export const AdminMapAnimation = ({ sessions }) => {
                             <div>
                                 <p className="text-xs font-black truncate max-w-[150px]">{hoveredLocation.loc}</p>
                                 <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-0.5">{hoveredLocation.device}</p>
-                                {hoveredLocation.isSimulated && (
-                                    <p className="text-[9px] text-amber-500 font-bold mt-1">Simulated User</p>
-                                )}
                             </div>
                         </motion.div>
                     )}
