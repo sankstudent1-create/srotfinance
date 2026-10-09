@@ -3,6 +3,65 @@
 
 export const posts = [
   {
+    slug: "rbi-calibrated-tightening-emi-playbook",
+    title: "RBI Hiked to 5.50% — But HDFC Bank Cut Rates the Same Day: Your EMI Playbook",
+    description: "RBI raised the repo rate 25 bps to 5.50% on Oct 7 and switched to 'calibrated tightening'. Yet HDFC Bank cut its MCLR by up to 15 bps the same day. Here is whose EMI rises, whose falls, and the verified month-by-month math for the tightening cycle ahead.",
+    date: "2026-10-09",
+    updated: "2026-10-09",
+    author: "Srot Finance Team",
+    category: "Interest Rates",
+    readMins: 6,
+    keywords: ["rbi calibrated tightening", "hdfc bank mclr cut october 2026", "repo rate 5.50 emi impact", "emi after rbi rate hike", "rbi mpc december 2026", "mclr vs eblr home loan"],
+    calculatorLink: "/calculators/emi-calculator",
+    calculatorName: "EMI Calculator",
+    blocks: [
+      { t: "h2", text: "The short answer" },
+      { t: "p", html: "On <strong>October 7, 2026</strong>, the RBI's Monetary Policy Committee voted unanimously to raise the repo rate <strong>25 basis points to 5.50%</strong> — the first hike since February 2023 — and changed its stance from neutral to <strong>\"calibrated tightening\"</strong>. Governor Sanjay Malhotra said rate cuts are off the table for now: the next move is a hike or a pause. But here is the twist nobody expected: <strong>on the very same day, HDFC Bank cut its MCLR lending rates by 5–15 basis points across tenures.</strong> So one bank's borrowers got relief hours after the central bank tightened. Whether your EMI rises or falls depends entirely on which benchmark your loan is linked to — and most borrowers have never checked." },
+      { t: "h2", text: "The twist: not everyone's EMI goes up" },
+      { t: "p", html: "India's floating-rate home loans run on two different tracks. <strong>External-benchmark (EBLR/repo-linked) loans</strong> — 68.2% of banks' outstanding floating-rate rupee loans — must be reset at least once every three months, so the RBI's 25 bps hike reaches these borrowers at their next reset. <strong>MCLR-linked loans</strong> (another 29.6%) follow each bank's own MCLR, which moves on the bank's funding costs — not the repo rate. HDFC Bank's October 7 MCLR cut (effective immediately) means its MCLR-linked borrowers see <em>lower</em> rates at their next reset, even as repo-linked borrowers pay more." },
+      { t: "table", head: ["HDFC Bank MCLR tenure", "Old rate", "New rate (Oct 7)", "Change"], rows: [
+        ["Overnight", "7.90%", "7.80%", "−10 bps"],
+        ["1 month", "7.90%", "7.75%", "−15 bps"],
+        ["3 months", "8.05%", "7.95%", "−10 bps"],
+        ["6 months", "8.25%", "8.15%", "−10 bps"],
+        ["1 year", "8.35%", "8.30%", "−5 bps"],
+        ["2 years", "8.45%", "8.40%", "−5 bps"],
+        ["3 years", "8.60%", "8.55%", "−5 bps"]
+      ] },
+      { t: "example", title: "What the MCLR cut is actually worth", html: "On a ₹50 lakh, 20-year loan, the 15 bps cut to the 1-month MCLR saves about <strong>₹464/month at reset</strong> (₹41,511 → ₹41,047). The 5 bps cut to the 1-year MCLR — the benchmark most retail home loans use — saves about <strong>₹157/month</strong> (₹42,918 → ₹42,760). Modest, but real — and moving in the opposite direction to the RBI." },
+      { t: "h2", text: "What 'calibrated tightening' means for your EMI" },
+      { t: "p", html: "\"Calibrated tightening\" is the RBI telling you the hiking has a plan behind it — not a one-off. Cuts are off the table; every future meeting is a choice between another hike and a pause. Morgan Stanley expects a full cycle: <strong>four 25 bps hikes to a terminal repo rate of 6.25% by April 2027</strong>. Here is what each step of that cycle costs on a ₹50 lakh, 20-year loan starting at 8.50% (all numbers verified by formula):" },
+      { t: "table", head: ["Cycle step", "Loan rate", "EMI", "Extra per month", "Extra interest over 20 yrs"], rows: [
+        ["Now (after Oct 7 hike)", "8.75%", "₹44,186", "+₹794", "₹1.9 lakh"],
+        ["One more 25 bps (Dec?)", "9.00%", "₹44,986", "+₹1,595", "₹3.8 lakh"],
+        ["Two more hikes", "9.25%", "₹45,793", "+₹2,402", "₹5.8 lakh"],
+        ["Full cycle to 6.25% repo", "9.50%", "₹46,607", "+₹3,215", "₹7.7 lakh"]
+      ] },
+      { t: "p", html: "The sting compounds: a full 100 bps cycle adds <strong>₹7.7 lakh in extra interest</strong> on the same ₹50 lakh loan — paid purely because of rate moves. Fixed-rate loans are untouched by all of this; the rate you signed is the rate you keep." },
+      { t: "h2", text: "Your 4-move playbook before the December MPC" },
+      { t: "ul", items: [
+        "<strong>Find your benchmark today.</strong> Open your loan agreement or net-banking and check whether your loan is EBLR/repo-linked or MCLR-linked, plus your reset date. EBLR loans reset quarterly — if your reset falls in Oct–Dec, the 25 bps hike lands then. MCLR borrowers: check whether your bank followed HDFC's cut or not.",
+        "<strong>Prepay into tenure, not EMI.</strong> When you prepay, ask the bank to reduce the tenure and keep the EMI. On a 20-year loan this saves far more interest than lowering the EMI — and it matters more with every hike.",
+        "<strong>Negotiate your spread or refinance.</strong> Banks add their own margin over the benchmark. If your spread is rich versus current offers (public-sector banks still advertise from ~7.00–7.25%), ask for a reset or take your loan elsewhere — tightening cycles are when banks compete hardest for clean borrowers.",
+        "<strong>Savers: lock in now.</strong> Banks typically lift FD rates within weeks of a repo hike. If you have been waiting, book longer-tenure FDs before the December MPC — and ladder across 1, 3 and 5-year tenures. Small-savings rates (PPF 7.1%, Senior Citizens 8.2%) are frozen for Oct–Dec 2026, so FDs are where the action is."
+      ] },
+      { t: "h2", text: "Mark your calendar" },
+      { t: "ul", items: [
+        "<strong>October 21:</strong> the MPC releases the minutes of the Oct 5–7 meeting — watch for how close the vote on the stance change was and what members said about December.",
+        "<strong>December 2–4:</strong> the next MPC review. With cuts off the table, it is hike-or-pause — and another 25 bps would take the repo rate to 5.75%."
+      ] },
+      { t: "note", title: "We will update this post", html: "This playbook will be refreshed after the December 2–4 MPC decision with the actual verdict and revised EMI numbers — bookmark it." },
+      { t: "faq", items: [
+        { q: "My bank has not changed my EMI yet — will it?", a: "If your loan is repo/EBLR-linked, yes — at your next quarterly reset. MCLR-linked loans change only on your reset date and only if your bank revises its MCLR. Check your agreement for the benchmark and reset date." },
+        { q: "I am an HDFC Bank borrower — does the MCLR cut help me?", a: "Only if your loan is MCLR-linked; most newer HDFC home loans are repo/EBLR-linked, which follow the RBI's hike, not the MCLR cut. Check your sanction letter." },
+        { q: "Should I switch from floating to fixed rate now?", a: "Fixed rates are already pricing in the hikes, so switching usually locks in the higher rate anyway. The cheaper defence is usually prepaying into tenure or refinancing to a lower spread." },
+        { q: "How much does the full tightening cycle add to my EMI?", a: "On a ₹50 lakh, 20-year loan at 8.50%, a full 100 bps cycle (repo to 6.25%) adds about ₹3,215/month and ₹7.7 lakh in total interest. Shorter tenures and smaller loans scale proportionally." },
+        { q: "When is the next RBI rate decision?", a: "The next MPC meeting is December 2–4, 2026. The Governor has said the choice is between a hike and a pause — cuts are off the table for now." }
+      ] },
+      { t: "cta", title: "Run your own numbers", text: "Plug in your loan amount, rate and tenure — then add 0.25%, 0.50% and 1.00% to preview each step of the tightening cycle.", label: "Open EMI Calculator", to: "/calculators/emi-calculator" }
+    ]
+  },
+  {
   slug: "rbi-repo-rate-october-2026-emi-impact",
   title: "RBI Repo Rate October 2026: What a Hike to 5.50% Does to Your EMI",
   description: "RBI's MPC hiked the repo rate 25 bps to 5.50% on Oct 7, 2026 — the first increase since February 2023. Here is the exact EMI and FD math under the new rate, and what to do before your loan resets.",
